@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,12 @@ export default function Home() {
   const addToCart = useAddToCart();
   const addToWishlist = useAddToWishlist();
   const wishlistStore = useWishlistStore();
+  const [isVisible, setIsVisible] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   // Filter mock products for the Flash Sale cards
   const flashSaleProducts = mockProducts.slice(0, 4);
@@ -49,7 +55,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       
       {/* 1. HERO SECTION */}
-      <section className="relative h-[85vh] w-full overflow-hidden">
+      <section ref={heroRef} className="relative h-[85vh] w-full overflow-hidden">
         {/* Background Image with Zoom on Mount */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -57,7 +63,7 @@ export default function Home() {
             alt="Luxury Arches Background"
             fill
             priority
-            className="object-cover object-center scale-105 animate-pulse duration-10000 ease-out brightness-[0.8] dark:brightness-[0.6]"
+            className={`object-cover object-center transition-transform duration-[2000ms] ease-out brightness-[0.8] dark:brightness-[0.6] ${isVisible ? 'scale-105' : 'scale-100'}`}
           />
         </div>
         
@@ -65,26 +71,26 @@ export default function Home() {
         <div className="absolute inset-0 z-10 flex items-center bg-black/10 dark:bg-black/30">
           <div className="container mx-auto px-6 sm:px-12">
             <div className="max-w-2xl text-white">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6">
+              <div className={`inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 <Sparkles className="h-3 w-3 text-white" />
                 <span className="text-[10px] sm:text-xs font-semibold tracking-wider uppercase">
                   NEW COLLECTION 2026
                 </span>
               </div>
-              <h1 className="text-5xl sm:text-7xl font-serif font-bold mb-6 leading-[1.15] tracking-tight">
+              <h1 className={`text-5xl sm:text-7xl font-serif font-bold mb-6 leading-[1.15] tracking-tight transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 Elevate Your Daily Narrative.
               </h1>
-              <p className="text-base sm:text-lg mb-8 text-neutral-100/90 leading-relaxed font-light">
+              <p className={`text-base sm:text-lg mb-8 text-neutral-100/90 leading-relaxed font-light transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 Discover a curated selection of essentials that blend architectural precision with contemporary ease. Experience the new standard of premium living.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className={`flex flex-wrap gap-4 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
                 <Link href="/products">
-                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 rounded-md shadow-lg shadow-black/15 transition-all hover:-translate-y-0.5">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 rounded-md shadow-lg shadow-black/15 transition-all hover:-translate-y-0.5 active:scale-95">
                     Shop Now
                   </Button>
                 </Link>
                 <Link href="/lookbook">
-                  <Button variant="outline" className="bg-white/10 hover:bg-white/20 border-white/40 text-white font-semibold px-8 py-6 rounded-md backdrop-blur-sm transition-all hover:-translate-y-0.5">
+                  <Button variant="outline" className="bg-white/10 hover:bg-white/20 border-white/40 text-white font-semibold px-8 py-6 rounded-md backdrop-blur-sm transition-all hover:-translate-y-0.5 active:scale-95">
                     View Lookbook
                   </Button>
                 </Link>
@@ -105,13 +111,14 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 sm:gap-6 justify-center">
-            {mockCategories.map((category) => (
+            {mockCategories.map((category, index) => (
               <Link
                 key={category.id}
                 href={`/products?category=${encodeURIComponent(category.name)}`}
-                className="group flex flex-col items-center"
+                className="group flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-500"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border border-border/60 shadow-md group-hover:shadow-xl transition-all duration-500 mb-4 bg-muted">
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden border border-border/60 shadow-md group-hover:shadow-xl transition-all duration-500 mb-4 bg-muted active:scale-95">
                   <Image
                     src={category.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400'}
                     alt={category.name}
@@ -176,13 +183,16 @@ export default function Home() {
 
           {/* Flash Sale Product Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {flashSaleProducts.map((product) => {
+            {flashSaleProducts.map((product, index) => {
               const isInWishlist = wishlistStore.isInWishlist(product.id);
               return (
                 <div
                   key={product.id}
-                  className="group relative bg-card border border-border/60 rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/45 transition-all duration-300 flex flex-col cursor-pointer"
+                  className="group relative bg-card border border-border/60 rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/45 transition-all duration-300 flex flex-col cursor-pointer animate-in fade-in slide-in-from-bottom-4 duration-500"
+                  style={{ animationDelay: `${index * 100}ms` }}
                   onClick={() => window.location.href = `/products/${product.id}`}
+                  onTouchStart={(e) => e.currentTarget.classList.add('scale-[0.98]')}
+                  onTouchEnd={(e) => e.currentTarget.classList.remove('scale-[0.98]')}
                 >
                   {/* Image Container with Badges */}
                   <div className="relative aspect-square w-full overflow-hidden bg-muted">
@@ -206,7 +216,7 @@ export default function Home() {
                       <Button
                         variant="secondary"
                         size="icon"
-                        className="h-10 w-10 rounded-full shadow-md bg-card/95 hover:bg-primary hover:text-primary-foreground border-none transition-all hover:scale-110"
+                        className="h-10 w-10 rounded-full shadow-md bg-card/95 hover:bg-primary hover:text-primary-foreground border-none transition-all hover:scale-110 active:scale-90"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (isInWishlist) {
@@ -214,6 +224,7 @@ export default function Home() {
                           } else {
                             addToWishlist.mutate(product.id);
                           }
+                          if (navigator.vibrate) navigator.vibrate(30);
                         }}
                       >
                         <Heart className={`h-4.5 w-4.5 ${isInWishlist ? 'fill-accent text-accent' : ''}`} />
@@ -221,7 +232,7 @@ export default function Home() {
                       <Button
                         variant="secondary"
                         size="icon"
-                        className="h-10 w-10 rounded-full shadow-md bg-card/95 hover:bg-primary hover:text-primary-foreground border-none transition-all hover:scale-110"
+                        className="h-10 w-10 rounded-full shadow-md bg-card/95 hover:bg-primary hover:text-primary-foreground border-none transition-all hover:scale-110 active:scale-90"
                         onClick={(e) => {
                           e.stopPropagation();
                           window.location.href = `/products/${product.id}`;
@@ -257,10 +268,11 @@ export default function Home() {
 
                       <Button
                         size="sm"
-                        className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold h-8 rounded px-3 gap-1.5 transition-all"
+                        className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold h-8 rounded px-3 gap-1.5 transition-all active:scale-95"
                         onClick={(e) => {
                           e.stopPropagation();
                           addToCart.mutate({ productId: product.id, quantity: 1 });
+                          if (navigator.vibrate) navigator.vibrate(50);
                         }}
                       >
                         <ShoppingBag className="w-3.5 h-3.5" />

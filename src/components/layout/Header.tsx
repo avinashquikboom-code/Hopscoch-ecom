@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { MobileSearchOverlay } from '@/components/common/MobileSearchOverlay';
 import { useAuthStore, useCartStore, useThemeStore } from '@/store';
 
 export function Header() {
@@ -20,6 +21,7 @@ export function Header() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const { user, isAuthenticated } = useAuthStore();
   const { cart } = useCartStore();
   const { theme, setTheme } = useThemeStore();
@@ -82,7 +84,7 @@ export function Header() {
               </Link>
             </nav>
 
-            {/* Search Bar - Pill Design */}
+            {/* Search Bar - Pill Design (Desktop) */}
             <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xs xl:max-w-sm mx-4">
               <div className="relative w-full">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -95,6 +97,16 @@ export function Header() {
                 />
               </div>
             </form>
+
+            {/* Mobile Search Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-10 w-10 rounded-full hover:bg-muted"
+              onClick={() => setIsMobileSearchOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
 
             {/* Actions */}
             <div className="flex items-center gap-2">
@@ -157,70 +169,70 @@ export function Header() {
                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                   <div className="flex flex-col gap-8 mt-12">
                     <div className="space-y-4">
-                      <span className="text-xl font-serif font-semibold tracking-wider text-primary uppercase block pb-2 border-b border-border">
+                      <span className="text-xl font-serif font-semibold tracking-wider text-primary uppercase block pb-2 border-b border-border animate-in fade-in slide-in-from-right-4 duration-300">
                         AURA
                       </span>
                       <nav className="flex flex-col gap-4">
                         <Link 
                           href="/products?category=Fashion" 
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase"
+                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase py-2 px-3 rounded-lg hover:bg-muted/50 active:scale-95 transition-all duration-200 animate-in fade-in slide-in-from-right-4 duration-300 delay-100"
                         >
                           Fashion
                         </Link>
                         <Link 
                           href="/products?category=Electronics" 
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase"
+                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase py-2 px-3 rounded-lg hover:bg-muted/50 active:scale-95 transition-all duration-200 animate-in fade-in slide-in-from-right-4 duration-300 delay-150"
                         >
                           Electronics
                         </Link>
                         <Link 
                           href="/products?category=Home & Kitchen" 
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase"
+                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase py-2 px-3 rounded-lg hover:bg-muted/50 active:scale-95 transition-all duration-200 animate-in fade-in slide-in-from-right-4 duration-300 delay-200"
                         >
                           Home
                         </Link>
                         <Link 
                           href="/products?category=Beauty & Personal Care" 
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase"
+                          className="text-base font-medium text-foreground/80 hover:text-primary transition-colors uppercase py-2 px-3 rounded-lg hover:bg-muted/50 active:scale-95 transition-all duration-200 animate-in fade-in slide-in-from-right-4 duration-300 delay-250"
                         >
                           Beauty
                         </Link>
                       </nav>
                     </div>
 
-                    <div className="pt-6 border-t border-border">
+                    <div className="pt-6 border-t border-border animate-in fade-in slide-in-from-right-4 duration-300 delay-300">
                       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Account</h3>
                       {isAuthenticated ? (
                         <div className="flex flex-col gap-3">
                           <Link 
                             href="/profile" 
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-base font-medium text-foreground/80 hover:text-primary transition-colors"
+                            className="text-base font-medium text-foreground/80 hover:text-primary transition-colors py-2 px-3 rounded-lg hover:bg-muted/50 active:scale-95 transition-all duration-200"
                           >
                             Profile
                           </Link>
                           <Link 
                             href="/orders" 
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-base font-medium text-foreground/80 hover:text-primary transition-colors"
+                            className="text-base font-medium text-foreground/80 hover:text-primary transition-colors py-2 px-3 rounded-lg hover:bg-muted/50 active:scale-95 transition-all duration-200"
                           >
                             Orders
                           </Link>
                           <Link 
                             href="/wishlist" 
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-base font-medium text-foreground/80 hover:text-primary transition-colors"
+                            className="text-base font-medium text-foreground/80 hover:text-primary transition-colors py-2 px-3 rounded-lg hover:bg-muted/50 active:scale-95 transition-all duration-200"
                           >
                             Wishlist
                           </Link>
                         </div>
                       ) : (
                         <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold active:scale-95 transition-transform duration-200">
                             Login
                           </Button>
                         </Link>
@@ -235,6 +247,12 @@ export function Header() {
           </div>
         </div>
       </header>
+
+      {/* Mobile Search Overlay */}
+      <MobileSearchOverlay
+        isOpen={isMobileSearchOpen}
+        onClose={() => setIsMobileSearchOpen(false)}
+      />
     </div>
   );
 }

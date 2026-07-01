@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Heart, ShoppingCart, Star, Eye } from 'lucide-react';
@@ -22,6 +22,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
   const [cartAdded, setCartAdded] = useState(false);
   const [wishlistPulse, setWishlistPulse] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -32,6 +34,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
     addToCart.mutate({ productId: product.id, quantity: 1 });
     setCartAdded(true);
     setTimeout(() => setCartAdded(false), 1800);
+    // Haptic feedback simulation
+    if (navigator.vibrate) navigator.vibrate(50);
   };
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
@@ -41,6 +45,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
     if (!isInWishlist) {
       addToWishlist.mutate(product.id);
     }
+    // Haptic feedback simulation
+    if (navigator.vibrate) navigator.vibrate(isInWishlist ? [30] : [30, 50, 30]);
   };
 
   const handleNavigate = () => router.push(`/products/${product.id}`);
@@ -50,9 +56,17 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
   if (viewMode === 'list') {
     return (
       <div
+        ref={cardRef}
         onClick={handleNavigate}
-        className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer
-          hover:border-primary/40 hover:shadow-[0_8px_40px_-8px_rgba(0,0,0,0.15)] transition-all duration-300 flex gap-0"
+        onTouchStart={() => setIsPressed(true)}
+        onTouchEnd={() => setIsPressed(false)}
+        onMouseDown={() => setIsPressed(true)}
+        onMouseUp={() => setIsPressed(false)}
+        onMouseLeave={() => setIsPressed(false)}
+        className={`group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer
+          hover:border-primary/40 hover:shadow-[0_8px_40px_-8px_rgba(0,0,0,0.15)] transition-all duration-300 flex gap-0
+          ${isPressed ? 'scale-[0.98] shadow-inner' : 'scale-100'}
+          active:scale-[0.97]`}
       >
         {/* Image */}
         <div className="relative w-52 flex-shrink-0 overflow-hidden">
@@ -62,7 +76,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
               alt={product.name}
               fill
               sizes="208px"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className={`object-cover transition-transform duration-500 ${isPressed ? 'scale-100' : 'group-hover:scale-105'}`}
               onError={() => setImgError(true)}
             />
           ) : (
@@ -144,9 +158,17 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
   // Grid Mode
   return (
     <div
+      ref={cardRef}
       onClick={handleNavigate}
-      className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer
-        hover:border-primary/30 hover:shadow-[0_12px_48px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col"
+      onTouchStart={() => setIsPressed(true)}
+      onTouchEnd={() => setIsPressed(false)}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
+      className={`group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer
+        hover:border-primary/30 hover:shadow-[0_12px_48px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col
+        ${isPressed ? 'scale-[0.98] shadow-inner' : 'scale-100'}
+        active:scale-[0.97]`}
     >
       {/* Image Container */}
       <div className="relative aspect-[4/5] overflow-hidden bg-muted/30">
@@ -156,7 +178,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
             alt={product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover group-hover:scale-108 transition-transform duration-700"
+            className={`object-cover transition-transform duration-700 ${isPressed ? 'scale-100' : 'group-hover:scale-108'}`}
             onError={() => setImgError(true)}
           />
         ) : (
@@ -196,7 +218,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
             ${isInWishlist
               ? 'bg-red-500 text-white shadow-lg shadow-red-500/30'
               : 'bg-white/80 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/30 opacity-0 group-hover:opacity-100'}
-            ${wishlistPulse ? 'scale-125' : 'scale-100'}`}
+            ${wishlistPulse ? 'scale-125' : 'scale-100'}
+            active:scale-90`}
         >
           <Heart className={`w-4 h-4 transition-transform ${isInWishlist ? 'fill-current' : ''}`} />
         </button>
@@ -207,7 +230,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
           className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-4 py-2 rounded-xl
             bg-white/95 backdrop-blur-sm text-xs font-semibold text-gray-800 shadow-lg
             opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0
-            transition-all duration-300 whitespace-nowrap hover:bg-white"
+            transition-all duration-300 whitespace-nowrap hover:bg-white
+            active:scale-95 sm:opacity-0 sm:group-hover:opacity-100 opacity-100 translate-y-0"
         >
           <Eye className="w-3.5 h-3.5" />
           Quick View
@@ -258,7 +282,8 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
               ${cartAdded
                 ? 'bg-green-500 text-white scale-95'
                 : 'bg-primary text-primary-foreground hover:bg-primary/85 hover:shadow-md hover:shadow-primary/20 hover:scale-[1.03] active:scale-95'}
-              disabled:opacity-40 disabled:cursor-not-allowed`}
+              disabled:opacity-40 disabled:cursor-not-allowed
+              active:scale-90`}
           >
             <ShoppingCart className={`w-3.5 h-3.5 transition-transform ${cartAdded ? 'scale-110' : ''}`} />
             {cartAdded ? 'Added!' : 'Add'}
