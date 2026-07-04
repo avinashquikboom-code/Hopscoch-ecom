@@ -76,6 +76,7 @@ const navItems: NavItem[] = [
     icon: CreditCard,
     children: [
       { title: 'Transactions', href: '/admin/payments', icon: Package },
+      { title: 'Gateway', href: '/admin/payments/gateway', icon: Package },
       { title: 'Analytics', href: '/admin/payments/analytics', icon: Package },
     ],
   },

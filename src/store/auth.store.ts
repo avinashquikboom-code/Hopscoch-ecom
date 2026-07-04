@@ -9,6 +9,9 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   
+  isLoginModalOpen: boolean;
+  openLoginModal: () => void;
+  closeLoginModal: () => void;
   setAuth: (authResponse: AuthResponse) => void;
   setUser: (user: User) => void;
   logout: () => void;
@@ -22,6 +25,9 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       isLoading: false,
+      isLoginModalOpen: false,
+      openLoginModal: () => set({ isLoginModalOpen: true }),
+      closeLoginModal: () => set({ isLoginModalOpen: false }),
 
       setAuth: (authResponse: AuthResponse) => {
         set({

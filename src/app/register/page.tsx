@@ -4,29 +4,39 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useLogin } from '@/hooks';
+import { useRegister } from '@/hooks';
 import { Loader2 } from 'lucide-react';
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const login = useLogin();
+
+  const register = useRegister();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login.mutate({ email, password });
+    register.mutate({
+      email,
+      password,
+      firstName,
+      lastName,
+      phone,
+    });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f1f3f6] dark:bg-gray-950 px-4 py-12 font-sans">
-      <div className="w-full max-w-3xl h-auto md:h-[500px] bg-white dark:bg-gray-900 rounded-sm shadow-md overflow-hidden flex flex-col md:flex-row">
+      <div className="w-full max-w-3xl h-auto md:h-[550px] bg-white dark:bg-gray-900 rounded-sm shadow-md overflow-hidden flex flex-col md:flex-row">
         
-        {/* Left Side: Brand Banner (Primary green gradient) */}
+        {/* Left Side: Brand Banner */}
         <div className="md:w-[40%] bg-gradient-to-b from-[#0a4c44] to-[#0d9488] p-8 text-white flex flex-col justify-between hidden md:flex">
           <div>
-            <h2 className="text-2xl font-bold">Login</h2>
+            <h2 className="text-2xl font-bold">Looks like you're new here!</h2>
             <p className="text-[13px] text-gray-100/90 leading-relaxed mt-4">
-              Get access to your Orders, Wishlist and Recommendations
+              Sign up with your mobile number and email to get started
             </p>
           </div>
           
@@ -43,12 +53,44 @@ export default function LoginPage() {
 
         {/* Right Side: Form */}
         <div className="w-full md:w-[60%] p-8 md:p-10 flex flex-col justify-between">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             
+            {/* Split First & Last Name */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label htmlFor="firstName" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  First Name
+                </label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="John"
+                  className="border-0 border-b border-gray-300 dark:border-gray-700 rounded-none px-0 py-1.5 focus-visible:ring-0 focus:border-[#0d9488] bg-transparent outline-none text-sm w-full transition-all"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label htmlFor="lastName" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Last Name
+                </label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Doe"
+                  className="border-0 border-b border-gray-300 dark:border-gray-700 rounded-none px-0 py-1.5 focus-visible:ring-0 focus:border-[#0d9488] bg-transparent outline-none text-sm w-full transition-all"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
             {/* Email Field */}
             <div className="space-y-1">
               <label htmlFor="email" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Enter Email Address
+                Email Address
               </label>
               <Input
                 id="email"
@@ -61,16 +103,27 @@ export default function LoginPage() {
               />
             </div>
 
+            {/* Mobile Number Field */}
+            <div className="space-y-1">
+              <label htmlFor="phone" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Mobile Number
+              </label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="9876543210"
+                className="border-0 border-b border-gray-300 dark:border-gray-700 rounded-none px-0 py-1.5 focus-visible:ring-0 focus:border-[#0d9488] bg-transparent outline-none text-sm w-full transition-all"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+            </div>
+
             {/* Password Field */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Enter Password
-                </label>
-                <Link href="/forgot-password" className="text-xs text-[#0d9488] hover:underline font-semibold tracking-wide">
-                  Forgot?
-                </Link>
-              </div>
+              <label htmlFor="password" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Set Password
+              </label>
               <Input
                 id="password"
                 type="password"
@@ -91,23 +144,23 @@ export default function LoginPage() {
             <Button
               type="submit"
               className="w-full bg-[#fb641b] hover:bg-[#f35c12] text-white font-bold h-11 rounded-sm shadow-xs transition-colors mt-4 cursor-pointer"
-              disabled={login.isPending}
+              disabled={register.isPending}
             >
-              {login.isPending ? (
+              {register.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  Creating Account...
                 </>
               ) : (
-                'LOGIN'
+                'CONTINUE'
               )}
             </Button>
           </form>
 
-          {/* New to brand link */}
-          <div className="mt-8 text-center">
-            <Link href="/register" className="text-xs text-[#0d9488] hover:underline font-bold tracking-wider">
-              New to Aura Couture? Create an account
+          {/* Existing user link */}
+          <div className="mt-6 text-center">
+            <Link href="/login" className="w-full block text-center py-2.5 border border-gray-200 dark:border-gray-800 text-[#0d9488] hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-sm font-semibold text-xs transition-all tracking-wider shadow-2xs">
+              EXISTING USER? LOG IN
             </Link>
           </div>
 
@@ -116,4 +169,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

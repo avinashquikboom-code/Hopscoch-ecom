@@ -153,6 +153,7 @@ export interface ReturnRequest {
   pickupStatus: string;
   inspectionStatus: string;
   refundStatus: string;
+  refundMethod?: string;
   refundAmount: number;
   adminNotes?: string;
   createdAt: Date;
