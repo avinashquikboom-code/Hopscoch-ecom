@@ -63,7 +63,7 @@ export function LoginModal() {
       onClick={handleBackdropClick}
     >
       <div 
-        className={`w-[90%] max-w-3xl h-auto md:h-[520px] bg-white dark:bg-gray-950 rounded-sm shadow-2xl overflow-hidden flex flex-col md:flex-row relative transition-all duration-300
+        className={`w-[90%] max-w-3xl h-auto md:h-[520px] bg-white dark:bg-gray-950 rounded-[18px] shadow-[0_24px_48px_-8px_rgb(0_0_0/0.15),0_8px_20px_-4px_rgb(0_0_0/0.08)] overflow-hidden flex flex-col md:flex-row relative transition-all duration-300
           ${shouldShake ? 'animate-shake' : ''}
         `}
       >
@@ -114,7 +114,7 @@ export function LoginModal() {
                 id="modal-email"
                 type="email"
                 placeholder="name@example.com"
-                className="border-0 border-b border-gray-300 dark:border-gray-700 rounded-none px-0 py-1.5 focus-visible:ring-0 focus:border-[#0d9488] bg-transparent dark:bg-transparent outline-none text-sm w-full transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                className="border-0 border-b border-[#E2E8F0] dark:border-gray-700 rounded-none px-0 h-12 focus-visible:ring-0 focus:border-[#0F766E] bg-transparent dark:bg-transparent outline-none text-sm w-full transition-all text-[#0F172A] dark:text-gray-100 placeholder:text-[#94A3B8] dark:placeholder:text-gray-600"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -127,7 +127,7 @@ export function LoginModal() {
                 <label htmlFor="modal-password" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Enter Password
                 </label>
-                <Link href="/forgot-password" onClick={closeLoginModal} className="text-xs text-[#0d9488] hover:underline font-semibold tracking-wide">
+                <Link href="/forgot-password" onClick={closeLoginModal} className="text-xs text-[#0F766E] hover:underline font-semibold tracking-wide">
                   Forgot?
                 </Link>
               </div>
@@ -135,22 +135,22 @@ export function LoginModal() {
                 id="modal-password"
                 type="password"
                 placeholder="••••••••"
-                className="border-0 border-b border-gray-300 dark:border-gray-700 rounded-none px-0 py-1.5 focus-visible:ring-0 focus:border-[#0d9488] bg-transparent dark:bg-transparent outline-none text-sm w-full transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-600"
+                className="border-0 border-b border-[#E2E8F0] dark:border-gray-700 rounded-none px-0 h-12 focus-visible:ring-0 focus:border-[#0F766E] bg-transparent dark:bg-transparent outline-none text-sm w-full transition-all text-[#0F172A] dark:text-gray-100 placeholder:text-[#94A3B8] dark:placeholder:text-gray-600"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
 
-            <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed pt-2">
+            <p className="text-[11px] text-[#94A3B8] dark:text-gray-500 leading-relaxed pt-2">
               By continuing, you agree to Aura Couture's{' '}
-              <Link href="/terms" onClick={closeLoginModal} className="text-[#0d9488] hover:underline font-semibold">Terms of Use</Link> and{' '}
-              <Link href="/privacy" onClick={closeLoginModal} className="text-[#0d9488] hover:underline font-semibold">Privacy Policy</Link>.
+              <Link href="/terms" onClick={closeLoginModal} className="text-[#0F766E] hover:underline font-semibold">Terms of Use</Link> and{' '}
+              <Link href="/privacy" onClick={closeLoginModal} className="text-[#0F766E] hover:underline font-semibold">Privacy Policy</Link>.
             </p>
 
             <Button
               type="submit"
-              className="w-full bg-[#fb641b] hover:bg-[#f35c12] text-white font-bold h-11 rounded-sm shadow-xs transition-colors mt-4 cursor-pointer"
+              className="w-full h-12 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold rounded-xl shadow-[0_4px_12px_-2px_rgb(15_118_110/0.30)] transition-all mt-4 cursor-pointer tracking-wide"
               disabled={login.isPending}
             >
               {login.isPending ? (
@@ -165,8 +165,8 @@ export function LoginModal() {
           </form>
 
           {/* New to brand link */}
-          <div className="mt-6 text-center border-t border-gray-100 dark:border-gray-800 pt-5">
-            <Link href="/register" onClick={closeLoginModal} className="text-xs text-[#0d9488] hover:underline font-bold tracking-wider">
+          <div className="mt-6 text-center border-t border-[#E2E8F0] dark:border-gray-800 pt-5">
+            <Link href="/register" onClick={closeLoginModal} className="text-xs text-[#0F766E] hover:underline font-semibold tracking-wider">
               New to Aura Couture? Create an account
             </Link>
           </div>

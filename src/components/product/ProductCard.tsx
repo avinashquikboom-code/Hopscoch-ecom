@@ -16,7 +16,7 @@ interface ProductCardProps {
 }
 
 const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
-const DEFAULT_COLORS = ['#0d9488', '#1e293b', '#94a3b8', '#d1d5db', '#e2e8f0'];
+const DEFAULT_COLORS = ['#0F766E', '#1e293b', '#94a3b8', '#d1d5db', '#e2e8f0'];
 
 export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
   const router = useRouter();
@@ -82,19 +82,19 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
         onClick={handleNavigate}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="group bg-white border border-gray-150 rounded-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-350 flex flex-col h-full relative"
+        className="group bg-white dark:bg-card border border-[#E2E8F0] dark:border-border rounded-[20px] overflow-hidden cursor-pointer hover:shadow-[0_8px_24px_-4px_rgb(0_0_0/0.08),0_4px_10px_-2px_rgb(0_0_0/0.04)] hover:-translate-y-0.5 transition-all duration-300 ease-out flex flex-col h-full relative"
       >
         
-        {/* Wishlist Overlay (Myntra Style - Top Right of Image) */}
+        {/* Wishlist — top right */}
         <button
           onClick={handleAddToWishlist}
-          className={`absolute top-3 right-3 z-20 p-2 rounded-full bg-white/90 backdrop-blur-xs border border-gray-100/50 shadow-md text-gray-400 hover:text-red-500 transition-all duration-300
-            ${isInWishlist ? 'text-red-500 fill-red-500 bg-white' : 'text-gray-400'}
+          className={`absolute top-3 right-3 z-20 p-2 rounded-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border border-white/60 dark:border-white/10 shadow-[0_2px_8px_rgb(0_0_0/0.10)] transition-all duration-300
+            ${isInWishlist ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}
             ${wishlistPulse ? 'scale-125' : 'scale-100'}
             active:scale-90`}
           aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <Heart className="w-4.5 h-4.5" />
+          <Heart className={`w-[18px] h-[18px] ${isInWishlist ? 'fill-red-500' : ''}`} />
         </button>
 
         {/* Image Container with Hover Swap & Details Overlay */}
@@ -123,38 +123,37 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
             </div>
           )}
 
-          {/* Rating Badge Overlay (Myntra Style - Bottom Left on Image) */}
+          {/* Rating Badge — bottom left */}
           {product.rating > 0 && (
-            <div className="absolute bottom-2.5 left-2.5 bg-white/90 backdrop-blur-xs text-gray-800 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm border border-gray-100/50 z-10">
+            <div className="absolute bottom-2.5 left-2.5 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm text-gray-800 dark:text-gray-100 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-[0_1px_4px_rgb(0_0_0/0.12)] border border-white/60 dark:border-white/10 z-10">
               <span>{product.rating.toFixed(1)}</span>
-              <Star className="w-3 h-3 text-[#0d9488] fill-[#0d9488]" />
-              <span className="text-gray-400 font-normal">|</span>
-              <span className="text-gray-500 font-bold">{product.reviewCount || 10}</span>
+              <Star className="w-3 h-3 text-[#0F766E] fill-[#0F766E]" />
+              <span className="text-gray-400 font-normal">·</span>
+              <span className="text-gray-500 dark:text-gray-400 font-medium">{product.reviewCount || 10}</span>
             </div>
           )}
 
-          {/* Discount Tag Overlay (Myntra Style - Bottom Right on Image) */}
+          {/* Discount Badge — bottom right */}
           {discount && discount > 0 && (
-            <Badge className="absolute bottom-2.5 right-2.5 bg-[#0d9488] hover:bg-[#0d9488] text-white font-extrabold text-[9px] px-2 py-0.5 rounded-sm tracking-wide shadow-sm border-none z-10">
+            <Badge className="absolute bottom-2.5 right-2.5 bg-[#0F766E] hover:bg-[#0F766E] text-white font-bold text-[10px] px-2.5 py-0.5 rounded-xl tracking-wide shadow-sm border-none z-10">
               {discount}% OFF
             </Badge>
           )}
 
-          {/* Sliding Quick Add & Quick View Overlay (Myntra Style) */}
-          <div className={`absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-xs border-t border-gray-150 py-3 px-2.5 flex flex-col gap-2 transition-transform duration-300 transform translate-y-full group-hover:translate-y-0 z-20`}>
-            <div className="flex items-center justify-between text-[10px] font-black uppercase text-gray-400 tracking-wider">
+          {/* Quick Add — slides up on hover */}
+          <div className={`absolute inset-x-0 bottom-0 bg-white/98 dark:bg-gray-950/98 backdrop-blur-sm border-t border-[#E2E8F0] dark:border-border py-3 px-3 flex flex-col gap-2 transition-transform duration-300 ease-out transform translate-y-full group-hover:translate-y-0 z-20`}>
+            <div className="flex items-center justify-between text-[10px] font-semibold uppercase text-gray-400 dark:text-gray-500 tracking-wider">
               <span>Quick Add</span>
-              <span className="text-[#0d9488] flex items-center gap-0.5"><Eye className="w-3.5 h-3.5" /> View Details</span>
+              <span className="text-[#0F766E] flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> View Details</span>
             </div>
             
-            {/* Quick Sizes */}
             <div className="flex justify-between gap-1.5">
               {DEFAULT_SIZES.map((size) => (
                 <button
                   key={size}
                   onClick={(e) => handleQuickAddSize(e, size)}
                   disabled={product.stock === 0}
-                  className="flex-1 bg-white hover:bg-teal-50 border border-gray-200 hover:border-[#0d9488] text-gray-850 hover:text-[#0d9488] text-xs font-bold py-1 rounded transition-colors disabled:opacity-40"
+                  className="flex-1 min-h-[32px] bg-white dark:bg-gray-900 hover:bg-[#F0FDFA] dark:hover:bg-[#022c2a] border border-[#E2E8F0] dark:border-border hover:border-[#0F766E] text-gray-700 dark:text-gray-300 hover:text-[#0F766E] text-xs font-semibold rounded-xl transition-colors disabled:opacity-40"
                 >
                   {size}
                 </button>
@@ -164,41 +163,41 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
 
         </div>
 
-        {/* Product Details (Myntra layout) */}
-        <div className="p-3.5 flex flex-col flex-1 gap-1 bg-white">
+        {/* Product Details */}
+        <div className="p-3.5 flex flex-col flex-1 gap-1 bg-white dark:bg-card">
           
           {/* Brand */}
-          <p className="text-xs font-black text-gray-800 uppercase tracking-widest leading-none">
+          <p className="text-[10px] font-bold text-[#64748B] dark:text-gray-500 uppercase tracking-widest leading-none">
             {product.brand || 'Aura Couture'}
           </p>
           
           {/* Product Name */}
-          <h3 className="text-xs text-gray-500 font-normal line-clamp-1 group-hover:text-[#0d9488] transition-colors leading-relaxed">
+          <h3 className="text-xs text-[#334155] dark:text-gray-400 font-normal line-clamp-1 group-hover:text-[#0F766E] transition-colors leading-relaxed">
             {product.name}
           </h3>
 
           {/* Pricing Row */}
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-xs sm:text-sm font-bold text-gray-900">₹{product.price}</span>
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-sm font-semibold text-[#0F172A] dark:text-gray-100">₹{product.price}</span>
             {product.originalPrice && (
               <>
-                <span className="text-[10px] text-gray-400 line-through">₹{product.originalPrice}</span>
-                <span className="text-[10px] font-bold text-[#0d9488] italic">
-                  ({discount}% OFF)
+                <span className="text-[11px] text-[#94A3B8] dark:text-gray-600 line-through">₹{product.originalPrice}</span>
+                <span className="text-[10px] font-semibold text-[#0F766E]">
+                  {discount}% off
                 </span>
               </>
             )}
           </div>
 
-          {/* Color swatches under pricing */}
-          <div className="flex items-center gap-1.5 mt-2 pt-1 border-t border-gray-100">
+          {/* Color swatches */}
+          <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-[#E2E8F0] dark:border-border">
             {DEFAULT_COLORS.map((col, idx) => (
               <button
                 key={idx}
                 onClick={(e) => { e.stopPropagation(); setSelectedColor(col); }}
                 style={{ backgroundColor: col }}
                 className={`w-3.5 h-3.5 rounded-full border transition-all cursor-pointer ${
-                  selectedColor === col ? 'ring-2 ring-[#0d9488] border-white scale-110' : 'border-gray-250 hover:scale-105'
+                  selectedColor === col ? 'ring-2 ring-[#0F766E] ring-offset-1 border-white scale-110' : 'border-gray-300 dark:border-gray-700 hover:scale-105'
                 }`}
                 title={`Color option ${idx + 1}`}
               />
@@ -210,11 +209,11 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
     );
   }
 
-  // List Mode (Myntra search list item style)
+  // List Mode
   return (
     <div
       onClick={handleNavigate}
-      className="group bg-white border-b border-gray-200/80 p-5 cursor-pointer hover:shadow-sm transition-all duration-200 flex gap-6"
+      className="group bg-white dark:bg-card border-b border-[#E2E8F0] dark:border-border p-5 cursor-pointer hover:bg-[#F0FDFA]/30 dark:hover:bg-[#022c2a]/20 transition-colors duration-200 flex gap-6"
     >
       {/* Product Image */}
       <div className="relative w-40 sm:w-48 aspect-[3/4] flex-shrink-0 bg-gray-50 border border-gray-100 rounded-sm overflow-hidden">
@@ -249,7 +248,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
           </p>
           
           {/* Product Name */}
-          <h3 className="text-base font-semibold text-gray-900 leading-snug mb-2 truncate group-hover:text-[#0d9488] transition-colors">
+          <h3 className="text-base font-semibold text-[#0F172A] dark:text-gray-100 leading-snug mb-2 truncate group-hover:text-[#0F766E] transition-colors">
             {product.name}
           </h3>
           
@@ -260,27 +259,26 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
 
           {/* Ratings & Reviews */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="inline-flex items-center gap-0.5 bg-[#388e3c] text-white text-[10px] font-black px-1.5 py-0.5 rounded-sm">
+            <span className="inline-flex items-center gap-1 bg-[#0F766E] text-white text-[11px] font-semibold px-2 py-0.5 rounded-lg">
               {product.rating.toFixed(1)} <Star className="w-2.5 h-2.5 fill-current" />
             </span>
-            <span className="text-xs text-gray-400 font-medium">
-              {product.reviewCount} Ratings & Reviews
+            <span className="text-xs text-[#64748B] dark:text-gray-500 font-medium">
+              {product.reviewCount} Ratings
             </span>
             
-            {/* Assured Badge */}
-            <span className="inline-flex items-center text-[9px] font-black tracking-tighter bg-gradient-to-r from-teal-600 to-[#0d9488] text-white px-1 py-0.5 rounded-sm italic ml-1">
-              Assured <span className="text-yellow-400 ml-0.5">★</span>
+            <span className="inline-flex items-center text-[10px] font-semibold bg-[#F0FDFA] dark:bg-[#022c2a] text-[#0F766E] px-2 py-0.5 rounded-lg border border-[#99F6E4] dark:border-[#115E59] ml-1">
+              Assured <span className="text-amber-400 ml-0.5">★</span>
             </span>
           </div>
         </div>
 
         {/* Pricing Block */}
-        <div className="flex items-baseline gap-2.5 mt-auto border-t border-gray-100 pt-3 flex-wrap">
-          <span className="text-lg sm:text-xl font-bold text-gray-900">₹{product.price}</span>
+        <div className="flex items-baseline gap-2.5 mt-auto border-t border-[#E2E8F0] dark:border-border pt-3 flex-wrap">
+          <span className="text-lg sm:text-xl font-semibold text-[#0F172A] dark:text-gray-100">₹{product.price}</span>
           {product.originalPrice && (
             <>
-              <span className="text-sm text-gray-400 line-through">₹{product.originalPrice}</span>
-              <span className="text-sm font-bold text-[#0d9488]">
+              <span className="text-sm text-[#94A3B8] dark:text-gray-600 line-through">₹{product.originalPrice}</span>
+              <span className="text-sm font-semibold text-[#0F766E]">
                 {discount}% Off
               </span>
             </>
