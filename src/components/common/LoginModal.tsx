@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/store';
 import { useLogin } from '@/hooks';
 
@@ -15,7 +14,7 @@ export function LoginModal() {
   const [shouldShake, setShouldShake] = useState(false);
   const login = useLogin();
 
-  // Reset inputs when modal closes/opens
+  // Reset inputs when modal opens
   useEffect(() => {
     if (isLoginModalOpen) {
       setEmail('');
@@ -31,26 +30,17 @@ export function LoginModal() {
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      triggerShake();
-    }
+    if (e.target === e.currentTarget) triggerShake();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      triggerShake();
-      return;
-    }
+    if (!email || !password) { triggerShake(); return; }
     login.mutate(
       { email, password },
       {
-        onSuccess: () => {
-          closeLoginModal();
-        },
-        onError: () => {
-          triggerShake();
-        },
+        onSuccess: () => closeLoginModal(),
+        onError: () => triggerShake(),
       }
     );
   };
@@ -58,37 +48,49 @@ export function LoginModal() {
   if (!isLoginModalOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 dark:bg-black/80 backdrop-blur-xs transition-opacity duration-300"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
       onClick={handleBackdropClick}
+      style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
     >
-      <div 
-        className={`w-[90%] max-w-3xl h-auto md:h-[520px] bg-white dark:bg-gray-950 rounded-[18px] shadow-[0_24px_48px_-8px_rgb(0_0_0/0.15),0_8px_20px_-4px_rgb(0_0_0/0.08)] overflow-hidden flex flex-col md:flex-row relative transition-all duration-300
-          ${shouldShake ? 'animate-shake' : ''}
-        `}
+      <div
+        className={`w-[90%] max-w-3xl h-auto md:h-[520px] rounded-[18px] overflow-hidden flex flex-col md:flex-row relative ${shouldShake ? 'animate-shake' : ''}`}
+        style={{ background: '#ffffff', boxShadow: '0 24px 64px -8px rgba(0,0,0,0.25), 0 8px 24px -4px rgba(0,0,0,0.12)' }}
       >
-        
-        {/* Close Button */}
-        <button 
+
+        {/* ── Close Button ───────────────────────────────────── */}
+        <button
           onClick={closeLoginModal}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-100 z-10 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors cursor-pointer"
+          className="absolute top-4 right-4 z-10 p-1.5 rounded-full transition-colors cursor-pointer"
+          style={{ color: '#94A3B8', background: 'transparent' }}
+          onMouseEnter={e => (e.currentTarget.style.background = '#F1F5F9')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Left Side: Brand Banner */}
-        <div className="md:w-[40%] bg-gradient-to-b from-[#0a4c44] to-[#0d9488] p-8 text-white flex flex-col justify-between hidden md:flex select-none">
+        {/* ── Left: Brand Banner ─────────────────────────────── */}
+        <div
+          className="hidden md:flex md:w-[40%] flex-col justify-between p-8 select-none"
+          style={{ background: 'linear-gradient(160deg, #0a4c44 0%, #0d9488 100%)', color: '#ffffff' }}
+        >
           <div>
-            <h2 className="text-2xl font-bold">Login</h2>
-            <p className="text-[13px] text-gray-100/90 leading-relaxed mt-4">
-              Get access to your Orders, Wishlist and Recommendations
+            <p style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: '12px' }}>
+              AURA COUTURE
+            </p>
+            <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#ffffff', lineHeight: 1.1, marginBottom: '12px' }}>
+              Welcome<br />back.
+            </h2>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>
+              Get access to your Orders, Wishlist and personalised Recommendations.
             </p>
           </div>
-          
-          <svg className="w-32 h-32 opacity-80 mt-auto mx-auto" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="100" cy="100" r="80" fill="white" fillOpacity="0.05" />
-            <path d="M60 80 H140 L130 140 H70 L60 80 Z" fill="white" fillOpacity="0.1" stroke="white" strokeWidth="4" strokeLinejoin="round" />
+
+          {/* Decorative shopping bag SVG */}
+          <svg className="w-28 h-28 mx-auto mt-auto opacity-70" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="80" fill="white" fillOpacity="0.06" />
+            <path d="M60 80 H140 L130 140 H70 L60 80 Z" fill="white" fillOpacity="0.12" stroke="white" strokeWidth="4" strokeLinejoin="round" />
             <path d="M50 60 L60 80 M150 60 L140 80" stroke="white" strokeWidth="4" strokeLinecap="round" />
             <circle cx="80" cy="160" r="10" fill="white" />
             <circle cx="120" cy="160" r="10" fill="white" />
@@ -96,81 +98,154 @@ export function LoginModal() {
           </svg>
         </div>
 
-        {/* Right Side: Form */}
-        <div className="w-full md:w-[60%] p-8 md:p-10 flex flex-col justify-between bg-white dark:bg-gray-950">
-          <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-            
-            {/* Warning Message */}
-            <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-xs text-[11px] text-red-600 dark:text-red-400 font-bold select-none flex items-center gap-1.5 animate-pulse">
-              <span>⚠️ Login required to view products / actions</span>
-            </div>
-            
-            {/* Email Field */}
-            <div className="space-y-1">
-              <label htmlFor="modal-email" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Enter Email Address
-              </label>
-              <Input
-                id="modal-email"
-                type="email"
-                placeholder="name@example.com"
-                className="border-0 border-b border-[#E2E8F0] dark:border-gray-700 rounded-none px-0 h-12 focus-visible:ring-0 focus:border-[#0F766E] bg-transparent dark:bg-transparent outline-none text-sm w-full transition-all text-[#0F172A] dark:text-gray-100 placeholder:text-[#94A3B8] dark:placeholder:text-gray-600"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+        {/* ── Right: Form ────────────────────────────────────── */}
+        <div
+          className="w-full md:w-[60%] flex flex-col justify-between p-8 md:p-10"
+          style={{ background: '#ffffff' }}
+        >
+          <form onSubmit={handleSubmit}>
+
+            {/* Warning Banner */}
+            <div
+              className="mb-6 flex items-center gap-2 px-3 py-2.5 rounded-lg text-[11px] font-bold animate-pulse"
+              style={{ background: '#FEF2F2', borderLeft: '4px solid #EF4444', color: '#DC2626' }}
+            >
+              <span>⚠️</span>
+              <span>Login required to view products / actions</span>
             </div>
 
-            {/* Password Field */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label htmlFor="modal-password" className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Enter Password
+            {/* Email */}
+            <div style={{ marginBottom: '20px' }}>
+              <label
+                htmlFor="modal-email"
+                style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
+              >
+                Email Address
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Mail style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
+                <input
+                  id="modal-email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    paddingLeft: '24px',
+                    paddingBottom: '8px',
+                    paddingTop: '6px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1.5px solid #E2E8F0',
+                    outline: 'none',
+                    fontSize: '14px',
+                    color: '#0F172A',
+                    fontFamily: 'inherit',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
+                  onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label
+                  htmlFor="modal-password"
+                  style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase' }}
+                >
+                  Password
                 </label>
-                <Link href="/forgot-password" onClick={closeLoginModal} className="text-xs text-[#0F766E] hover:underline font-semibold tracking-wide">
+                <Link
+                  href="/forgot-password"
+                  onClick={closeLoginModal}
+                  style={{ fontSize: '11px', fontWeight: 700, color: '#0F766E', textDecoration: 'none' }}
+                >
                   Forgot?
                 </Link>
               </div>
-              <Input
-                id="modal-password"
-                type="password"
-                placeholder="••••••••"
-                className="border-0 border-b border-[#E2E8F0] dark:border-gray-700 rounded-none px-0 h-12 focus-visible:ring-0 focus:border-[#0F766E] bg-transparent dark:bg-transparent outline-none text-sm w-full transition-all text-[#0F172A] dark:text-gray-100 placeholder:text-[#94A3B8] dark:placeholder:text-gray-600"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div style={{ position: 'relative' }}>
+                <Lock style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
+                <input
+                  id="modal-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    paddingLeft: '24px',
+                    paddingBottom: '8px',
+                    paddingTop: '6px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1.5px solid #E2E8F0',
+                    outline: 'none',
+                    fontSize: '14px',
+                    color: '#0F172A',
+                    fontFamily: 'inherit',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
+                  onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
+                />
+              </div>
             </div>
 
-            <p className="text-[11px] text-[#94A3B8] dark:text-gray-500 leading-relaxed pt-2">
+            {/* Terms */}
+            <p style={{ fontSize: '11px', color: '#94A3B8', lineHeight: 1.6, marginBottom: '20px' }}>
               By continuing, you agree to Aura Couture's{' '}
-              <Link href="/terms" onClick={closeLoginModal} className="text-[#0F766E] hover:underline font-semibold">Terms of Use</Link> and{' '}
-              <Link href="/privacy" onClick={closeLoginModal} className="text-[#0F766E] hover:underline font-semibold">Privacy Policy</Link>.
+              <Link href="/terms" onClick={closeLoginModal} style={{ color: '#0F766E', fontWeight: 600 }}>Terms of Use</Link>
+              {' '}and{' '}
+              <Link href="/privacy" onClick={closeLoginModal} style={{ color: '#0F766E', fontWeight: 600 }}>Privacy Policy</Link>.
             </p>
 
-            <Button
+            {/* Submit */}
+            <button
               type="submit"
-              className="w-full h-12 bg-[#0F766E] hover:bg-[#115E59] text-white font-semibold rounded-xl shadow-[0_4px_12px_-2px_rgb(15_118_110/0.30)] transition-all mt-4 cursor-pointer tracking-wide"
               disabled={login.isPending}
+              style={{
+                width: '100%',
+                height: '48px',
+                background: login.isPending ? '#5eada6' : '#0F766E',
+                color: '#ffffff',
+                fontWeight: 700,
+                fontSize: '13px',
+                letterSpacing: '0.1em',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: login.isPending ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'background 0.2s',
+                boxShadow: '0 4px 12px -2px rgba(15, 118, 110, 0.35)',
+              }}
+              onMouseEnter={e => { if (!login.isPending) (e.currentTarget as HTMLButtonElement).style.background = '#115E59'; }}
+              onMouseLeave={e => { if (!login.isPending) (e.currentTarget as HTMLButtonElement).style.background = '#0F766E'; }}
             >
-              {login.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                'LOGIN'
-              )}
-            </Button>
+              {login.isPending
+                ? <><Loader2 className="w-4 h-4 animate-spin" /> Signing in...</>
+                : 'LOGIN'}
+            </button>
           </form>
 
-          {/* New to brand link */}
-          <div className="mt-6 text-center border-t border-[#E2E8F0] dark:border-gray-800 pt-5">
-            <Link href="/register" onClick={closeLoginModal} className="text-xs text-[#0F766E] hover:underline font-semibold tracking-wider">
-              New to Aura Couture? Create an account
+          {/* Register link */}
+          <div style={{ marginTop: '24px', textAlign: 'center', paddingTop: '20px', borderTop: '1px solid #F1F5F9' }}>
+            <Link
+              href="/register"
+              onClick={closeLoginModal}
+              style={{ fontSize: '12px', fontWeight: 700, color: '#0F766E', textDecoration: 'none', letterSpacing: '0.05em' }}
+            >
+              New to Aura Couture? <span style={{ textDecoration: 'underline' }}>Create an account</span>
             </Link>
           </div>
-
         </div>
       </div>
     </div>

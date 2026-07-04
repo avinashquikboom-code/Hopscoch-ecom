@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Heart, User, Menu, Moon, Sun, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +43,6 @@ export function Header() {
 
   const { user, isAuthenticated, openLoginModal } = useAuthStore();
   const { cart } = useCartStore();
-  const { theme, setTheme } = useThemeStore();
 
   // Load search history from LocalStorage
   useEffect(() => {
@@ -168,16 +167,6 @@ export function Header() {
               <span>0 Supercoins</span>
             </div>
 
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="h-6 w-6 rounded-full hover:bg-gray-200/50"
-            >
-              <Sun className="h-3 w-3 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-gray-600" />
-              <Moon className="absolute h-3 w-3 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-gray-600" />
-            </Button>
           </div>
 
         </div>
@@ -245,7 +234,7 @@ export function Header() {
 
             <Link href="/products?category=Accessories" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Beauty</Link>
             <Link href="/products?category=Collections" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Genz</Link>
-            <Link href="/products?sort=popular" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5 flex items-center gap-0.5">
+            <Link href="/studio" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5 flex items-center gap-0.5">
               <span>Studio</span>
               <sup className="text-[9px] font-black text-rose-500 tracking-normal ml-0.5 animate-pulse">NEW</sup>
             </Link>

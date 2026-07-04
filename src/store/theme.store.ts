@@ -12,23 +12,14 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: 'system',
+      theme: 'light',
 
-      setTheme: (theme: Theme) => {
-        set({ theme });
-        
+      setTheme: (_theme: Theme) => {
+        set({ theme: 'light' });
         if (typeof window !== 'undefined') {
           const root = window.document.documentElement;
-          root.classList.remove('light', 'dark');
-
-          if (theme === 'system') {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light';
-            root.classList.add(systemTheme);
-          } else {
-            root.classList.add(theme);
-          }
+          root.classList.remove('dark');
+          root.classList.add('light');
         }
       },
     }),
