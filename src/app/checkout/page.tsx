@@ -33,19 +33,19 @@ export default function CheckoutPage() {
   const [checkoutStep, setCheckoutStep] = useState<'shipping' | 'payment'>('shipping');
 
   // Form State - Contact & Shipping Details
-  const [fullName, setFullName] = useState('Aarav Mehta');
-  const [emailAddress, setEmailAddress] = useState('aarav@auracouture.in');
-  const [phone, setPhone] = useState('9876543210');
-  const [streetAddress, setStreetAddress] = useState('45 Residency Road');
-  const [city, setCity] = useState('Pune');
-  const [stateProvince, setStateProvince] = useState('Maharashtra');
-  const [zipPostal, setZipPostal] = useState('411001');
+  const [fullName, setFullName] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
+  const [phone, setPhone] = useState('');
+  const [streetAddress, setStreetAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [stateProvince, setStateProvince] = useState('');
+  const [zipPostal, setZipPostal] = useState('');
 
   // Form State - Payment details
   const [paymentTab, setPaymentTab] = useState<'card' | 'upi' | 'netbanking' | 'cod'>('card');
   
   // Card
-  const [cardholderName, setCardholderName] = useState('AARAV MEHTA');
+  const [cardholderName, setCardholderName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');

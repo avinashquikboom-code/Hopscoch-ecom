@@ -30,10 +30,6 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const searchRef = useRef<HTMLDivElement>(null);
-  
-  if (pathname === '/checkout') {
-    return null;
-  }
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -48,8 +44,6 @@ export function Header() {
   const { user, isAuthenticated, openLoginModal } = useAuthStore();
   const { cart } = useCartStore();
   const { theme, setTheme } = useThemeStore();
-
-  const cartItemsCount = cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   // Load search history from LocalStorage
   useEffect(() => {
@@ -73,6 +67,13 @@ export function Header() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Early return AFTER all hooks
+  if (pathname === '/checkout') {
+    return null;
+  }
+
+  const cartItemsCount = cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   const handleSearchSubmit = (queryStr: string) => {
     const trimmed = queryStr.trim();
@@ -368,13 +369,11 @@ export function Header() {
             
             {/* Login Button (only when not authenticated, hidden on mobile) */}
             {!isAuthenticated && (
-              <button onClick={openLoginModal} className="hidden md:inline-block border-none bg-transparent outline-none cursor-pointer">
-                <Button 
-                  variant="outline" 
-                  className="h-8 px-4 border border-[#0d9488] text-[#0d9488] hover:bg-[#0d9488]/5 font-bold text-xs rounded-sm tracking-wider cursor-pointer"
-                >
-                  LOGIN
-                </Button>
+              <button
+                onClick={openLoginModal}
+                className="hidden md:inline-flex items-center h-8 px-4 border border-[#0F766E] text-[#0F766E] hover:bg-[#0F766E]/5 font-bold text-xs rounded-sm tracking-wider cursor-pointer bg-transparent transition-colors"
+              >
+                LOGIN
               </button>
             )}
 

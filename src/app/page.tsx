@@ -168,6 +168,7 @@ export default function Home() {
               alt={CAROUSEL_SLIDES[activeSlide].title}
               fill
               priority
+              sizes="100vw"
               className="object-cover object-center brightness-[0.65] select-none"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent"></div>
@@ -278,6 +279,7 @@ export default function Home() {
               src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&auto=format&fit=crop&q=80" 
               alt="Couture collection" 
               fill
+              sizes="(max-width: 768px) 50vw, 33vw"
               className="object-cover object-top group-hover:scale-102 transition-all duration-300"
             />
           </div>
@@ -294,6 +296,7 @@ export default function Home() {
               src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&auto=format&fit=crop&q=80" 
               alt="Men couture" 
               fill
+              sizes="(max-width: 768px) 50vw, 33vw"
               className="object-cover object-top group-hover:scale-102 transition-all duration-300"
             />
           </div>
@@ -310,6 +313,7 @@ export default function Home() {
               src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&auto=format&fit=crop&q=80" 
               alt="Designer handbags" 
               fill
+              sizes="(max-width: 768px) 50vw, 33vw"
               className="object-cover object-center group-hover:scale-102 transition-all duration-300"
             />
           </div>
