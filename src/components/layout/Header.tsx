@@ -120,21 +120,21 @@ export function Header() {
     : [];
 
   return (
-    <div className="w-full flex flex-col font-sans bg-white border-b border-gray-200/80 shadow-sm sticky top-0 z-50">
+    <div className="w-full flex flex-col font-sans bg-white dark:bg-gray-950 border-b border-gray-200/80 dark:border-gray-800/80 shadow-sm sticky top-0 z-50">
       
       {/* 1. TOP UTILITY BAR (Clean, thin bar for location and preferences) */}
-      <div className="w-full bg-[#f5f5f6] py-1.5 px-4 sm:px-6 md:px-12 border-b border-gray-200 hidden md:block">
+      <div className="w-full bg-[#f5f5f6] dark:bg-gray-900 py-1.5 px-4 sm:px-6 md:px-12 border-b border-gray-200 dark:border-gray-800 hidden md:block">
         <div className="container mx-auto flex items-center justify-between gap-4">
           
           {/* Left Side: Delivery address pin */}
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600">
-            <MapPin className="w-3.5 h-3.5 text-gray-500" />
-            <span>Deliver to: <span className="text-gray-800">411036</span></span>
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600 dark:text-gray-400">
+            <MapPin className="w-3.5 h-3.5 text-gray-500 dark:text-gray-500" />
+            <span>Deliver to: <span className="text-gray-800 dark:text-gray-200">411036</span></span>
             <span className="text-[#0d9488] hover:underline cursor-pointer ml-1">Select location &gt;</span>
           </div>
 
           {/* Right Side: Language, Currency, Supercoins & Theme toggle */}
-          <div className="flex items-center gap-5 text-[11px] font-bold text-gray-600">
+          <div className="flex items-center gap-5 text-[11px] font-bold text-gray-600 dark:text-gray-400">
             
             {/* Language Selector */}
             <div className="flex items-center gap-1">
@@ -142,7 +142,7 @@ export function Header() {
               <select 
                 value={language} 
                 onChange={(e) => setLanguage(e.target.value as any)}
-                className="bg-transparent border-none outline-none font-bold text-gray-600 cursor-pointer focus:ring-0 p-0 text-[11px]"
+                className="bg-transparent border-none outline-none font-bold text-gray-600 dark:text-gray-300 cursor-pointer focus:ring-0 p-0 text-[11px]"
               >
                 <option value="EN">English</option>
                 <option value="HI">हिन्दी</option>
@@ -155,7 +155,7 @@ export function Header() {
               <select 
                 value={currency} 
                 onChange={(e) => setCurrency(e.target.value as any)}
-                className="bg-transparent border-none outline-none font-bold text-gray-600 cursor-pointer focus:ring-0 p-0 text-[11px]"
+                className="bg-transparent border-none outline-none font-bold text-gray-600 dark:text-gray-300 cursor-pointer focus:ring-0 p-0 text-[11px]"
               >
                 <option value="INR">INR (₹)</option>
                 <option value="USD">USD ($)</option>
@@ -184,7 +184,7 @@ export function Header() {
       </div>
 
       {/* 2. MAIN HEADER BAR (Myntra-style Logo, Navigation Links, Search Bar & Action Buttons) */}
-      <div className="w-full bg-white py-3 px-4 sm:px-6 md:px-12 border-b border-gray-100">
+      <div className="w-full bg-white dark:bg-gray-950 py-3 px-4 sm:px-6 md:px-12 border-b border-gray-100 dark:border-gray-800">
         <div className="container mx-auto flex items-center justify-between gap-4 md:gap-8">
           
           {/* Left Side: Logo & Mobile Hamburger Menu */}
@@ -238,7 +238,7 @@ export function Header() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-[12px] font-extrabold tracking-wider text-[#282c3f] shrink-0 uppercase">
+          <nav className="hidden lg:flex items-center gap-6 text-[12px] font-extrabold tracking-wider text-[#282c3f] dark:text-gray-200 shrink-0 uppercase">
             <Link href="/products?category=Men" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Men</Link>
             <Link href="/products?category=Women" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Women</Link>
             <Link href="/products?category=Kids" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Kids</Link>
@@ -255,10 +255,10 @@ export function Header() {
           <div ref={searchRef} className="flex-1 max-w-lg relative hidden md:block">
             <form onSubmit={handleSearchForm} className="relative w-full">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
+            <Input
                 type="search"
                 placeholder="Search for products, brands and more"
-                className="w-full pl-10 pr-4 py-2.5 h-10 rounded-md bg-[#f5f5f6] border border-transparent focus:bg-white focus:border-gray-200 focus:ring-0 text-gray-800 text-sm placeholder:text-gray-500 font-normal outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2.5 h-10 rounded-md bg-[#f5f5f6] dark:bg-gray-800 border border-transparent dark:border-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:border-gray-200 focus:ring-0 text-gray-800 dark:text-gray-100 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-500 font-normal outline-none transition-all"
                 value={searchQuery}
                 onFocus={() => setSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -267,7 +267,7 @@ export function Header() {
 
             {/* LIVE SEARCH DROPDOWN OVERLAY */}
             {searchFocused && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200/90 rounded-lg shadow-xl py-4.5 px-5 z-40 text-xs text-gray-700 animate-in fade-in slide-in-from-top-1 duration-150">
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-gray-900 border border-gray-200/90 dark:border-gray-700 rounded-lg shadow-xl py-4.5 px-5 z-40 text-xs text-gray-700 dark:text-gray-300 animate-in fade-in slide-in-from-top-1 duration-150">
                 
                 {/* 1. Dynamic Auto suggestions as user types */}
                 {suggestions.length > 0 && (
@@ -278,7 +278,7 @@ export function Header() {
                         <div
                           key={idx}
                           onClick={() => handleSearchSubmit(s)}
-                          className="flex items-center gap-2 py-2 px-2.5 hover:bg-teal-50/50 hover:text-[#0d9488] rounded-md cursor-pointer transition-colors font-medium text-gray-800"
+                          className="flex items-center gap-2 py-2 px-2.5 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 hover:text-[#0d9488] rounded-md cursor-pointer transition-colors font-medium text-gray-800 dark:text-gray-200"
                         >
                           <Search className="w-3.5 h-3.5 text-gray-400" />
                           <span>{s}</span>
@@ -305,9 +305,9 @@ export function Header() {
                         <div
                           key={idx}
                           onClick={() => handleSearchSubmit(item)}
-                          className="flex items-center justify-between py-1.5 px-2.5 hover:bg-gray-50 rounded-md cursor-pointer group transition-colors"
+                          className="flex items-center justify-between py-1.5 px-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer group transition-colors"
                         >
-                          <div className="flex items-center gap-2 text-gray-800 font-medium">
+                          <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 font-medium">
                             <History className="w-3.5 h-3.5 text-gray-400" />
                             <span>{item}</span>
                           </div>
@@ -365,7 +365,7 @@ export function Header() {
           </div>
 
           {/* Right Side Actions: Profile, Wishlist, Bag */}
-          <div className="flex items-center gap-5 sm:gap-6 text-gray-800 shrink-0">
+          <div className="flex items-center gap-5 sm:gap-6 text-gray-800 dark:text-gray-200 shrink-0">
             
             {/* Login Button (only when not authenticated, hidden on mobile) */}
             {!isAuthenticated && (
@@ -380,33 +380,33 @@ export function Header() {
             {/* User Dropdown */}
             <div className="relative group flex flex-col items-center cursor-pointer">
               {isAuthenticated && user ? (
-                <Link href="/profile" className="flex flex-col items-center text-gray-700 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
+                <Link href="/profile" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
                   <User className="h-5 w-5" />
                   <span className="text-[10px] font-bold tracking-tight">{displayName}</span>
                 </Link>
               ) : (
-                <Link href="/login" className="flex flex-col items-center text-gray-700 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
+                <Link href="/login" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
                   <User className="h-5 w-5" />
                   <span className="text-[10px] font-bold tracking-tight">Profile</span>
                 </Link>
               )}
               
               {/* Dropdown items popup */}
-              <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-100 shadow-xl rounded-sm py-1.5 text-xs text-gray-700 hidden group-hover:block z-30">
-                <Link href="/orders" className="block px-4 py-2 hover:bg-gray-50 hover:text-[#0d9488]">My Orders</Link>
-                <Link href="/wishlist" className="block px-4 py-2 hover:bg-gray-50 hover:text-[#0d9488]">My Wishlist</Link>
-                <Link href="/faq" className="block px-4 py-2 hover:bg-gray-50 hover:text-[#0d9488]">Help Center</Link>
+              <div className="absolute top-full right-0 mt-1 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 shadow-xl rounded-sm py-1.5 text-xs text-gray-700 dark:text-gray-300 hidden group-hover:block z-30">
+                <Link href="/orders" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">My Orders</Link>
+                <Link href="/wishlist" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">My Wishlist</Link>
+                <Link href="/faq" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">Help Center</Link>
               </div>
             </div>
 
             {/* Wishlist */}
-            <Link href="/wishlist" className="flex flex-col items-center text-gray-700 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
+            <Link href="/wishlist" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
               <Heart className="h-5 w-5" />
               <span className="text-[10px] font-bold tracking-tight">Wishlist</span>
             </Link>
 
             {/* Bag/Cart */}
-            <Link href="/cart" className="flex flex-col items-center text-gray-700 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
+            <Link href="/cart" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
               <div className="relative">
                 <ShoppingBag className="h-5 w-5" />
                 {cartItemsCount > 0 && (

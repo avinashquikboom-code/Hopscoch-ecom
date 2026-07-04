@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} light`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans pb-16 lg:pb-0">
         <ReactQueryProvider>
           <Header />
@@ -43,4 +43,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 

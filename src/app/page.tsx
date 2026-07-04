@@ -222,11 +222,11 @@ export default function Home() {
 
       {/* 3. Flash Sale Section (Meesho inspired with countdown timer) */}
       <section className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 mt-4">
-        <div className="bg-white rounded-sm shadow-xs border border-gray-200 overflow-hidden p-5">
+        <div className="bg-white dark:bg-gray-900 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden p-5">
           <div className="flex flex-col sm:flex-row justify-between items-baseline sm:items-center border-b border-gray-150 pb-4 mb-5 gap-3.5">
             <div className="flex items-center gap-3">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
-              <h2 className="text-lg font-black uppercase text-gray-900 tracking-wider">Flash Sale</h2>
+              <h2 className="text-lg font-black uppercase text-gray-900 dark:text-gray-100 tracking-wider">Flash Sale</h2>
               
               {/* Flash Countdown */}
               <div className="flex items-center gap-1.5 bg-red-50 text-red-600 px-3 py-1 rounded text-xs font-black font-mono">
@@ -251,7 +251,7 @@ export default function Home() {
       <section className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 mt-4">
         <div className="bg-white rounded-sm shadow-xs border border-gray-200 overflow-hidden">
           <div className="flex justify-between items-center px-5 py-4 border-b border-gray-200 flex-wrap gap-4">
-            <h2 className="text-lg font-black uppercase text-gray-900 tracking-wider">Today's Hot Deals</h2>
+            <h2 className="text-lg font-black uppercase text-gray-900 dark:text-gray-100 tracking-wider">Today's Hot Deals</h2>
             <Link href="/products">
               <Button className="bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold h-8.5 px-6 rounded-sm text-xs tracking-wider uppercase border-none cursor-pointer">
                 View All
@@ -272,7 +272,7 @@ export default function Home() {
       <section className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div 
           onClick={() => router.push('/products?category=Women')}
-          className="bg-white p-3.5 rounded-sm shadow-xs border border-gray-200 cursor-pointer group"
+          className="bg-white dark:bg-gray-900 p-3.5 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 cursor-pointer group"
         >
           <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-50 rounded-sm">
             <Image 
@@ -283,13 +283,13 @@ export default function Home() {
               className="object-cover object-top group-hover:scale-102 transition-all duration-300"
             />
           </div>
-          <h3 className="text-sm font-bold text-gray-800 mt-3 text-center uppercase tracking-wider">Premium Winter Wear</h3>
+          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 mt-3 text-center uppercase tracking-wider">Premium Winter Wear</h3>
           <p className="text-xs text-[#0d9488] text-center font-bold mt-0.5">Min. 40% OFF</p>
         </div>
 
         <div 
           onClick={() => router.push('/products?category=Men')}
-          className="bg-white p-3.5 rounded-sm shadow-xs border border-gray-200 cursor-pointer group"
+          className="bg-white dark:bg-gray-900 p-3.5 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 cursor-pointer group"
         >
           <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-50 rounded-sm">
             <Image 
@@ -300,13 +300,13 @@ export default function Home() {
               className="object-cover object-top group-hover:scale-102 transition-all duration-300"
             />
           </div>
-          <h3 className="text-sm font-bold text-gray-800 mt-3 text-center uppercase tracking-wider">Luxe Formal Suits</h3>
+          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 mt-3 text-center uppercase tracking-wider">Luxe Formal Suits</h3>
           <p className="text-xs text-[#0d9488] text-center font-bold mt-0.5">Up to ₹1,500 Off</p>
         </div>
 
         <div 
           onClick={() => router.push('/products?category=Accessories')}
-          className="bg-white p-3.5 rounded-sm shadow-xs border border-gray-200 cursor-pointer group"
+          className="bg-white dark:bg-gray-900 p-3.5 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 cursor-pointer group"
         >
           <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-50 rounded-sm">
             <Image 
@@ -317,16 +317,16 @@ export default function Home() {
               className="object-cover object-center group-hover:scale-102 transition-all duration-300"
             />
           </div>
-          <h3 className="text-sm font-bold text-gray-800 mt-3 text-center uppercase tracking-wider">Leather Accessories</h3>
+          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 mt-3 text-center uppercase tracking-wider">Leather Accessories</h3>
           <p className="text-xs text-[#0d9488] text-center font-bold mt-0.5">Flat 30% OFF</p>
         </div>
       </section>
 
       {/* 6. New Arrivals (Grid Layout) */}
       <section className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 mt-4">
-        <div className="bg-white rounded-sm shadow-xs border border-gray-200 overflow-hidden p-5">
+        <div className="bg-white dark:bg-gray-900 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden p-5">
           <div className="flex justify-between items-baseline border-b border-gray-150 pb-4 mb-5">
-            <h2 className="text-lg font-black uppercase text-gray-900 tracking-wider">New Arrivals</h2>
+            <h2 className="text-lg font-black uppercase text-gray-900 dark:text-gray-100 tracking-wider">New Arrivals</h2>
             <Link href="/products?sort=newest" className="text-xs font-black text-[#0d9488] hover:underline flex items-center gap-0.5">
               <span>VIEW ALL NEW</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -344,7 +344,7 @@ export default function Home() {
       <section className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         
         {/* Trending Section */}
-        <div className="bg-white rounded-sm shadow-xs border border-gray-200 overflow-hidden p-5">
+        <div className="bg-white dark:bg-gray-900 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden p-5">
           <div className="flex justify-between items-baseline border-b border-gray-150 pb-3 mb-4">
             <h2 className="text-base font-black uppercase text-gray-900 tracking-wider">Trending Right Now</h2>
             <Link href="/products?sort=popular" className="text-xs font-bold text-[#0d9488] hover:underline">View All</Link>
@@ -357,7 +357,7 @@ export default function Home() {
         </div>
 
         {/* Best Sellers Section */}
-        <div className="bg-white rounded-sm shadow-xs border border-gray-200 overflow-hidden p-5">
+        <div className="bg-white dark:bg-gray-900 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden p-5">
           <div className="flex justify-between items-baseline border-b border-gray-150 pb-3 mb-4">
             <h2 className="text-base font-black uppercase text-gray-900 tracking-wider">Best Sellers</h2>
             <Link href="/products?sort=popular" className="text-xs font-bold text-[#0d9488] hover:underline">View All</Link>
@@ -373,9 +373,9 @@ export default function Home() {
 
       {/* 8. Top Rated / Popular Products (Grid) */}
       <section className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 mt-4">
-        <div className="bg-white rounded-sm shadow-xs border border-gray-200 overflow-hidden p-5">
+        <div className="bg-white dark:bg-gray-900 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 overflow-hidden p-5">
           <div className="flex justify-between items-baseline border-b border-gray-150 pb-4 mb-5">
-            <h2 className="text-lg font-black uppercase text-gray-900 tracking-wider">Top Rated Products</h2>
+            <h2 className="text-lg font-black uppercase text-gray-900 dark:text-gray-100 tracking-wider">Top Rated Products</h2>
             <Link href="/products?sort=rating" className="text-xs font-black text-[#0d9488] hover:underline flex items-center gap-0.5">
               <span>EXPLORE TOP RATED</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -391,12 +391,12 @@ export default function Home() {
 
       {/* 9. Instagram Social Feed Section */}
       <section className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 mt-4">
-        <div className="bg-white rounded-sm shadow-xs border border-gray-200 p-5">
+        <div className="bg-white dark:bg-gray-900 rounded-sm shadow-xs border border-gray-200 dark:border-gray-700 p-5">
           <div className="text-center mb-6">
             <div className="inline-flex items-center justify-center p-2 rounded-full bg-teal-50 text-[#0d9488] mb-2">
               <Instagram className="w-5 h-5" />
             </div>
-            <h2 className="text-lg font-black uppercase text-gray-900 tracking-wider">Shop The Look</h2>
+            <h2 className="text-lg font-black uppercase text-gray-900 dark:text-gray-100 tracking-wider">Shop The Look</h2>
             <p className="text-xs text-gray-400 mt-1">Tag us on Instagram <span className="font-bold text-gray-700">#AuraCoutureStyle</span> to get featured</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3.5">

@@ -240,7 +240,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
       </div>
 
       {/* Product Information */}
-      <div className="flex-1 flex flex-col justify-between min-w-0 py-1 bg-white">
+      <div className="flex-1 flex flex-col justify-between min-w-0 py-1 bg-white dark:bg-card">
         <div>
           {/* Brand */}
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">

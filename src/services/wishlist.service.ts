@@ -1,21 +1,41 @@
-import { apiClient } from '@/lib/axios';
-import { API_ENDPOINTS } from '@/constants';
 import { Wishlist } from '@/types';
+import { STORAGE_KEYS } from '@/constants';
+
+function delay(ms = 250) {
+  return new Promise((res) => setTimeout(res, ms));
+}
+
+function getLocalWishlist(): Wishlist {
+  try {
+    const stored = typeof window !== 'undefined'
+      ? localStorage.getItem(STORAGE_KEYS.WISHLIST_DATA)
+      : null;
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed?.state?.wishlist) return parsed.state.wishlist;
+    }
+  } catch { /* ignore */ }
+  return { id: 'local', userId: '', items: [], updatedAt: new Date().toISOString() } as any;
+}
 
 export const wishlistService = {
   async getWishlist(): Promise<Wishlist> {
-    return apiClient.get<Wishlist>(API_ENDPOINTS.WISHLIST);
+    await delay();
+    return getLocalWishlist();
   },
 
-  async addToWishlist(productId: string): Promise<Wishlist> {
-    return apiClient.post<Wishlist>(API_ENDPOINTS.WISHLIST, { productId });
+  async addToWishlist(_productId: string): Promise<Wishlist> {
+    await delay(200);
+    return getLocalWishlist();
   },
 
-  async removeFromWishlist(productId: string): Promise<Wishlist> {
-    return apiClient.delete<Wishlist>(API_ENDPOINTS.WISHLIST_ITEM(productId));
+  async removeFromWishlist(_productId: string): Promise<Wishlist> {
+    await delay(200);
+    return getLocalWishlist();
   },
 
   async clearWishlist(): Promise<Wishlist> {
-    return apiClient.delete<Wishlist>(API_ENDPOINTS.WISHLIST);
+    await delay(200);
+    return { id: 'local', userId: '', items: [], updatedAt: new Date().toISOString() } as any;
   },
 };
