@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '@/services';
 import { Address } from '@/types';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 export function useAddresses() {
   return useQuery({

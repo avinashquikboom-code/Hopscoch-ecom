@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useWishlistStore } from '@/store';
 import { useAddToCart, useRemoveFromWishlist } from '@/hooks';
 import { Heart, Trash2, ShoppingCart, Share2, ArrowRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 export default function WishlistPage() {
   const items = useWishlistStore((state) => state.wishlist?.items || []);

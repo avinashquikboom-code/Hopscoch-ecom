@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/services';
 import { LoginCredentials, RegisterCredentials, User } from '@/types';
 import { useAuthStore } from '@/store';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { useRouter } from 'next/navigation';
 
 export function useLogin() {

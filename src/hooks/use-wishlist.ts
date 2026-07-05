@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { wishlistService } from '@/services';
 import { Wishlist } from '@/types';
 import { useWishlistStore } from '@/store';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 export function useWishlist() {
   const queryClient = useQueryClient();

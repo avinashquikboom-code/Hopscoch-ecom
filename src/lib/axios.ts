@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { API_BASE_URL, STORAGE_KEYS } from '@/constants';
+import { toast } from '@/components/ui/toast';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -24,6 +25,29 @@ class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+
+        const method = (config.method || 'GET').toUpperCase();
+        const url = config.url || '';
+        const path = url.toLowerCase();
+        
+        const isSlowMutation = method !== 'GET' && (
+          path.includes('/upload') ||
+          path.includes('/settings') ||
+          path.includes('/checkout') ||
+          path.includes('/process') ||
+          path.includes('/import') ||
+          path.includes('/export')
+        );
+
+        if (isSlowMutation) {
+          let loadingMsg = "Processing request...";
+          if (path.includes("/upload")) loadingMsg = "ℹ Product is being uploaded...";
+          else if (path.includes("/export") || path.includes("/import")) loadingMsg = "ℹ Processing request... Please wait...";
+          
+          const loadingToastId = toast.loading(loadingMsg);
+          (config as any)._loadingToastId = loadingToastId;
+        }
+
         return config;
       },
       (error) => {
@@ -34,36 +58,86 @@ class ApiClient {
     // Response interceptor
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
+        const loadingToastId = (response.config as any)._loadingToastId;
+        if (loadingToastId) {
+          toast.dismiss(loadingToastId);
+        }
+
+        let reqData = response.config.data;
+        if (typeof reqData === 'string') {
+          try {
+            reqData = JSON.parse(reqData);
+          } catch (_) {}
+        }
+
+        toast.handleApiResponse(
+          response.config.method || 'GET',
+          response.config.url || '',
+          response.status,
+          reqData,
+          response.data
+        );
+
         return response;
       },
       async (error: AxiosError) => {
         const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+        const canAttemptRefresh = error.response?.status === 401 && !originalRequest?._retry && this.getRefreshToken();
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (canAttemptRefresh) {
           originalRequest._retry = true;
-
           try {
             const refreshToken = this.getRefreshToken();
-            if (refreshToken) {
-              const response = await this.client.post('/auth/refresh', {
-                refreshToken,
-              });
+            const response = await this.client.post('/auth/refresh', {
+              refreshToken,
+            });
 
-              const { token } = response.data;
-              this.setToken(token);
+            const { token } = response.data;
+            this.setToken(token);
 
-              if (originalRequest.headers) {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-              }
-
-              return this.client(originalRequest);
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
             }
+
+            // Retry the original request
+            return this.client(originalRequest);
           } catch (refreshError) {
+            const loadingToastId = (error.config as any)?._loadingToastId;
+            if (loadingToastId) {
+              toast.dismiss(loadingToastId);
+            }
             this.clearTokens();
+            toast.handleApiResponse(
+              error.config?.method || 'GET',
+              error.config?.url || '',
+              401,
+              error.config?.data ? JSON.parse(error.config.data) : null,
+              { message: "Session expired." }
+            );
             window.location.href = '/login';
             return Promise.reject(refreshError);
           }
         }
+
+        const loadingToastId = (error.config as any)?._loadingToastId;
+        if (loadingToastId) {
+          toast.dismiss(loadingToastId);
+        }
+
+        let reqData = error.config?.data;
+        if (typeof reqData === 'string') {
+          try {
+            reqData = JSON.parse(reqData);
+          } catch (_) {}
+        }
+
+        toast.handleApiResponse(
+          error.config?.method || 'GET',
+          error.config?.url || '',
+          error.response?.status || 0,
+          reqData,
+          error.response?.data
+        );
 
         return Promise.reject(error);
       }

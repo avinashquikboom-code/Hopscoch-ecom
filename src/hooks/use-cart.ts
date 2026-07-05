@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { cartService } from '@/services';
 import { Cart } from '@/types';
 import { useCartStore } from '@/store';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 export function useCart() {
   const queryClient = useQueryClient();

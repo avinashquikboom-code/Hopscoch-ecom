@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Loader2, Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { authService } from '@/services/auth.service';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');

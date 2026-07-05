@@ -9,7 +9,7 @@ import {
   Package, Star, CreditCard, Phone, Mail, Edit3, Save, X,
   Home, Briefcase, Plus, Trash2, Pencil, RefreshCw, Upload, AlertCircle
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 

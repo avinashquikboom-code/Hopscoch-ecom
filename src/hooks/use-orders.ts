@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderService } from '@/services';
 import { Order, CheckoutFormData } from '@/types';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { useRouter } from 'next/navigation';
 
 export function useOrders(page = 1, limit = 10) {

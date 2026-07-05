@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Trash2, ShoppingBag, ArrowRight, Truck, Tag, Gift, Percent, Check, AlertCircle } from 'lucide-react';
 import { useCart, useUpdateCartItem, useRemoveFromCart, useApplyCoupon, useRemoveCoupon } from '@/hooks';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 const AVAILABLE_COUPONS = [
   { code: 'AURA10', description: 'Get 10% off on your entire purchase' },

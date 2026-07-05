@@ -8,7 +8,7 @@ import { useWishlistStore, useAuthStore } from '@/store';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 interface ProductCardProps {
   product: Product;

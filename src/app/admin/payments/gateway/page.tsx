@@ -12,7 +12,7 @@ import {
   Eye, EyeOff, Plus, Settings, CheckCircle2, AlertCircle, Play, 
   RefreshCw, ShieldCheck, HelpCircle, ArrowRight, Activity, Cpu, Sparkles 
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 

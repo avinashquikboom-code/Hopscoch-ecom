@@ -9,7 +9,7 @@ import { mockProducts } from '@/lib/mock-data';
 import { Heart, Share2, Star, ShieldCheck, ChevronRight, Tag, MapPin, Truck, HelpCircle, X, Check, MessageSquare, Download } from 'lucide-react';
 import { useAddToCart, useAddToWishlist, useRemoveFromWishlist } from '@/hooks';
 import { useWishlistStore } from '@/store';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 // Custom inline SVG icons for social platforms
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (

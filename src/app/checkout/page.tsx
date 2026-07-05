@@ -13,7 +13,7 @@ import {
   ShoppingBag, HelpCircle, ArrowLeft, User, QrCode, Building, ChevronRight
 } from 'lucide-react';
 import { useCart, useClearCart } from '@/hooks';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/toast';
 
 interface CheckoutItem {
   id: string;
