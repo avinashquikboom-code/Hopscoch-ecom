@@ -5,7 +5,7 @@ import { ReactQueryProvider } from "@/lib/react-query";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-import { Toaster } from "@/components/ui/sonner";
+import { ToastProvider } from "@/components/ui/toast";
 import { LoginModal } from "@/components/common";
 
 const inter = Inter({ 
@@ -32,12 +32,13 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${playfair.variable} light`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans pb-16 lg:pb-0">
         <ReactQueryProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <MobileBottomNav />
-          <LoginModal />
-          <Toaster />
+          <ToastProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <MobileBottomNav />
+            <LoginModal />
+          </ToastProvider>
         </ReactQueryProvider>
       </body>
     </html>
