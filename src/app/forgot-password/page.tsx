@@ -2,27 +2,61 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Loader2, Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { authService } from '@/services/auth.service';
-import { toast } from '@/components/ui/toast';
+import { Phone, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { auth } from '@/lib/firebase/config';
+import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
   const [isPending, setIsPending] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-
+    if (phone.length < 10) {
+      alert('Please enter a valid phone number');
+      return;
+    }
     setIsPending(true);
+
     try {
-      await authService.forgotPassword(email);
-      setIsSubmitted(true);
-      toast.success('Reset instructions sent to your email.');
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Something went wrong. Please try again.';
-      toast.error(msg);
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-forgot', {
+          size: 'invisible',
+        });
+      }
+
+      const formattedPhone = `+91${phone}`;
+      const result = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
+      setConfirmationResult(result);
+      setIsOtpSent(true);
+    } catch (error: any) {
+      alert(error.message || 'Failed to send OTP');
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otp.length !== 4) {
+      alert('Please enter a 4-digit OTP');
+      return;
+    }
+    if (!confirmationResult) {
+      alert('Please send OTP first');
+      return;
+    }
+    setIsPending(true);
+
+    try {
+      await confirmationResult.confirm(otp);
+      alert('OTP verified successfully! You can now reset your password.');
+      window.location.href = '/login';
+    } catch (error: any) {
+      alert(error.message || 'Invalid OTP');
     } finally {
       setIsPending(false);
     }
@@ -67,51 +101,36 @@ export default function ForgotPasswordPage() {
           className="w-full md:w-[60%] p-8 md:p-10 flex flex-col justify-between"
           style={{ background: '#ffffff' }}
         >
-          {isSubmitted ? (
-            <div className="my-auto text-center py-6 px-4">
-              <CheckCircle2 className="w-16 h-16 text-[#0F766E] mx-auto mb-4 animate-bounce" />
-              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
-                Reset Email Sent
-              </h3>
-              <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.6, maxWidth: '280px', margin: '0 auto 24px' }}>
-                We have sent secure instructions to <span className="font-semibold text-slate-800">{email}</span>. Please check your inbox and spam folders.
-              </p>
-              
-              <Link 
-                href="/login"
-                className="inline-flex items-center justify-center gap-1.5 text-xs font-bold tracking-wider text-[#0F766E] hover:underline"
-              >
-                <ArrowLeft className="w-4 h-4" /> BACK TO LOGIN
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="my-auto space-y-6">
+          <div id="recaptcha-container-forgot"></div>
+          {!isOtpSent ? (
+            <form onSubmit={handleSendOTP} className="my-auto space-y-6">
               <div>
                 <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
-                  Forgot Password?
+                  Reset Password
                 </h3>
                 <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.5, marginBottom: '24px' }}>
-                  Enter your email address and we'll send you instructions to reset your password.
+                  Enter your phone number to receive a 4-digit OTP for password reset.
                 </p>
               </div>
 
-              {/* Email Input */}
+              {/* Phone Input */}
               <div style={{ marginBottom: '24px' }}>
                 <label 
-                  htmlFor="email" 
+                  htmlFor="phone" 
                   style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
                 >
-                  Email Address
+                  Phone Number
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <Mail style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
+                  <Phone style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
                   <input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    id="phone"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                     required
+                    maxLength={10}
                     style={{
                       width: '100%',
                       paddingLeft: '24px',
@@ -132,39 +151,28 @@ export default function ForgotPasswordPage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Send OTP Button */}
               <button
                 type="submit"
                 disabled={isPending}
                 style={{
                   width: '100%',
-                  height: '48px',
-                  background: isPending ? '#5eada6' : '#0F766E',
-                  color: '#ffffff',
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  letterSpacing: '0.1em',
+                  padding: '12px',
+                  background: isPending ? '#94A3B8' : '#0F766E',
+                  color: 'white',
                   border: 'none',
-                  borderRadius: '12px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 700,
                   cursor: isPending ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.2s',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  transition: 'background 0.2s',
-                  boxShadow: '0 4px 12px -2px rgba(15, 118, 110, 0.35)',
                 }}
-                onMouseEnter={e => { if (!isPending) (e.currentTarget as HTMLButtonElement).style.background = '#115E59'; }}
-                onMouseLeave={e => { if (!isPending) (e.currentTarget as HTMLButtonElement).style.background = '#0F766E'; }}
               >
-                {isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Sending link...
-                  </>
-                ) : (
-                  'SEND RESET LINK'
-                )}
+                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send OTP'}
               </button>
 
               <div className="text-center pt-4">
@@ -175,6 +183,103 @@ export default function ForgotPasswordPage() {
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to Login
                 </Link>
               </div>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOTP} className="my-auto space-y-6">
+              <div>
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
+                  Enter OTP
+                </h3>
+                <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.5, marginBottom: '24px' }}>
+                  Enter the 4-digit OTP sent to your phone number.
+                </p>
+              </div>
+
+              {/* OTP Input */}
+              <div style={{ marginBottom: '24px' }}>
+                <label 
+                  htmlFor="otp" 
+                  style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
+                >
+                  4-Digit OTP
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    id="otp"
+                    type="text"
+                    placeholder="0000"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    required
+                    maxLength={4}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '0',
+                      paddingBottom: '8px',
+                      paddingTop: '6px',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: '1.5px solid #E2E8F0',
+                      outline: 'none',
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      fontFamily: 'inherit',
+                      letterSpacing: '8px',
+                      textAlign: 'center',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
+                    onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
+                  />
+                </div>
+              </div>
+
+              {/* Verify OTP Button */}
+              <button
+                type="submit"
+                disabled={isPending}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  background: isPending ? '#94A3B8' : '#0F766E',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: isPending ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify OTP'}
+              </button>
+
+              {/* Back Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOtpSent(false);
+                  setOtp('');
+                }}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  background: 'transparent',
+                  color: '#0F766E',
+                  border: 'none',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                }}
+              >
+                Back to enter phone number
+              </button>
             </form>
           )}
 
