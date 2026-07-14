@@ -47,6 +47,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const [selectedSize, setSelectedSize] = useState('M');
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
+  const [flyStyle, setFlyStyle] = useState<React.CSSProperties | null>(null);
 
   // Cats catwalk video state
   const [isPlayingCatwalk, setIsPlayingCatwalk] = useState(false);
@@ -66,12 +67,31 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : undefined;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    setFlyStyle({
+      left: `${x}px`,
+      top: `${y}px`,
+      position: 'fixed',
+      zIndex: 9999,
+      pointerEvents: 'none',
+      width: '40px',
+      height: '55px',
+      borderRadius: '4px',
+      overflow: 'hidden',
+      border: '2px solid #0d9488',
+      boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+      animation: 'flyToCart 0.8s cubic-bezier(0.2, 0.6, 0.4, 1) forwards',
+    });
+
     addToCartMutation.mutate(
       { productId: product.id, quantity: 1 },
       {
         onSuccess: () => {
           toast.success('Added to Cart successfully!');
+          setTimeout(() => setFlyStyle(null), 800);
         }
       }
     );
@@ -292,7 +312,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
             {/* Action Buttons: Add To Cart & Buy Now */}
             <div className="grid grid-cols-2 gap-3.5 mt-6">
               <Button
-                onClick={handleAddToCart}
+                onClick={(e) => handleAddToCart(e)}
                 disabled={addToCartMutation.isPending || product.stock === 0}
                 className="bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold h-13 rounded-sm border-none shadow-sm uppercase tracking-wider text-sm cursor-pointer"
               >
@@ -699,6 +719,28 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
         </div>
       )}
 
+      {flyStyle && (
+        <div style={flyStyle}>
+          <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
+        </div>
+      )}
+      <style>{`
+        @keyframes flyToCart {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          30% {
+            transform: scale(1.1) translateY(-20px);
+          }
+          100% {
+            left: calc(100vw - 80px);
+            top: 25px;
+            transform: scale(0.15);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }
