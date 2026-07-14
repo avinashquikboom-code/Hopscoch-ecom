@@ -1,0 +1,46 @@
+name: Build & Push Storefront
+
+# Build the image and push it to AWS ECR on every push to main.
+# Deployment to the server is MANUAL (pull + ./deploy-ecom.sh on the VPS).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # Hardcoded ECR target (no secrets needed for region/repo).
+  AWS_REGION: ap-south-1
+  IMAGE_URI: 546941058055.dkr.ecr.ap-south-1.amazonaws.com/hopscotch-ecom
+
+jobs:
+  build-and-push:
+    name: Build image and push to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to ECR
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # No build args: backend URL is resolved at runtime via BACKEND_API_URL
+          # (set in ecom.env on the VPS), not baked into the image.
+          docker build \
+            -t "$IMAGE_URI:$IMAGE_TAG" \
+            -t "$IMAGE_URI:latest" \
+            .
+          docker push "$IMAGE_URI:$IMAGE_TAG"
+          docker push "$IMAGE_URI:latest"
+          echo "Pushed $IMAGE_URI:latest (and :$IMAGE_TAG)"
