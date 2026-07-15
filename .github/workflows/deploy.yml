@@ -35,9 +35,12 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # No build args: backend URL is resolved at runtime via BACKEND_API_URL
-          # (set in ecom.env on the VPS), not baked into the image.
+          # NEXT_PUBLIC_API_URL is inlined into the client bundle at build time,
+          # so it must be a build arg — setting it in ecom.env at container start
+          # would be too late. Includes /api: the axios client uses it as baseURL
+          # with endpoints that carry no prefix of their own.
           docker build \
+            --build-arg NEXT_PUBLIC_API_URL=https://api.fciseller.com/api \
             -t "$IMAGE_URI:$IMAGE_TAG" \
             -t "$IMAGE_URI:latest" \
             .
