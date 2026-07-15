@@ -4,7 +4,9 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+# npm install, not ci: the committed lockfile omits platform-specific optional
+# deps (@emnapi/*) that resolve on linux, and ci hard-fails on any mismatch.
+RUN npm install --legacy-peer-deps --no-audit --no-fund
 
 # ---------- builder ----------
 FROM node:22-alpine AS builder
