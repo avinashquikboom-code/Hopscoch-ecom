@@ -15,8 +15,17 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useLogin } from '@/hooks';
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().refine(
+    (val) => {
+      const isEmail = z.string().email().safeParse(val).success;
+      const isMobile = /^\d{10}$/.test(val);
+      return isEmail || isMobile;
+    },
+    {
+      message: 'Please enter a valid email address or 10-digit mobile number',
+    }
+  ),
+  password: z.string().min(4, 'Password must be at least 4 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -61,11 +70,11 @@ export default function LoginPage() {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email or Mobile Number</Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="your.email@example.com"
+                type="text"
+                placeholder="your.email@example.com or 10-digit number"
                 {...register('email')}
               />
               {errors.email && (

@@ -18,14 +18,17 @@ function nameFromEmail(email: string): { firstName: string; lastName: string } {
   return { firstName, lastName };
 }
 
-function buildUser(email: string, extra?: Partial<User>): User {
+function buildUser(emailOrPhone: string, extra?: Partial<User>): User {
+  const isEmail = emailOrPhone.includes('@');
+  const email = isEmail ? emailOrPhone : `${emailOrPhone}@auracouture.in`;
+  const phone = isEmail ? '' : emailOrPhone;
   const { firstName, lastName } = nameFromEmail(email);
   return {
     id: 'usr_' + Math.random().toString(36).slice(2, 10),
     email,
     firstName,
     lastName,
-    phone: '',
+    phone,
     avatar: null,
     createdAt: new Date().toISOString(),
     ...extra,

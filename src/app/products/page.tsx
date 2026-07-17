@@ -547,16 +547,16 @@ function ProductsContent() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F1F3F6] pb-16 font-sans">
+    <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 pb-16 font-sans transition-colors duration-300">
       
       {/* Search Result Title Bar */}
-      <div className="bg-white border-b border-gray-200 py-3 shadow-sm mb-3">
+      <div className="bg-white dark:bg-zinc-900 border-b border-neutral-100 dark:border-neutral-850 py-3 shadow-xs mb-4">
         <div className="container mx-auto px-4 sm:px-6 md:px-12 flex items-baseline justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-base sm:text-lg font-black uppercase text-neutral-850 dark:text-neutral-100 flex items-center gap-2">
               Showing Results for "{selectedCategory === 'all' ? 'All Clothing' : selectedCategory}"
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-neutral-450 dark:text-neutral-500 mt-0.5 font-medium">
               (Showing {startIdx + 1}–{Math.min(startIdx + ITEMS_PER_PAGE, totalProducts)} of {totalProducts} products)
             </p>
           </div>
@@ -564,18 +564,18 @@ function ProductsContent() {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 md:px-12">
-        <div className="flex gap-3.5 items-start">
+        <div className="flex gap-4 items-start">
 
           {/* Desktop Filters Sidebar (Sticky filters) */}
-          <aside className="hidden lg:block w-64 xl:w-72 bg-white border border-gray-200 p-4 shadow-sm shrink-0 rounded-sm sticky top-[80px] max-h-[85vh] overflow-y-auto scrollbar-hide">
+          <aside className="hidden lg:block w-64 xl:w-72 bg-white dark:bg-zinc-900 border border-neutral-100 dark:border-neutral-850/80 p-5 shadow-xs shrink-0 rounded-2xl sticky top-[80px] max-h-[85vh] overflow-y-auto scrollbar-hide">
             <FiltersPanel />
           </aside>
 
           {/* Products Grid & Toolbar Box */}
-          <div className="flex-1 bg-white border border-gray-200 shadow-sm rounded-sm p-4 min-w-0">
+          <div className="flex-1 bg-white dark:bg-zinc-900 border border-neutral-100 dark:border-neutral-850/80 shadow-xs rounded-2xl p-5 min-w-0">
             
             {/* Top Toolbar (Sort tabs + View option) */}
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-4 flex-wrap gap-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3.5 mb-5 flex-wrap gap-4">
               
               {/* Flipkart-style sorting tabs */}
               <div className="flex items-center gap-5 overflow-x-auto scrollbar-hide text-xs sm:text-sm font-semibold text-gray-500">
@@ -757,10 +757,10 @@ function ProductsContent() {
 export default function ProductsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#F1F3F6]">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 transition-colors duration-300">
         <div className="flex flex-col items-center gap-3">
           <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#0d9488] border-t-transparent" />
-          <p className="text-xs text-gray-400 font-bold tracking-wider uppercase animate-pulse">Loading Catalog...</p>
+          <p className="text-xs text-neutral-400 dark:text-neutral-500 font-bold tracking-wider uppercase animate-pulse">Loading Catalog...</p>
         </div>
       </div>
     }>

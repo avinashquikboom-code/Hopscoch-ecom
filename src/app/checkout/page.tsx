@@ -251,10 +251,10 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F3F6] font-sans flex flex-col justify-between">
+    <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 font-sans flex flex-col justify-between transition-colors duration-300">
       
       {/* SECURE HEADER */}
-      <header className="bg-white border-b border-gray-200 py-3 shadow-xs sticky top-0 z-50">
+      <header className="bg-white dark:bg-zinc-900 border-b border-neutral-100 dark:border-neutral-850 py-3 shadow-xs sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 md:px-12 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 select-none shrink-0">

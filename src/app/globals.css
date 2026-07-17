@@ -329,8 +329,9 @@
 
 /* Accessible touch targets on mobile */
 @media (max-width: 768px) {
-  button, a, input, select {
-    min-height: 44px;
+  /* Only apply min-height to text inputs, search inputs and selectors to prevent distortion of small buttons */
+  input[type="text"], input[type="email"], input[type="search"], select {
+    min-height: 42px;
   }
   .touch-target {
     min-height: 48px;

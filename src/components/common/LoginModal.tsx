@@ -114,20 +114,20 @@ export function LoginModal() {
               <span>Login required to view products / actions</span>
             </div>
 
-            {/* Email */}
+            {/* Email or Mobile Number */}
             <div style={{ marginBottom: '20px' }}>
               <label
                 htmlFor="modal-email"
                 style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
               >
-                Email Address
+                Email or Mobile Number
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
                 <input
                   id="modal-email"
-                  type="email"
-                  placeholder="name@example.com"
+                  type="text"
+                  placeholder="name@example.com or 10-digit number"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required

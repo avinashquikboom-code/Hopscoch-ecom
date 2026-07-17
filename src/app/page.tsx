@@ -122,28 +122,29 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F1F3F6] text-foreground font-sans">
+    <div className="flex flex-col min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 text-foreground font-sans">
       
-      {/* 1. Category Bar (Meesho/Flipkart inspired row of circles) */}
-      <section className="bg-white border-b border-gray-250/60 py-3 px-4 shadow-xs shrink-0">
+      {/* 1. Category Bar (Modern Editorial Layout) */}
+      <section className="bg-white dark:bg-gray-950 border-b border-gray-100 dark:border-gray-900 py-5 px-4 sm:px-6 md:px-12 shadow-xs shrink-0 transition-colors duration-300">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center justify-between gap-6 overflow-x-auto scrollbar-hide py-1">
+          <div className="flex items-center justify-between gap-8 overflow-x-auto scrollbar-hide py-1">
             {mockCategories.map((category) => (
               <Link
                 key={category.id}
                 href={`/products?category=${encodeURIComponent(category.name)}`}
                 className="flex flex-col items-center text-center shrink-0 group select-none cursor-pointer"
               >
-                <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-150 shadow-xs group-hover:scale-105 transition-transform duration-300 relative bg-gray-50 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-neutral-100 dark:border-neutral-800 shadow-xs group-hover:shadow-md group-hover:scale-105 transition-all duration-300 relative bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center">
                   <Image
                     src={category.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200'}
                     alt={category.name}
                     fill
-                    sizes="64px"
-                    className="object-cover object-top"
+                    sizes="80px"
+                    className="object-cover object-top filter grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
                   />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-305"></div>
                 </div>
-                <span className="text-xs font-bold text-gray-800 mt-2 group-hover:text-[#0d9488] transition-colors leading-none tracking-wide">
+                <span className="text-[11px] font-bold text-neutral-600 dark:text-neutral-300 mt-2.5 group-hover:text-[#0d9488] transition-colors leading-none tracking-widest uppercase">
                   {category.name}
                 </span>
               </Link>
@@ -152,42 +153,80 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. Main Large Carousel Banner (Auto-Playing with Framer Motion transitions) */}
-      <section className="relative w-full h-[280px] sm:h-[400px] overflow-hidden bg-gray-900">
+      {/* 2. Main Large Carousel Banner (Cinematic Auto-Playing with Framer Motion) */}
+      <section className="relative w-full h-[280px] sm:h-[420px] overflow-hidden bg-gray-950">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSlide}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.6, ease: 'easeInOut' }}
-            className="absolute inset-0 w-full h-full flex items-center bg-gray-900"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 w-full h-full flex items-center bg-gray-950"
           >
-            <Image
-              src={CAROUSEL_SLIDES[activeSlide].image}
-              alt={CAROUSEL_SLIDES[activeSlide].title}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover object-center brightness-[0.65] select-none"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent"></div>
+            {/* Ken Burns Zoom Effect */}
+            <div className="absolute inset-0 overflow-hidden bg-gray-950">
+              <motion.div
+                initial={{ scale: 1.12 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 6, ease: 'easeOut' }}
+                className="w-full h-full relative"
+              >
+                <Image
+                  src={CAROUSEL_SLIDES[activeSlide].image}
+                  alt={CAROUSEL_SLIDES[activeSlide].title}
+                  fill
+                  priority
+                  sizes="100vw"
+                  className="object-cover object-center brightness-[0.55] select-none"
+                />
+              </motion.div>
+            </div>
             
-            <div className="absolute left-8 sm:left-16 max-w-lg text-white z-10 flex flex-col gap-2">
-              <Badge className="bg-[#0d9488] text-white hover:bg-[#0d9488] font-black uppercase text-[9px] tracking-widest w-fit rounded-sm px-2.5 py-0.5">
-                EXCLUSIVE COLLECTION
-              </Badge>
-              <h2 className="text-2xl sm:text-4xl font-serif font-black tracking-wide leading-tight mt-1">
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+            
+            {/* Staggered Text Animations */}
+            <div className="absolute left-8 sm:left-16 max-w-lg text-white z-10 flex flex-col gap-2.5">
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.4 }}
+              >
+                <Badge className="bg-[#0d9488] text-white hover:bg-[#0d9488] font-black uppercase text-[9px] tracking-widest w-fit rounded-sm px-2.5 py-0.5 border-none shadow-xs">
+                  EXCLUSIVE COLLECTION
+                </Badge>
+              </motion.div>
+              
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="text-2xl sm:text-4xl font-serif font-black tracking-wide leading-tight mt-1"
+              >
                 {CAROUSEL_SLIDES[activeSlide].title}
-              </h2>
-              <p className="text-xs sm:text-base text-gray-200 font-light mt-0.5">
+              </motion.h2>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="text-xs sm:text-base text-gray-200 font-light mt-0.5"
+              >
                 {CAROUSEL_SLIDES[activeSlide].subtitle}
-              </p>
-              <Link href={CAROUSEL_SLIDES[activeSlide].link} className="mt-4">
-                <Button className="bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold h-10 px-8 rounded-sm shadow-md border-none text-xs tracking-wider uppercase active:scale-95 transition-all">
-                  Shop Now
-                </Button>
-              </Link>
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="mt-4"
+              >
+                <Link href={CAROUSEL_SLIDES[activeSlide].link}>
+                  <Button className="bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold h-10 px-8 rounded-sm shadow-md border-none text-xs tracking-wider uppercase active:scale-95 transition-all cursor-pointer">
+                    Shop Now
+                  </Button>
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -198,7 +237,7 @@ export default function Home() {
             <button
               key={i}
               onClick={() => setActiveSlide(i)}
-              className={`h-2 w-2 rounded-full transition-all cursor-pointer ${
+              className={`h-2 w-2 rounded-full transition-all cursor-pointer border-none ${
                 activeSlide === i ? 'bg-[#0d9488] w-6' : 'bg-white/50'
               }`}
             />

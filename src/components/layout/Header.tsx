@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Heart, User, Menu, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -40,9 +40,19 @@ export function Header() {
   // Language & Currency states
   const [language, setLanguage] = useState<'EN' | 'HI'>('EN');
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
+  const [mounted, setMounted] = useState(false);
 
   const { user, isAuthenticated, openLoginModal } = useAuthStore();
   const { cart } = useCartStore();
+  const { theme, setTheme } = useThemeStore();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Load search history from LocalStorage
   useEffect(() => {
@@ -368,7 +378,7 @@ export function Header() {
 
             {/* User Dropdown */}
             <div className="relative group flex flex-col items-center cursor-pointer">
-              {isAuthenticated && user ? (
+              {mounted && isAuthenticated && user ? (
                 <Link href="/profile" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
                   <User className="h-5 w-5" />
                   <span className="text-[10px] font-bold tracking-tight">{displayName}</span>
@@ -398,7 +408,7 @@ export function Header() {
             <Link href="/cart" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
               <div className="relative">
                 <ShoppingBag className="h-5 w-5" />
-                {cartItemsCount > 0 && (
+                {mounted && cartItemsCount > 0 && (
                   <Badge className="absolute -top-1.5 -right-2 h-4 min-w-4 flex items-center justify-center p-0.5 bg-[#0d9488] text-white text-[8px] font-black rounded-full border border-white shadow-sm">
                     {cartItemsCount}
                   </Badge>
@@ -406,6 +416,20 @@ export function Header() {
               </div>
               <span className="text-[10px] font-bold tracking-tight">Bag</span>
             </Link>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none cursor-pointer bg-transparent border-none"
+              aria-label="Toggle theme"
+            >
+              {mounted && theme === 'dark' ? (
+                <Sun className="h-5 w-5 text-amber-500 fill-amber-400" />
+              ) : (
+                <Moon className="h-5 w-5 text-gray-700" />
+              )}
+              <span className="text-[10px] font-bold tracking-tight">Theme</span>
+            </button>
 
             {/* Mobile Actions: Search (Icon only on mobile) */}
             <Button

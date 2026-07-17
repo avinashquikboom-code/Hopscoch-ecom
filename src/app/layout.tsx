@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { ToastProvider } from "@/components/ui/toast";
-import { LoginModal } from "@/components/common";
+import { LoginModal, ThemeProvider } from "@/components/common";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -33,11 +33,13 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans pb-16 lg:pb-0">
         <ReactQueryProvider>
           <ToastProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <MobileBottomNav />
-            <LoginModal />
+            <ThemeProvider>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <MobileBottomNav />
+              <LoginModal />
+            </ThemeProvider>
           </ToastProvider>
         </ReactQueryProvider>
       </body>

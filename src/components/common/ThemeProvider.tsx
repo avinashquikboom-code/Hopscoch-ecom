@@ -6,6 +6,11 @@ import { useThemeStore } from '@/store';
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useThemeStore();
 
+  // Rehydrate store on client mount
+  useEffect(() => {
+    useThemeStore.persist.rehydrate();
+  }, []);
+
   // Apply theme class on mount and whenever theme changes
   useEffect(() => {
     const root = window.document.documentElement;

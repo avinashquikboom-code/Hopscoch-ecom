@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, ShoppingBag, Heart, User, Search } from 'lucide-react';
@@ -9,11 +9,16 @@ import { useCartStore, useWishlistStore } from '@/store';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
   const { cart } = useCartStore();
   const wishlistStore = useWishlistStore();
   
   const cartItemsCount = cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
   const wishlistCount = wishlistStore.wishlist?.items.length || 0;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },
@@ -52,7 +57,7 @@ export function MobileBottomNav() {
                       : 'text-muted-foreground group-hover:text-foreground'
                   )}
                 />
-                {item.badge && item.badge > 0 && (
+                {mounted && item.badge && item.badge > 0 && (
                   <span className="absolute -top-1 -right-2 min-w-[18px] h-[18px] flex items-center justify-center bg-primary text-primary-foreground text-[10px] font-bold rounded-full animate-scale-in">
                     {item.badge > 9 ? '9+' : item.badge}
                   </span>

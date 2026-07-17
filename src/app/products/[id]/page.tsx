@@ -208,28 +208,28 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const specsList = getSpecs(product.id);
 
   return (
-    <div className="min-h-screen bg-[#F1F3F6] pb-16 font-sans">
+    <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 pb-16 font-sans transition-colors duration-300">
       
       {/* Container */}
       <div className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 py-3">
         
         {/* Breadcrumb */}
-        <div className="flex items-center gap-1 text-xs text-gray-500 mb-3.5">
+        <div className="flex items-center gap-1 text-xs text-neutral-450 dark:text-neutral-500 mb-3.5">
           <Link href="/" className="hover:text-[#0d9488]">Home</Link>
-          <ChevronRight className="w-3 h-3 text-gray-400" />
+          <ChevronRight className="w-3 h-3 text-neutral-400" />
           <Link href="/products" className="hover:text-[#0d9488]">Clothing</Link>
-          <ChevronRight className="w-3 h-3 text-gray-400" />
-          <span className="text-gray-900 truncate font-semibold">{product.name}</span>
+          <ChevronRight className="w-3 h-3 text-neutral-400" />
+          <span className="text-neutral-850 dark:text-neutral-100 truncate font-semibold">{product.name}</span>
         </div>
-
+ 
         {/* Core Layout Split */}
         <div className="flex flex-col lg:flex-row gap-3.5 items-stretch">
           
           {/* LEFT COLUMN: Sticky Image Gallery & Action Buttons */}
-          <div className="w-full lg:w-[42%] bg-white p-4 border border-gray-200 rounded-sm flex flex-col h-fit lg:sticky lg:top-[70px]">
+          <div className="w-full lg:w-[42%] bg-white dark:bg-zinc-900 p-5 border border-neutral-100 dark:border-neutral-850/80 rounded-2xl flex flex-col h-fit lg:sticky lg:top-[80px]">
             
             {/* Gallery Viewer with Hover Zoom or CATWALK Video */}
-            <div className="relative w-full aspect-[4/5] bg-gray-50 border border-gray-100 flex items-center justify-center rounded-sm overflow-hidden z-10">
+            <div className="relative w-full aspect-[4/5] bg-neutral-50 dark:bg-neutral-950 border border-neutral-100 dark:border-neutral-850 rounded-xl flex items-center justify-center overflow-hidden z-10">
               {isPlayingCatwalk ? (
                 <div className="absolute inset-0 bg-black flex flex-col items-center justify-center">
                   {/* Catwalk video preview container */}
