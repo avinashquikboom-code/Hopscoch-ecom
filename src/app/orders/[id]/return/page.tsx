@@ -16,7 +16,7 @@ const RETURN_REASONS = [
 
 const REFUND_METHODS = [
   { id: 'original', label: 'Original Payment Method', sub: 'Refund to your card / UPI (3–5 days)' },
-  { id: 'wallet', label: 'Aura Couture Wallet', sub: 'Instant credit for next purchase' },
+  { id: 'wallet', label: 'FCISeller Wallet', sub: 'Instant credit for next purchase' },
 ];
 
 const PICKUP_SLOTS = [

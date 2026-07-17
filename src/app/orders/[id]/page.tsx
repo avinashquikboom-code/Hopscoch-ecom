@@ -17,7 +17,7 @@ const MOCK_ORDERS: Record<string, any> = {
     paymentMethod: 'Visa •••• 4582',
     address: '42 Sunshine Lane, Koregaon Park, Pune, Maharashtra – 411001',
     items: [
-      { id: '1', name: 'Premium Linen Blazer', brand: 'Aura Couture', size: 'M', color: 'Sage Green', qty: 1, price: 1799, image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&q=80' },
+      { id: '1', name: 'Premium Linen Blazer', brand: 'FCISeller', size: 'M', color: 'Sage Green', qty: 1, price: 1799, image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&q=80' },
       { id: '2', name: 'Tailored Chinos', brand: 'Aura Studio', size: '32', color: 'Ivory', qty: 1, price: 1200, image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=200&q=80' },
     ],
     timeline: [
@@ -35,7 +35,7 @@ const MOCK_ORDERS: Record<string, any> = {
     paymentMethod: 'UPI — avinash@ybl',
     address: 'Level 5, Tower B, Cybercity, Magarpatta, Pune – 411013',
     items: [
-      { id: '3', name: 'Silk Wrap Dress', brand: 'Aura Couture', size: 'S', color: 'Dusty Rose', qty: 1, price: 1890, image: 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=200&q=80' },
+      { id: '3', name: 'Silk Wrap Dress', brand: 'FCISeller', size: 'S', color: 'Dusty Rose', qty: 1, price: 1890, image: 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=200&q=80' },
     ],
     timeline: [
       { label: 'Order Placed', time: 'Jun 03 • 3:45 PM', done: true },
@@ -52,7 +52,7 @@ const MOCK_ORDERS: Record<string, any> = {
     paymentMethod: 'Net Banking — HDFC',
     address: '42 Sunshine Lane, Koregaon Park, Pune, Maharashtra – 411001',
     items: [
-      { id: '4', name: 'Cashmere Overcoat', brand: 'Aura Couture', size: 'L', color: 'Charcoal', qty: 1, price: 3499, image: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=200&q=80' },
+      { id: '4', name: 'Cashmere Overcoat', brand: 'FCISeller', size: 'L', color: 'Charcoal', qty: 1, price: 3499, image: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=200&q=80' },
       { id: '5', name: 'Merino Turtleneck', brand: 'Aura Studio', size: 'M', color: 'Cream', qty: 2, price: 650, image: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=200&q=80' },
     ],
     timeline: [
@@ -72,7 +72,7 @@ function getFallbackOrder(id: string) {
     status: 'processing', total: 1499, shipping: 0, tax: 270, discount: 0,
     paymentMethod: 'Card •••• 0000',
     address: 'Your delivery address',
-    items: [{ id: '0', name: 'Aura Couture Item', brand: 'Aura Couture', size: 'M', color: 'Teal', qty: 1, price: 1499, image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&q=80' }],
+    items: [{ id: '0', name: 'FCISeller Item', brand: 'FCISeller', size: 'M', color: 'Teal', qty: 1, price: 1499, image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&q=80' }],
     timeline: [
       { label: 'Order Placed', time: 'Just now', done: true },
       { label: 'Order Confirmed', time: 'Processing', done: false },

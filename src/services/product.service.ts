@@ -21,7 +21,7 @@ function mapBackendProductToFrontend(raw: any): Product {
     discount: raw.discountValue ? Number(raw.discountValue) : 0,
     images: images,
     category: raw.category?.name || 'Collections',
-    brand: raw.brand?.name || 'Aura Couture',
+    brand: raw.brand?.name || 'FCISeller',
     stock: raw.stock !== undefined ? Number(raw.stock) : 10,
     rating: Number(raw.avgRating || 4.5),
     reviewCount: Number(raw.reviewCount || 0),
@@ -83,174 +83,152 @@ export const productService = {
     try {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
-      if (res.ok) {
-        const raw = json.data ?? json.products ?? json ?? [];
-        if (Array.isArray(raw)) {
-          const mapped = raw.map(mapBackendProductToFrontend);
-          const filtered = applyFilters(mapped, filters);
-          const start = (pagination.page - 1) * pagination.limit;
-          const data = filtered.slice(start, start + pagination.limit);
-          return {
-            data,
-            total: filtered.length,
-            page: pagination.page,
-            limit: pagination.limit,
-            totalPages: Math.ceil(filtered.length / pagination.limit),
-          } as any;
-        }
+      if (!res.ok) throw new Error(json.message || 'Failed to fetch products');
+      const raw = json.data ?? json.products ?? json ?? [];
+      if (Array.isArray(raw)) {
+        const mapped = raw.map(mapBackendProductToFrontend);
+        const filtered = applyFilters(mapped, filters);
+        const start = (pagination.page - 1) * pagination.limit;
+        const data = filtered.slice(start, start + pagination.limit);
+        return {
+          data,
+          total: filtered.length,
+          page: pagination.page,
+          limit: pagination.limit,
+          totalPages: Math.ceil(filtered.length / pagination.limit),
+        } as any;
       }
+      return { data: [], total: 0, page: 1, limit: 12, totalPages: 1 } as any;
     } catch (e) {
-      console.warn('Backend products fetch failed, using mock fallback:', e);
+      console.error('Backend products fetch failed:', e);
+      throw e;
     }
-
-    await delay(300);
-    const filtered = applyFilters(mockProducts, filters);
-    const start = (pagination.page - 1) * pagination.limit;
-    const data = filtered.slice(start, start + pagination.limit);
-    return {
-      data,
-      total: filtered.length,
-      page: pagination.page,
-      limit: pagination.limit,
-      totalPages: Math.ceil(filtered.length / pagination.limit),
-    } as any;
   },
 
   async getProductById(id: string): Promise<Product> {
     try {
       const res = await fetch(`${API_BASE}/api/products/${id}`);
       const json = await res.json();
-      if (res.ok && json.data) {
+      if (!res.ok) throw new Error(json.message || 'Product not found');
+      if (json.data) {
         return mapBackendProductToFrontend(json.data);
       }
+      throw new Error('Product not found');
     } catch (e) {
-      console.warn(`Backend fetch for product ${id} failed, using mock fallback:`, e);
+      console.error(`Backend fetch for product ${id} failed:`, e);
+      throw e;
     }
-
-    await delay(200);
-    const product = mockProducts.find((p) => p.id === id);
-    if (!product) throw { response: { data: { message: 'Product not found.' } } };
-    return product;
   },
 
   async getFeaturedProducts(): Promise<Product[]> {
     try {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
-      if (res.ok) {
-        const raw = json.data ?? json.products ?? json ?? [];
-        if (Array.isArray(raw)) {
-          const mapped = raw.map(mapBackendProductToFrontend);
-          return mapped.filter((p) => p.isFeatured || p.rating >= 4.5).slice(0, 10);
-        }
+      if (!res.ok) throw new Error(json.message || 'Failed to fetch featured products');
+      const raw = json.data ?? json.products ?? json ?? [];
+      if (Array.isArray(raw)) {
+        const mapped = raw.map(mapBackendProductToFrontend);
+        return mapped.filter((p) => p.isFeatured || p.rating >= 4.5).slice(0, 10);
       }
+      return [];
     } catch (e) {
-      console.warn('Backend featured fetch failed, using mock:', e);
+      console.error('Backend featured fetch failed:', e);
+      return [];
     }
-    await delay(200);
-    return mockProducts.filter((p) => p.isFeatured || p.rating >= 4.5).slice(0, 10);
   },
 
   async getTrendingProducts(): Promise<Product[]> {
     try {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
-      if (res.ok) {
-        const raw = json.data ?? json.products ?? json ?? [];
-        if (Array.isArray(raw)) {
-          const mapped = raw.map(mapBackendProductToFrontend);
-          return [...mapped].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 10);
-        }
+      if (!res.ok) throw new Error(json.message || 'Failed to fetch trending products');
+      const raw = json.data ?? json.products ?? json ?? [];
+      if (Array.isArray(raw)) {
+        const mapped = raw.map(mapBackendProductToFrontend);
+        return [...mapped].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 10);
       }
+      return [];
     } catch (e) {
-      console.warn('Backend trending fetch failed, using mock:', e);
+      console.error('Backend trending fetch failed:', e);
+      return [];
     }
-    await delay(200);
-    return [...mockProducts].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 10);
   },
 
   async getNewArrivals(): Promise<Product[]> {
     try {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
-      if (res.ok) {
-        const raw = json.data ?? json.products ?? json ?? [];
-        if (Array.isArray(raw)) {
-          const mapped = raw.map(mapBackendProductToFrontend);
-          return [...mapped].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 10);
-        }
+      if (!res.ok) throw new Error(json.message || 'Failed to fetch new arrivals');
+      const raw = json.data ?? json.products ?? json ?? [];
+      if (Array.isArray(raw)) {
+        const mapped = raw.map(mapBackendProductToFrontend);
+        return [...mapped].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 10);
       }
+      return [];
     } catch (e) {
-      console.warn('Backend new arrivals fetch failed, using mock:', e);
+      console.error('Backend new arrivals fetch failed:', e);
+      return [];
     }
-    await delay(200);
-    return [...mockProducts].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 10);
   },
 
   async getBestSellers(): Promise<Product[]> {
     try {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
-      if (res.ok) {
-        const raw = json.data ?? json.products ?? json ?? [];
-        if (Array.isArray(raw)) {
-          const mapped = raw.map(mapBackendProductToFrontend);
-          return [...mapped].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
-        }
+      if (!res.ok) throw new Error(json.message || 'Failed to fetch best sellers');
+      const raw = json.data ?? json.products ?? json ?? [];
+      if (Array.isArray(raw)) {
+        const mapped = raw.map(mapBackendProductToFrontend);
+        return [...mapped].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
       }
+      return [];
     } catch (e) {
-      console.warn('Backend best sellers fetch failed, using mock:', e);
+      console.error('Backend best sellers fetch failed:', e);
+      return [];
     }
-    await delay(200);
-    return [...mockProducts].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
   },
 
   async searchProducts(query: string): Promise<Product[]> {
     try {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
-      if (res.ok) {
-        const raw = json.data ?? json.products ?? json ?? [];
-        if (Array.isArray(raw)) {
-          const mapped = raw.map(mapBackendProductToFrontend);
-          const q = query.toLowerCase();
-          return mapped.filter(
-            (p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
-          );
-        }
+      if (!res.ok) throw new Error(json.message || 'Search failed');
+      const raw = json.data ?? json.products ?? json ?? [];
+      if (Array.isArray(raw)) {
+        const mapped = raw.map(mapBackendProductToFrontend);
+        const q = query.toLowerCase();
+        return mapped.filter(
+          (p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
+        );
       }
+      return [];
     } catch (e) {
-      console.warn('Backend search fetch failed, using mock:', e);
+      console.error('Backend search fetch failed:', e);
+      return [];
     }
-    await delay(250);
-    const q = query.toLowerCase();
-    return mockProducts.filter(
-      (p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
-    );
   },
 
   async getCategories(): Promise<Category[]> {
     try {
       const res = await fetch(`${API_BASE}/api/categories`);
       const json = await res.json();
-      if (res.ok) {
-        const raw = json.data ?? json ?? [];
-        if (Array.isArray(raw)) {
-          return raw.map((cat: any) => ({
-            id: String(cat.id),
-            name: cat.name,
-            slug: cat.slug,
-            productCount: cat.productCount || 0,
-            icon: cat.iconUrl || '👗',
-            image: cat.bannerUrl || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
-          }));
-        }
+      if (!res.ok) throw new Error(json.message || 'Failed to fetch categories');
+      const raw = json.data ?? json ?? [];
+      if (Array.isArray(raw)) {
+        return raw.map((cat: any) => ({
+          id: String(cat.id),
+          name: cat.name,
+          slug: cat.slug,
+          productCount: cat.productCount || 0,
+          icon: cat.iconUrl || '👗',
+          image: cat.bannerUrl || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
+        }));
       }
+      return [];
     } catch (e) {
-      console.warn('Backend categories fetch failed, using mock:', e);
+      console.error('Backend categories fetch failed:', e);
+      return [];
     }
-    await delay(150);
-    return mockCategories;
   },
 
   async getProductReviews(

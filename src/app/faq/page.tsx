@@ -35,7 +35,7 @@ const faqs = [
   },
   {
     question: "How do I contact customer support?",
-    answer: "You can reach our customer support team via email at support@hopscotch.com or call us at +91 1800-123-4567. Our support team is available 24/7."
+    answer: "You can reach our customer support team via email at support@fciseller.com or call us at +91 1800-123-4567. Our support team is available 24/7."
   },
   {
     question: "Do you have physical stores?",

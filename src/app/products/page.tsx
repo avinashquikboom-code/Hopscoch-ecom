@@ -174,7 +174,7 @@ function ProductsContent() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [inStockOnly, setInStockOnly] = useState(false);
 
-  // New specific filter states (Aura Couture enhancements)
+  // New specific filter states (FCISeller enhancements)
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);

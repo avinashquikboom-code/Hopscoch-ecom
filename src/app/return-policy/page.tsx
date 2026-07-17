@@ -59,7 +59,7 @@ export default function ReturnPolicyPage() {
             <div>
               <h2 className="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">Contact Us</h2>
               <p className="text-gray-700 dark:text-gray-300">
-                If you have any questions about our return policy, please contact our customer support at returns@hopscotch.com or call +91 1800-123-4567.
+                If you have any questions about our return policy, please contact our customer support at returns@fciseller.com or call +91 1800-123-4567.
               </p>
             </div>
           </CardContent>

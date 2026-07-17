@@ -20,7 +20,7 @@ function nameFromEmail(email: string): { firstName: string; lastName: string } {
 
 function buildUser(emailOrPhone: string, extra?: Partial<User>): User {
   const isEmail = emailOrPhone.includes('@');
-  const email = isEmail ? emailOrPhone : `${emailOrPhone}@auracouture.in`;
+  const email = isEmail ? emailOrPhone : `${emailOrPhone}@fciseller.com`;
   const phone = isEmail ? '' : emailOrPhone;
   const { firstName, lastName } = nameFromEmail(email);
   return {
@@ -114,7 +114,7 @@ export const authService = {
     const stored = typeof window !== 'undefined'
       ? localStorage.getItem(STORAGE_KEYS.USER_DATA)
       : null;
-    let user: User = buildUser('user@auracouture.in');
+    let user: User = buildUser('user@fciseller.com');
     if (stored) {
       try {
         const parsed = JSON.parse(stored);

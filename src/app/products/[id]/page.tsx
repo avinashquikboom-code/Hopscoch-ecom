@@ -335,7 +335,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
             
             {/* Brand Title */}
             <h2 className="text-base sm:text-lg font-bold text-gray-400 tracking-wide mb-1 uppercase">
-              {product.brand || 'Aura Couture'}
+              {product.brand || 'FCISeller'}
             </h2>
             
             {/* Product Title Name */}
@@ -453,7 +453,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 
                 {/* WhatsApp */}
                 <button 
-                  onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Check out this premium Aura Couture outfit: ${product.name} at ${window.location.href}`)}`)}
+                  onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Check out this premium FCISeller outfit: ${product.name} at ${window.location.href}`)}`)}
                   className="px-3.5 py-1.5 bg-[#25d366] hover:bg-[#20ba5a] text-white rounded-sm text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer border-none"
                 >
                   <WhatsAppIcon />
@@ -647,7 +647,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
         {/* 3. More From Same Brand */}
         <div className="mt-8">
-          <h2 className="text-base font-black uppercase text-gray-900 tracking-wider mb-4">More from {product.brand || 'Aura Couture'}</h2>
+          <h2 className="text-base font-black uppercase text-gray-900 tracking-wider mb-4">More from {product.brand || 'FCISeller'}</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {mockProducts.slice(4, 8).map((p) => (
               <ProductCard key={p.id} product={p} />

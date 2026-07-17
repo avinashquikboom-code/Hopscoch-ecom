@@ -11,7 +11,7 @@ export default function TermsPage() {
             <div>
               <h2 className="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">Acceptance of Terms</h2>
               <p className="text-gray-700 dark:text-gray-300">
-                By accessing or using Hopscotch, you agree to be bound by these Terms & Conditions. If you do not agree to these terms, please do not use our website.
+                By accessing or using FCISeller, you agree to be bound by these Terms & Conditions. If you do not agree to these terms, please do not use our website.
               </p>
             </div>
 
@@ -53,14 +53,14 @@ export default function TermsPage() {
             <div>
               <h2 className="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">Intellectual Property</h2>
               <p className="text-gray-700 dark:text-gray-300">
-                All content on this website, including text, images, and logos, is the property of Hopscotch and protected by copyright laws.
+                All content on this website, including text, images, and logos, is the property of FCISeller and protected by copyright laws.
               </p>
             </div>
 
             <div>
               <h2 className="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">Limitation of Liability</h2>
               <p className="text-gray-700 dark:text-gray-300">
-                Hopscotch shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our website.
+                FCISeller shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our website.
               </p>
             </div>
 

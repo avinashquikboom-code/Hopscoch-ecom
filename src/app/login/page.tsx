@@ -77,7 +77,7 @@ export default function LoginPage() {
         >
           <div>
             <p style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: '12px' }}>
-              AURA COUTURE
+              FCI SELLER
             </p>
             <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#ffffff', lineHeight: 1.1, marginBottom: '12px' }}>
               Welcome<br />back.
@@ -259,7 +259,7 @@ export default function LoginPage() {
 
           {/* Terms and Privacy */}
           <p style={{ fontSize: '11px', color: '#94A3B8', lineHeight: 1.6, marginBottom: '20px', marginTop: '20px' }}>
-            By continuing, you agree to Aura Couture's{' '}
+            By continuing, you agree to FCISeller's{' '}
             <Link href="/terms" style={{ color: '#0F766E', fontWeight: 600 }}>Terms of Use</Link> and{' '}
             <Link href="/privacy" style={{ color: '#0F766E', fontWeight: 600 }}>Privacy Policy</Link>.
           </p>
@@ -270,7 +270,7 @@ export default function LoginPage() {
               href="/register" 
               style={{ fontSize: '12px', fontWeight: 700, color: '#0F766E', textDecoration: 'none', letterSpacing: '0.05em' }}
             >
-              New to Aura Couture? <span style={{ textDecoration: 'underline' }}>Create an account</span>
+              New to FCISeller? <span style={{ textDecoration: 'underline' }}>Create an account</span>
             </Link>
           </div>
 

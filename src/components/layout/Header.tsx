@@ -188,7 +188,7 @@ export function Header() {
           
           {/* Left Side: Logo & Mobile Hamburger Menu */}
           <div className="flex items-center gap-2">
-            {/* Desktop Aura Couture Logo */}
+            {/* Desktop FCISeller Logo */}
             <Link href="/" className="hidden md:flex items-center gap-2.5 select-none shrink-0">
               <svg className="w-9 h-7.5 shrink-0" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>

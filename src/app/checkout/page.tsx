@@ -184,7 +184,7 @@ export default function CheckoutPage() {
         key: keyId,
         amount: paiseAmount,
         currency: currency,
-        name: 'AURA COUTURE',
+        name: 'FCI SELLER',
         description: `Order Checkout Reference: ${backendOrderId}`,
         order_id: razorpayOrderId,
         handler: async function (response: any) {
@@ -654,7 +654,7 @@ export default function CheckoutPage() {
 
       {/* FOOTER */}
       <footer className="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-400 font-medium">
-        <p>&copy; {new Date().getFullYear()} AURA COUTURE. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} FCI SELLER. All rights reserved.</p>
       </footer>
 
       {/* SECURE GATEWAY SIMULATOR MODAL */}

@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
         >
           <div>
             <p style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: '12px' }}>
-              AURA COUTURE
+              FCI SELLER
             </p>
             <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#ffffff', lineHeight: 1.1, marginBottom: '12px' }}>
               Reset<br />Password.

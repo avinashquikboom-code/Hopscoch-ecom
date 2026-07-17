@@ -53,7 +53,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="text-2xl font-semibold mb-3 text-gray-900 dark:text-white">Contact Us</h2>
               <p className="text-gray-700 dark:text-gray-300">
-                If you have any questions about this Privacy Policy, please contact us at privacy@hopscotch.com
+                If you have any questions about this Privacy Policy, please contact us at privacy@fciseller.com
               </p>
             </div>
           </CardContent>

@@ -130,7 +130,7 @@ export default function CartPage() {
                         {/* Info details */}
                         <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                           <div>
-                            <p className="text-[9px] font-black uppercase text-neutral-400 dark:text-neutral-500 tracking-wider leading-none">{item.product.brand || 'Aura Couture'}</p>
+                            <p className="text-[9px] font-black uppercase text-neutral-400 dark:text-neutral-500 tracking-wider leading-none">{item.product.brand || 'FCISeller'}</p>
                             <Link href={`/products/${item.product.id}`}>
                               <h3 className="font-semibold text-xs sm:text-sm text-neutral-800 dark:text-neutral-200 hover:text-[#0d9488] transition-colors truncate mt-1">{item.product.name}</h3>
                             </Link>

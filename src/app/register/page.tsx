@@ -39,7 +39,7 @@ export default function RegisterPage() {
         >
           <div>
             <p style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: '12px' }}>
-              AURA COUTURE
+              FCI SELLER
             </p>
             <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#ffffff', lineHeight: 1.1, marginBottom: '12px' }}>
               Create<br />Account.
@@ -253,7 +253,7 @@ export default function RegisterPage() {
             </div>
 
             <p style={{ fontSize: '11px', color: '#94A3B8', lineHeight: 1.6, marginBottom: '14px' }}>
-              By continuing, you agree to Aura Couture's{' '}
+              By continuing, you agree to FCISeller's{' '}
               <Link href="/terms" style={{ color: '#0F766E', fontWeight: 600 }}>Terms of Use</Link> and{' '}
               <Link href="/privacy" style={{ color: '#0F766E', fontWeight: 600 }}>Privacy Policy</Link>.
             </p>

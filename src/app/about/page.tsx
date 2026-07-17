@@ -4,13 +4,13 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-white">About Hopscotch</h1>
+        <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-white">About FCISeller</h1>
 
         <div className="space-y-8">
           <section>
             <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Our Story</h2>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Founded in 2024, Hopscotch has grown from a small startup to one of India's leading e-commerce platforms. Our mission is to make quality products accessible to everyone at affordable prices. We believe in providing an exceptional shopping experience with a focus on customer satisfaction, product quality, and innovation.
+              Founded in 2024, FCISeller has grown from a small startup to one of India's leading e-commerce platforms. Our mission is to make quality products accessible to everyone at affordable prices. We believe in providing an exceptional shopping experience with a focus on customer satisfaction, product quality, and innovation.
             </p>
           </section>
 

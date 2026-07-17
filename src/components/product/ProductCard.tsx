@@ -168,7 +168,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
           
           {/* Brand */}
           <p className="text-[10px] font-bold text-[#64748B] dark:text-gray-500 uppercase tracking-widest leading-none">
-            {product.brand || 'Aura Couture'}
+            {product.brand || 'FCISeller'}
           </p>
           
           {/* Product Name */}
@@ -244,7 +244,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
         <div>
           {/* Brand */}
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-            {product.brand || 'Aura Couture'}
+            {product.brand || 'FCISeller'}
           </p>
           
           {/* Product Name */}

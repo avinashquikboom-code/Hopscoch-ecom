@@ -146,7 +146,7 @@ export const SOCIAL_LINKS = {
 
 // Contact Info
 export const CONTACT_INFO = {
-  EMAIL: 'support@hopscotch.com',
+  EMAIL: 'support@fciseller.com',
   PHONE: '+91 1800-123-4567',
   ADDRESS: '123 E-commerce Street, Tech City, India - 560001',
 } as const;

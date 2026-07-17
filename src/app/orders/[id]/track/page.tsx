@@ -19,7 +19,7 @@ export default function TrackOrderPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [trackingInfo, setTrackingInfo] = useState<any>({
-    carrier: 'Aura Couture Logistics',
+    carrier: 'FCISeller Logistics',
     trackingNumber: 'Pending',
     status: 'PROCESSING',
     estimatedDate: 'In 5-7 days',

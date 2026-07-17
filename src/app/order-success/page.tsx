@@ -81,7 +81,7 @@ function OrderSuccessContent() {
               Order Confirmed! 🎉
             </h1>
             <p className="text-[#64748B] text-sm mb-5 animate-slide-up-fade" style={{ animationDelay: '0.4s' }}>
-              Thank you for shopping with Aura Couture
+              Thank you for shopping with FCISeller
             </p>
 
             {/* Order details pill */}

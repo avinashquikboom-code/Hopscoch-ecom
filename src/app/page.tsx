@@ -501,7 +501,7 @@ export default function Home() {
           <div className="max-w-md mx-auto">
             <h2 className="text-xl sm:text-2xl font-serif font-black text-gray-800 tracking-wide">SUBSCRIBE TO OUR NEWSLETTER</h2>
             <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-              Join the Aura Couture circle to receive updates on new seasonal drops, private previews, and exclusive offers.
+              Join the FCISeller circle to receive updates on new seasonal drops, private previews, and exclusive offers.
             </p>
             
             {!isSubscribed ? (

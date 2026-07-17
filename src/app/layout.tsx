@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { ToastProvider } from "@/components/ui/toast";
-import { LoginModal, ThemeProvider } from "@/components/common";
+import { LoginModal, ThemeProvider, DataInitializer } from "@/components/common";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "AURA - Premium Lifestyle & Fashion",
+  title: "FCISeller - Premium Lifestyle & Fashion",
   description: "Discover a curated selection of essentials that blend architectural precision with contemporary ease. Experience the new standard of premium living.",
 };
 
@@ -34,11 +34,13 @@ export default function RootLayout({
         <ReactQueryProvider>
           <ToastProvider>
             <ThemeProvider>
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <MobileBottomNav />
-              <LoginModal />
+              <DataInitializer>
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+                <MobileBottomNav />
+                <LoginModal />
+              </DataInitializer>
             </ThemeProvider>
           </ToastProvider>
         </ReactQueryProvider>

@@ -93,7 +93,7 @@ export default function StudioPage() {
         {/* Header label */}
         <div className="absolute top-8 left-8 sm:left-16 flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-[#14B8A6]" />
-          <span className="text-[11px] font-bold tracking-[0.3em] text-white/80 uppercase">AURA COUTURE STUDIO</span>
+          <span className="text-[11px] font-bold tracking-[0.3em] text-white/80 uppercase">FCI SELLER STUDIO</span>
         </div>
 
         {/* Main copy */}

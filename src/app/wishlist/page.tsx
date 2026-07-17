@@ -107,7 +107,7 @@ export default function WishlistPage() {
 
                     {/* Details */}
                     <div className="p-3">
-                      <p className="text-[10px] font-black uppercase tracking-wider text-neutral-450 dark:text-neutral-500">{product.brand || 'Aura Couture'}</p>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-neutral-450 dark:text-neutral-500">{product.brand || 'FCISeller'}</p>
                       <Link href={`/products/${product.id}`}>
                         <h3 className="text-xs text-neutral-850 dark:text-neutral-200 font-semibold truncate hover:text-[#0d9488] transition-colors mt-0.5">{product.name}</h3>
                       </Link>
