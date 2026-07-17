@@ -14,7 +14,7 @@ import {
 import { useCart, useClearCart } from '@/hooks';
 import { toast } from '@/components/ui/toast';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+import { API_BASE } from '@/constants';
 
 function authHeaders(): HeadersInit {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;

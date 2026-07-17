@@ -63,7 +63,7 @@ const INSTAGRAM_POSTS = [
   'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80',
 ];
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+import { API_BASE } from '@/constants';
 
 export default function Home() {
   const router = useRouter();

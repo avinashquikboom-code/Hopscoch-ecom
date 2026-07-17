@@ -533,7 +533,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       }
 
       const path = url.toLowerCase();
-      const isApiCall = path.includes("/api/") || path.includes("localhost:5001") || (process.env.NEXT_PUBLIC_API_URL && path.includes(process.env.NEXT_PUBLIC_API_URL.toLowerCase()));
+      const isApiCall = path.includes("/api/") || path.includes("api.fciseller.com") || (process.env.NEXT_PUBLIC_API_URL && path.includes(process.env.NEXT_PUBLIC_API_URL.toLowerCase()));
       if (!isApiCall) {
         return originalFetch.apply(this, args);
       }

@@ -1,10 +1,6 @@
 import { mockProducts, mockCategories } from '@/lib/mock-data';
 import { Product, Category, Review, ProductFilters, PaginatedResponse } from '@/types';
-import { PAGINATION } from '@/constants';
-
-// NEXT_PUBLIC_API_URL includes the /api prefix (used by the axios client). This
-// service appends /api itself, so strip a trailing /api to avoid a double prefix.
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001').replace(/\/api\/?$/, '');
+import { PAGINATION, API_BASE } from '@/constants';
 
 function delay(ms = 300) {
   return new Promise((res) => setTimeout(res, ms));
