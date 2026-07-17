@@ -1,13 +1,17 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Flame, Grid, List } from 'lucide-react';
 import { useState } from 'react';
 
 export default function SalePage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const dealProducts = mockProducts.filter(p => p.originalPrice && p.originalPrice > p.price);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 

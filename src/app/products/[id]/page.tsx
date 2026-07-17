@@ -1,11 +1,12 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 import { Heart, Share2, Star, ShieldCheck, ChevronRight, Tag, MapPin, Truck, HelpCircle, X, Check, MessageSquare, Download } from 'lucide-react';
 import { useAddToCart, useAddToWishlist, useRemoveFromWishlist } from '@/hooks';
 import { useWishlistStore } from '@/store';
@@ -39,6 +40,9 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function ProductDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const router = useRouter();
   const unwrappedParams = use(params);
   const product = mockProducts.find(p => p.id === unwrappedParams.id) || mockProducts[0];

@@ -1,4 +1,3 @@
-import { mockProducts, mockCategories } from '@/lib/mock-data';
 import { Product, Category, Review, ProductFilters, PaginatedResponse } from '@/types';
 import { PAGINATION, API_BASE } from '@/constants';
 

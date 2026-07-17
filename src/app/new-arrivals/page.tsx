@@ -1,12 +1,16 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 import { Sparkles, Grid, List } from 'lucide-react';
 
 export default function NewArrivalsPage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const newArrivals = mockProducts.filter(p => p.isNew);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 

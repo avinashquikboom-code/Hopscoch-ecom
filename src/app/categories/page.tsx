@@ -1,11 +1,17 @@
 'use client';
+import { useProducts, useCategories } from '@/hooks/use-products';
+
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { mockCategories, mockProducts } from '@/lib/mock-data';
 import { ArrowRight } from 'lucide-react';
 
 export default function CategoriesPage() {
+  const { data: categoriesData } = useCategories();
+  const mockCategories = categoriesData || [];
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
       <div className="container mx-auto">

@@ -1,4 +1,6 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -11,13 +13,15 @@ import { Price } from '@/components/common/Price';
 import { Rating } from '@/components/common/Rating';
 import { ImageCarousel } from '@/components/common/ImageCarousel';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 import { useAddToCart, useAddToWishlist } from '@/hooks';
 import { useWishlistStore } from '@/store';
 import { ShoppingCart, Heart, Truck, Shield, RotateCcw } from 'lucide-react';
 import { CURRENCY } from '@/constants';
 
 export default function ProductDetailsPage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const params = useParams();
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);

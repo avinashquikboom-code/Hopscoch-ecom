@@ -1,12 +1,16 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 import { Grid, List } from 'lucide-react';
 
 export default function BabyPage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const babyProducts = mockProducts.filter(p => p.category === 'Baby' || p.category === 'Fashion');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 

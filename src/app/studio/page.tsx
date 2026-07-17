@@ -1,11 +1,12 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Play, Sparkles, TrendingUp, Camera, Palette, Eye } from 'lucide-react';
-import { mockProducts } from '@/lib/mock-data';
 
 // ── Editorial Drops ────────────────────────────────────────────────────────
 const DROPS = [
@@ -63,9 +64,11 @@ const BTS_SHOTS = [
 ];
 
 // Featured Studio products (first 6 from mock)
-const studioProducts = mockProducts.slice(0, 6);
-
 export default function StudioPage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+  const studioProducts = mockProducts.slice(0, 6);
+
   const router = useRouter();
   const [activeDrop, setActiveDrop] = useState(0);
 

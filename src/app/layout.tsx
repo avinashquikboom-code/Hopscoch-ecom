@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { ToastProvider } from "@/components/ui/toast";
-import { LoginModal, ThemeProvider, DataInitializer } from "@/components/common";
+import { LoginModal, ThemeProvider } from "@/components/common";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -34,13 +34,11 @@ export default function RootLayout({
         <ReactQueryProvider>
           <ToastProvider>
             <ThemeProvider>
-              <DataInitializer>
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-                <MobileBottomNav />
-                <LoginModal />
-              </DataInitializer>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <MobileBottomNav />
+              <LoginModal />
             </ThemeProvider>
           </ToastProvider>
         </ReactQueryProvider>

@@ -1,9 +1,10 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,9 @@ import { Filter, SlidersHorizontal, X } from 'lucide-react';
 import { SORT_OPTIONS, PRICE_RANGES, RATING_OPTIONS } from '@/constants';
 
 export default function ProductsPage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const searchParams = useSearchParams();
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);

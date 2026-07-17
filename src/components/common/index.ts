@@ -6,4 +6,3 @@ export { ImageCarousel } from './ImageCarousel';
 export { Badge } from './Badge';
 export { LoginModal } from './LoginModal';
 export { ThemeProvider } from './ThemeProvider';
-export { DataInitializer } from './DataInitializer';

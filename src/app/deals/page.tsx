@@ -1,12 +1,16 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Flame } from 'lucide-react';
 
 export default function DealsPage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const dealProducts = mockProducts.filter(p => p.originalPrice && p.originalPrice > p.price);
 
   return (

@@ -1,10 +1,14 @@
 'use client';
+import { useProducts } from '@/hooks/use-products';
+
 
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts } from '@/lib/mock-data';
 
 export default function CasualWearPage() {
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const products = mockProducts.slice(0, 8);
 
   return (

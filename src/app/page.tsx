@@ -1,4 +1,6 @@
 'use client';
+import { useProducts, useCategories } from '@/hooks/use-products';
+
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -6,7 +8,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { mockCategories, mockProducts } from '@/lib/mock-data';
 import { ArrowRight, Clock, Sparkles, ChevronLeft, ChevronRight, Star, Tag, ShoppingBag, Eye, Mail, ShieldCheck, Undo, HelpCircle } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,6 +67,11 @@ const INSTAGRAM_POSTS = [
 import { API_BASE } from '@/constants';
 
 export default function Home() {
+  const { data: categoriesData } = useCategories();
+  const mockCategories = categoriesData || [];
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const router = useRouter();
   const [activeSlide, setActiveSlide] = useState(0);
   const [email, setEmail] = useState('');

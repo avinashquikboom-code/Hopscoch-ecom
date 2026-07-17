@@ -1,9 +1,10 @@
 'use client';
+import { useProducts, useCategories } from '@/hooks/use-products';
+
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
-import { mockProducts, mockCategories } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import {
   SlidersHorizontal, X, ChevronDown, ChevronUp,
@@ -163,6 +164,11 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
 
 /* ─── Main Products Content ─────────────────────────────────────────────── */
 function ProductsContent() {
+  const { data: categoriesData } = useCategories();
+  const mockCategories = categoriesData || [];
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
