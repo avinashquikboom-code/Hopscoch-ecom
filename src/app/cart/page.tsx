@@ -11,7 +11,7 @@ import { useCart, useUpdateCartItem, useRemoveFromCart, useApplyCoupon, useRemov
 import { toast } from '@/components/ui/toast';
 
 const AVAILABLE_COUPONS = [
-  { code: 'AURA10', description: 'Get 10% off on your entire purchase' },
+  { code: 'FCI10', description: 'Get 10% off on your entire purchase' },
   { code: 'WELCOME200', description: 'Flat ₹200 off for your first order' },
   { code: 'FESTIVE30', description: 'Get 30% off on couture collections' }
 ];

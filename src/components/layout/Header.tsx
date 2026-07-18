@@ -206,8 +206,8 @@ export function Header() {
                 <path d="M38 48 L62 48" stroke="url(#auraSecondary)" strokeWidth="10" strokeLinecap="round" />
               </svg>
               <div className="flex flex-col justify-center leading-none">
-                <span className="font-black text-sm tracking-widest text-[#282c3f] uppercase">AURA</span>
-                <span className="text-[7px] font-bold tracking-[0.25em] text-gray-500 uppercase mt-0.5">COUTURE</span>
+                <span className="font-black text-sm tracking-widest text-[#282c3f] uppercase">FCI</span>
+                <span className="text-[7px] font-bold tracking-[0.25em] text-gray-500 uppercase mt-0.5">SELLER</span>
               </div>
             </Link>
 
@@ -229,8 +229,8 @@ export function Header() {
                   <path d="M38 48 L62 48" stroke="url(#auraSecondary)" strokeWidth="10" strokeLinecap="round" />
                 </svg>
                 <div className="flex flex-col justify-center leading-none">
-                  <span className="font-black text-xs tracking-widest text-[#282c3f] uppercase">AURA</span>
-                  <span className="text-[6px] font-bold tracking-[0.25em] text-gray-500 uppercase mt-0.5">COUTURE</span>
+                  <span className="font-black text-xs tracking-widest text-[#282c3f] uppercase">FCI</span>
+                  <span className="text-[6px] font-bold tracking-[0.25em] text-gray-500 uppercase mt-0.5">SELLER</span>
                 </div>
               </Link>
             </div>

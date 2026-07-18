@@ -75,7 +75,7 @@ export default function AdminDashboard() {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Welcome to AURA Admin Panel</p>
+        <p className="text-muted-foreground mt-1">Welcome to FCI SELLER Admin Panel</p>
       </div>
 
       {/* Stats Cards */}

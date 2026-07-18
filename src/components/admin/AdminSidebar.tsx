@@ -139,8 +139,8 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
       <div className="flex items-center justify-between h-16 px-4 border-b border-border">
         {!collapsed && (
           <Link href="/admin" className="flex items-center gap-2">
-            <span className="text-xl font-serif font-bold text-primary tracking-wider">
-              AURA
+            <span className="text-lg font-serif font-bold text-primary tracking-wider">
+              FCI SELLER
             </span>
             <span className="text-xs font-medium text-muted-foreground">ADMIN</span>
           </Link>

@@ -17,7 +17,7 @@ export function Footer() {
           {/* Brand Info */}
           <div className="flex flex-col gap-4">
             <h3 className="text-xl font-serif font-semibold tracking-wider text-primary uppercase">
-              AURA
+              FCI SELLER
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
               Premium lifestyle and fashion curated for the modern individual. Quality, sustainability, and timeless design in every piece.
@@ -130,7 +130,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-border/40 mt-16 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Aura Premium Lifestyle. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} FCI Seller. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-primary transition-colors">
               Privacy Policy

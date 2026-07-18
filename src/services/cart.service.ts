@@ -50,7 +50,7 @@ export const cartService = {
     await delay(400);
     const cart = getLocalCart();
     const validCoupons: Record<string, number> = {
-      'AURA10': 0.10,
+      'FCI10': 0.10,
       'WELCOME200': 200,
       'FESTIVE30': 0.30,
     };
