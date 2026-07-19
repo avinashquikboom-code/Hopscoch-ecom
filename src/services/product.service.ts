@@ -128,30 +128,80 @@ const MOCK_REVIEWS: Review[] = [
   { id: 'r3', userId: 'u3', productId: '1', rating: 5, comment: 'Loved the packaging and the product quality exceeded expectations!', createdAt: '2026-05-10', helpfulCount: 18, user: { firstName: 'Ananya', lastName: 'K.' } } as any,
 ];
 
+function extractRawProducts(json: any): any[] {
+  if (!json) return [];
+  const rawData = json.data ?? json;
+  if (rawData && typeof rawData === 'object' && Array.isArray((rawData as any).products)) {
+    return (rawData as any).products;
+  }
+  if (Array.isArray(rawData)) {
+    return rawData;
+  }
+  if (Array.isArray(json.products)) {
+    return json.products;
+  }
+  return [];
+}
+
 export const productService = {
   async getProducts(
     filters?: ProductFilters,
     pagination: { page: number; limit: number } = { page: PAGINATION.DEFAULT_PAGE, limit: PAGINATION.DEFAULT_LIMIT }
   ): Promise<PaginatedResponse<Product>> {
     try {
-      const res = await fetch(`${API_BASE}/api/products`);
+      const params = new URLSearchParams();
+      params.append('page', String(pagination.page));
+      params.append('limit', String(pagination.limit));
+
+      if (filters) {
+        if (filters.category && filters.category !== 'all') {
+          const categories = await this.getCategories();
+          const found = categories.find(
+            (c) => c.name.toLowerCase() === filters.category!.toLowerCase()
+          );
+          if (found) {
+            params.append('categoryId', found.id);
+          }
+        }
+
+        if (filters.priceRange) {
+          const [min, max] = filters.priceRange;
+          if (min !== undefined && min > 0) params.append('minPrice', String(min));
+          if (max !== undefined && max < Infinity) params.append('maxPrice', String(max));
+        }
+
+        if (filters.sortBy) {
+          params.append('sort', filters.sortBy);
+        }
+      }
+
+      const queryString = params.toString();
+      const url = `${API_BASE}/api/products${queryString ? `?${queryString}` : ''}`;
+      const res = await fetch(url);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch products');
-      const raw = json.data ?? json.products ?? json ?? [];
-      if (Array.isArray(raw)) {
-        const mapped = raw.map(mapBackendProductToFrontend);
-        const filtered = applyFilters(mapped, filters);
-        const start = (pagination.page - 1) * pagination.limit;
-        const data = filtered.slice(start, start + pagination.limit);
-        return {
-          data,
-          total: filtered.length,
-          page: pagination.page,
-          limit: pagination.limit,
-          totalPages: Math.ceil(filtered.length / pagination.limit),
-        } as any;
-      }
-      return { data: [], total: 0, page: 1, limit: 12, totalPages: 1 } as any;
+
+      const raw = extractRawProducts(json);
+      const mapped = raw.map(mapBackendProductToFrontend);
+
+      // Apply other filters locally (search, rating, inStock, brands, colors, sizes, etc.)
+      const filtered = applyFilters(mapped, {
+        ...filters,
+        category: undefined,
+        priceRange: undefined,
+        sortBy: undefined
+      });
+
+      const total = json.data?.pagination?.total ?? json.pagination?.total ?? filtered.length;
+      const totalPages = json.data?.pagination?.totalPages ?? json.pagination?.totalPages ?? Math.ceil(filtered.length / pagination.limit);
+
+      return {
+        data: filtered,
+        total: total,
+        page: pagination.page,
+        limit: pagination.limit,
+        totalPages: totalPages,
+      };
     } catch (e) {
       console.error('Backend products fetch failed:', e);
       throw e;
@@ -178,12 +228,9 @@ export const productService = {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch featured products');
-      const raw = json.data ?? json.products ?? json ?? [];
-      if (Array.isArray(raw)) {
-        const mapped = raw.map(mapBackendProductToFrontend);
-        return mapped.filter((p) => p.isFeatured || p.rating >= 4.5).slice(0, 10);
-      }
-      return [];
+      const raw = extractRawProducts(json);
+      const mapped = raw.map(mapBackendProductToFrontend);
+      return mapped.filter((p) => p.isFeatured || p.rating >= 4.5).slice(0, 10);
     } catch (e) {
       console.error('Backend featured fetch failed:', e);
       return [];
@@ -195,12 +242,9 @@ export const productService = {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch trending products');
-      const raw = json.data ?? json.products ?? json ?? [];
-      if (Array.isArray(raw)) {
-        const mapped = raw.map(mapBackendProductToFrontend);
-        return [...mapped].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 10);
-      }
-      return [];
+      const raw = extractRawProducts(json);
+      const mapped = raw.map(mapBackendProductToFrontend);
+      return [...mapped].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 10);
     } catch (e) {
       console.error('Backend trending fetch failed:', e);
       return [];
@@ -212,12 +256,9 @@ export const productService = {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch new arrivals');
-      const raw = json.data ?? json.products ?? json ?? [];
-      if (Array.isArray(raw)) {
-        const mapped = raw.map(mapBackendProductToFrontend);
-        return [...mapped].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 10);
-      }
-      return [];
+      const raw = extractRawProducts(json);
+      const mapped = raw.map(mapBackendProductToFrontend);
+      return [...mapped].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 10);
     } catch (e) {
       console.error('Backend new arrivals fetch failed:', e);
       return [];
@@ -229,12 +270,9 @@ export const productService = {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch best sellers');
-      const raw = json.data ?? json.products ?? json ?? [];
-      if (Array.isArray(raw)) {
-        const mapped = raw.map(mapBackendProductToFrontend);
-        return [...mapped].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
-      }
-      return [];
+      const raw = extractRawProducts(json);
+      const mapped = raw.map(mapBackendProductToFrontend);
+      return [...mapped].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
     } catch (e) {
       console.error('Backend best sellers fetch failed:', e);
       return [];
@@ -246,15 +284,12 @@ export const productService = {
       const res = await fetch(`${API_BASE}/api/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Search failed');
-      const raw = json.data ?? json.products ?? json ?? [];
-      if (Array.isArray(raw)) {
-        const mapped = raw.map(mapBackendProductToFrontend);
-        const q = query.toLowerCase();
-        return mapped.filter(
-          (p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
-        );
-      }
-      return [];
+      const raw = extractRawProducts(json);
+      const mapped = raw.map(mapBackendProductToFrontend);
+      const q = query.toLowerCase();
+      return mapped.filter(
+        (p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
+      );
     } catch (e) {
       console.error('Backend search fetch failed:', e);
       return [];

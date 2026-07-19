@@ -6,6 +6,8 @@ export function useProducts(filters?: ProductFilters, page = 1, limit = 12) {
   return useQuery({
     queryKey: ['products', filters, page, limit],
     queryFn: () => productService.getProducts(filters, { page, limit }),
+    refetchInterval: 10000,
+    staleTime: 5000,
   });
 }
 
@@ -57,6 +59,8 @@ export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
     queryFn: () => productService.getCategories(),
+    refetchInterval: 10000,
+    staleTime: 5000,
   });
 }
 
