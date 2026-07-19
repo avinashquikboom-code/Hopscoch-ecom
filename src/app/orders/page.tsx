@@ -1,127 +1,170 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Package, Truck, CheckCircle, Clock, XCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useOrders } from '@/hooks/use-orders';
+import {
+  Package, Truck, CheckCircle, Clock, XCircle, RotateCcw,
+  ShoppingBag, ChevronRight, Loader2
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; Icon: any }> = {
+  pending:           { label: 'Pending',           color: 'text-amber-700',   bg: 'bg-amber-50',   border: 'border-amber-200',   Icon: Clock },
+  payment_pending:   { label: 'Payment Pending',   color: 'text-orange-700',  bg: 'bg-orange-50',  border: 'border-orange-200',  Icon: Clock },
+  confirmed:         { label: 'Confirmed',         color: 'text-teal-700',    bg: 'bg-teal-50',    border: 'border-teal-200',    Icon: CheckCircle },
+  processing:        { label: 'Processing',        color: 'text-blue-700',    bg: 'bg-blue-50',    border: 'border-blue-200',    Icon: Package },
+  packed:            { label: 'Packed',            color: 'text-violet-700',  bg: 'bg-violet-50',  border: 'border-violet-200',  Icon: Package },
+  shipped:           { label: 'Shipped',           color: 'text-cyan-700',    bg: 'bg-cyan-50',    border: 'border-cyan-200',    Icon: Truck },
+  in_transit:        { label: 'In Transit',        color: 'text-cyan-700',    bg: 'bg-cyan-50',    border: 'border-cyan-200',    Icon: Truck },
+  out_for_delivery:  { label: 'Out for Delivery',  color: 'text-sky-700',     bg: 'bg-sky-50',     border: 'border-sky-200',     Icon: Truck },
+  delivered:         { label: 'Delivered',         color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', Icon: CheckCircle },
+  cancelled:         { label: 'Cancelled',         color: 'text-red-700',     bg: 'bg-red-50',     border: 'border-red-200',     Icon: XCircle },
+  return_requested:  { label: 'Return Requested',  color: 'text-rose-700',    bg: 'bg-rose-50',    border: 'border-rose-200',    Icon: RotateCcw },
+  returned:          { label: 'Returned',          color: 'text-gray-700',    bg: 'bg-gray-50',    border: 'border-gray-200',    Icon: RotateCcw },
+  refund_processing: { label: 'Refund Processing', color: 'text-purple-700',  bg: 'bg-purple-50',  border: 'border-purple-200',  Icon: RotateCcw },
+  refund_completed:  { label: 'Refund Completed',  color: 'text-green-700',   bg: 'bg-green-50',   border: 'border-green-200',   Icon: CheckCircle },
+};
+
+function getStatus(status: string) {
+  const key = (status || '').toLowerCase().replace(/\s+/g, '_');
+  return STATUS_CONFIG[key] || STATUS_CONFIG['processing'];
+}
 
 export default function OrdersPage() {
-  const orders = [
-    {
-      id: 'ORD-001',
-      date: '2024-01-15',
-      status: 'delivered',
-      total: 1299,
-      items: 3,
-    },
-    {
-      id: 'ORD-002',
-      date: '2024-01-18',
-      status: 'shipped',
-      total: 899,
-      items: 2,
-    },
-    {
-      id: 'ORD-003',
-      date: '2024-01-20',
-      status: 'processing',
-      total: 2499,
-      items: 1,
-    },
-    {
-      id: 'ORD-004',
-      date: '2024-01-22',
-      status: 'cancelled',
-      total: 599,
-      items: 1,
-    },
-  ];
+  const router = useRouter();
+  const { data, isLoading, isError, refetch } = useOrders(1, 20);
+  const orders = data?.data || [];
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'delivered':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'shipped':
-        return <Truck className="h-5 w-5 text-blue-500" />;
-      case 'processing':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case 'cancelled':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return <Package className="h-5 w-5 text-gray-500" />;
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#0F766E] animate-spin" />
+      </div>
+    );
+  }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'delivered':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'shipped':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'processing':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
-    }
-  };
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4 px-4">
+        <XCircle className="w-12 h-12 text-red-400" />
+        <p className="text-[#334155] font-semibold">Failed to load orders.</p>
+        <button
+          onClick={() => refetch()}
+          className="px-5 py-2.5 bg-[#0F766E] text-white rounded-xl text-sm font-semibold hover:bg-[#115E59] transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-5 px-4">
+        <div className="w-20 h-20 bg-[#F0FDFA] rounded-3xl flex items-center justify-center">
+          <ShoppingBag className="w-10 h-10 text-[#0F766E]" strokeWidth={1.5} />
+        </div>
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-[#0F172A] mb-1">No Orders Yet</h2>
+          <p className="text-sm text-[#64748B]">When you place orders, they'll appear here.</p>
+        </div>
+        <button
+          onClick={() => router.push('/products')}
+          className="px-6 py-3 bg-[#0F766E] text-white rounded-xl text-sm font-semibold hover:bg-[#115E59] transition-colors"
+        >
+          Start Shopping
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
-      <div className="container mx-auto max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">My Orders</h1>
-        
-        {orders.length === 0 ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <Package className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-              <h2 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">No orders yet</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Start shopping to see your orders here</p>
-              <Button className="bg-teal-600 hover:bg-teal-700">
-                Start Shopping
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <Card key={order.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{order.id}</CardTitle>
-                    <Badge className={getStatusColor(order.status)}>
-                      <div className="flex items-center gap-1">
-                        {getStatusIcon(order.status)}
-                        <span className="capitalize">{order.status}</span>
+    <div className="min-h-screen bg-[#F8FAFC]">
+      {/* Header */}
+      <div className="bg-white border-b border-[#E2E8F0] sticky top-0 z-30">
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          <h1 className="text-lg font-bold text-[#0F172A]">My Orders</h1>
+          <p className="text-xs text-[#64748B]">{orders.length} order{orders.length !== 1 ? 's' : ''}</p>
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+        {orders.map((order: any) => {
+          const statusKey = (order.status || '').toLowerCase();
+          const cfg = getStatus(statusKey);
+          const StatusIcon = cfg.Icon;
+          const rawId = order.id;
+          const displayId = order.orderNumber || `#${order.id}`;
+          const orderDate = order.createdAt
+            ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '';
+          const itemCount = (order.items || []).length;
+          const total = Number(order.total || 0);
+          // First product image for preview
+          const firstImage = order.items?.[0]?.product?.images?.[0];
+
+          return (
+            <div
+              key={rawId}
+              className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="p-5">
+                {/* Header row */}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div>
+                    <p className="text-sm font-bold text-[#0F172A] font-mono">{displayId}</p>
+                    <p className="text-xs text-[#94A3B8] mt-0.5">{orderDate}</p>
+                  </div>
+                  <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                    <StatusIcon className="w-3.5 h-3.5" />
+                    {cfg.label}
+                  </span>
+                </div>
+
+                {/* Items preview row */}
+                {itemCount > 0 && (
+                  <div className="flex items-center gap-2 mb-4">
+                    {order.items.slice(0, 3).map((item: any, i: number) => {
+                      const imgUrl = item.product?.images?.[0];
+                      return imgUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          key={i}
+                          src={imgUrl}
+                          alt={item.product?.name || 'Product'}
+                          className="w-12 h-14 object-cover rounded-lg border border-[#E2E8F0] flex-shrink-0"
+                        />
+                      ) : (
+                        <div key={i} className="w-12 h-14 bg-[#F1F5F9] rounded-lg flex-shrink-0 flex items-center justify-center">
+                          <Package className="w-4 h-4 text-[#94A3B8]" />
+                        </div>
+                      );
+                    })}
+                    {itemCount > 3 && (
+                      <div className="w-12 h-14 bg-[#F1F5F9] rounded-lg flex-shrink-0 flex items-center justify-center">
+                        <span className="text-xs font-bold text-[#64748B]">+{itemCount - 3}</span>
                       </div>
-                    </Badge>
+                    )}
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                        Placed on {new Date(order.date).toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {order.items} {order.items === 1 ? 'item' : 'items'}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-gray-900 dark:text-white">
-                        ₹{order.total.toFixed(2)}
-                      </p>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        View Details
-                      </Button>
-                    </div>
+                )}
+
+                {/* Footer row */}
+                <div className="flex items-center justify-between pt-3 border-t border-[#E2E8F0]">
+                  <div>
+                    <p className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider">Total</p>
+                    <p className="text-base font-bold text-[#0F172A]">₹{total.toLocaleString('en-IN')}</p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                  <Link
+                    href={`/orders/${rawId}`}
+                    className="inline-flex items-center gap-1 px-4 py-2 bg-[#F0FDFA] hover:bg-[#0F766E] text-[#0F766E] hover:text-white border border-[#99F6E4] hover:border-[#0F766E] rounded-xl text-sm font-semibold transition-all"
+                  >
+                    View Details <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

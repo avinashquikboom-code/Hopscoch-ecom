@@ -6,100 +6,105 @@ import { useParams } from 'next/navigation';
 import {
   ArrowLeft, Package, Truck, CheckCircle, Clock, XCircle,
   MapPin, CreditCard, Star, RefreshCw, PhoneCall,
-  ChevronRight, Download, MessageSquare, RotateCcw, ShieldCheck
+  ChevronRight, Download, MessageSquare, RotateCcw, ShieldCheck, Loader2
 } from 'lucide-react';
-
-// ── Mock order data ────────────────────────────────────────────
-const MOCK_ORDERS: Record<string, any> = {
-  'AUR-78421': {
-    id: '#AUR-78421', date: 'Jun 12, 2026', status: 'delivered',
-    total: 2999, shipping: 0, tax: 540, discount: 300,
-    paymentMethod: 'Visa •••• 4582',
-    address: '42 Sunshine Lane, Koregaon Park, Pune, Maharashtra – 411001',
-    items: [
-      { id: '1', name: 'Premium Linen Blazer', brand: 'FCISeller', size: 'M', color: 'Sage Green', qty: 1, price: 1799, image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=200&q=80' },
-      { id: '2', name: 'Tailored Chinos', brand: 'Aura Studio', size: '32', color: 'Ivory', qty: 1, price: 1200, image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=200&q=80' },
-    ],
-    timeline: [
-      { label: 'Order Placed', time: 'Jun 12 • 10:22 AM', done: true },
-      { label: 'Order Confirmed', time: 'Jun 12 • 11:00 AM', done: true },
-      { label: 'Packed & Dispatched', time: 'Jun 13 • 9:15 AM', done: true },
-      { label: 'In Transit', time: 'Jun 14 • 7:00 AM', done: true },
-      { label: 'Out for Delivery', time: 'Jun 16 • 8:30 AM', done: true },
-      { label: 'Delivered', time: 'Jun 16 • 2:15 PM', done: true },
-    ],
-  },
-  'AUR-78316': {
-    id: '#AUR-78316', date: 'Jun 03, 2026', status: 'shipped',
-    total: 1890, shipping: 0, tax: 340, discount: 0,
-    paymentMethod: 'UPI — avinash@ybl',
-    address: 'Level 5, Tower B, Cybercity, Magarpatta, Pune – 411013',
-    items: [
-      { id: '3', name: 'Silk Wrap Dress', brand: 'FCISeller', size: 'S', color: 'Dusty Rose', qty: 1, price: 1890, image: 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=200&q=80' },
-    ],
-    timeline: [
-      { label: 'Order Placed', time: 'Jun 03 • 3:45 PM', done: true },
-      { label: 'Order Confirmed', time: 'Jun 03 • 4:00 PM', done: true },
-      { label: 'Packed & Dispatched', time: 'Jun 04 • 10:00 AM', done: true },
-      { label: 'In Transit', time: 'Jun 05 • 8:00 AM', done: true },
-      { label: 'Out for Delivery', time: 'Expected Jun 07', done: false },
-      { label: 'Delivered', time: 'Estimated Jun 07', done: false },
-    ],
-  },
-  'AUR-77904': {
-    id: '#AUR-77904', date: 'May 25, 2026', status: 'processing',
-    total: 4799, shipping: 0, tax: 864, discount: 500,
-    paymentMethod: 'Net Banking — HDFC',
-    address: '42 Sunshine Lane, Koregaon Park, Pune, Maharashtra – 411001',
-    items: [
-      { id: '4', name: 'Cashmere Overcoat', brand: 'FCISeller', size: 'L', color: 'Charcoal', qty: 1, price: 3499, image: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=200&q=80' },
-      { id: '5', name: 'Merino Turtleneck', brand: 'Aura Studio', size: 'M', color: 'Cream', qty: 2, price: 650, image: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=200&q=80' },
-    ],
-    timeline: [
-      { label: 'Order Placed', time: 'May 25 • 6:30 PM', done: true },
-      { label: 'Order Confirmed', time: 'May 25 • 6:45 PM', done: true },
-      { label: 'Packed & Dispatched', time: 'Processing...', done: false },
-      { label: 'In Transit', time: 'Pending', done: false },
-      { label: 'Out for Delivery', time: 'Pending', done: false },
-      { label: 'Delivered', time: 'Estimated May 30', done: false },
-    ],
-  },
-};
-
-function getFallbackOrder(id: string) {
-  return {
-    id: `#${id}`, date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-    status: 'processing', total: 1499, shipping: 0, tax: 270, discount: 0,
-    paymentMethod: 'Card •••• 0000',
-    address: 'Your delivery address',
-    items: [{ id: '0', name: 'FCISeller Item', brand: 'FCISeller', size: 'M', color: 'Teal', qty: 1, price: 1499, image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200&q=80' }],
-    timeline: [
-      { label: 'Order Placed', time: 'Just now', done: true },
-      { label: 'Order Confirmed', time: 'Processing', done: false },
-      { label: 'Packed & Dispatched', time: 'Pending', done: false },
-      { label: 'In Transit', time: 'Pending', done: false },
-      { label: 'Out for Delivery', time: 'Pending', done: false },
-      { label: 'Delivered', time: 'Estimated soon', done: false },
-    ],
-  };
-}
+import { useOrder } from '@/hooks/use-orders';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; Icon: any }> = {
-  delivered:  { label: 'Delivered',  color: 'text-emerald-700', bg: 'bg-emerald-50',  border: 'border-emerald-200', Icon: CheckCircle },
-  shipped:    { label: 'Shipped',    color: 'text-blue-700',    bg: 'bg-blue-50',     border: 'border-blue-200',    Icon: Truck },
-  processing: { label: 'Processing', color: 'text-amber-700',   bg: 'bg-amber-50',    border: 'border-amber-200',   Icon: Clock },
-  cancelled:  { label: 'Cancelled',  color: 'text-red-700',     bg: 'bg-red-50',      border: 'border-red-200',     Icon: XCircle },
+  pending:           { label: 'Pending',           color: 'text-amber-700',   bg: 'bg-amber-50',   border: 'border-amber-200',   Icon: Clock },
+  payment_pending:   { label: 'Payment Pending',   color: 'text-orange-700',  bg: 'bg-orange-50',  border: 'border-orange-200',  Icon: Clock },
+  confirmed:         { label: 'Confirmed',         color: 'text-teal-700',    bg: 'bg-teal-50',    border: 'border-teal-200',    Icon: CheckCircle },
+  processing:        { label: 'Processing',        color: 'text-blue-700',    bg: 'bg-blue-50',    border: 'border-blue-200',    Icon: Package },
+  packed:            { label: 'Packed',            color: 'text-violet-700',  bg: 'bg-violet-50',  border: 'border-violet-200',  Icon: Package },
+  shipped:           { label: 'Shipped',           color: 'text-cyan-700',    bg: 'bg-cyan-50',    border: 'border-cyan-200',    Icon: Truck },
+  in_transit:        { label: 'In Transit',        color: 'text-cyan-700',    bg: 'bg-cyan-50',    border: 'border-cyan-200',    Icon: Truck },
+  out_for_delivery:  { label: 'Out for Delivery',  color: 'text-sky-700',     bg: 'bg-sky-50',     border: 'border-sky-200',     Icon: Truck },
+  delivered:         { label: 'Delivered',         color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', Icon: CheckCircle },
+  cancelled:         { label: 'Cancelled',         color: 'text-red-700',     bg: 'bg-red-50',     border: 'border-red-200',     Icon: XCircle },
+  return_requested:  { label: 'Return Requested',  color: 'text-rose-700',    bg: 'bg-rose-50',    border: 'border-rose-200',    Icon: RotateCcw },
+  returned:          { label: 'Returned',          color: 'text-gray-700',    bg: 'bg-gray-50',    border: 'border-gray-200',    Icon: RotateCcw },
+  refund_processing: { label: 'Refund Processing', color: 'text-purple-700',  bg: 'bg-purple-50',  border: 'border-purple-200',  Icon: RefreshCw },
+  refund_completed:  { label: 'Refund Completed',  color: 'text-green-700',   bg: 'bg-green-50',   border: 'border-green-200',   Icon: CheckCircle },
 };
+
+function getStatusCfg(status: string) {
+  const key = (status || '').toLowerCase().replace(/\s+/g, '_');
+  return STATUS_CONFIG[key] || STATUS_CONFIG['processing'];
+}
 
 export default function OrderDetailPage() {
   const params = useParams();
   const rawId = (params.id as string) || '';
-  // Support both AUR-78421 format and #AUR-78421
   const cleanId = rawId.replace('#', '');
-  const order = MOCK_ORDERS[cleanId] || getFallbackOrder(cleanId);
-  const status = STATUS_CONFIG[order.status] || STATUS_CONFIG.processing;
+
+  const { data: order, isLoading, isError, refetch } = useOrder(cleanId);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#0F766E] animate-spin" />
+      </div>
+    );
+  }
+
+  if (isError || !order) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center gap-4 px-4">
+        <XCircle className="w-12 h-12 text-red-400" />
+        <p className="text-[#334155] font-semibold">Order not found or could not be loaded.</p>
+        <div className="flex gap-3">
+          <Link href="/orders" className="px-5 py-2.5 border border-[#E2E8F0] text-[#64748B] rounded-xl text-sm font-semibold hover:bg-[#F8FAFC] transition-colors">
+            Back to Orders
+          </Link>
+          <button
+            onClick={() => refetch()}
+            className="px-5 py-2.5 bg-[#0F766E] text-white rounded-xl text-sm font-semibold hover:bg-[#115E59] transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const statusKey = (order.status || '').toLowerCase().replace(/\s+/g, '_');
+  const status = getStatusCfg(statusKey);
   const StatusIcon = status.Icon;
-  const lastDone = order.timeline.filter((t: any) => t.done).length;
+
+  // Build timeline from backend data
+  const timelineEvents: any[] = (order as any).timeline || [];
+  // Map backend OrderTimelineEvent to UI steps
+  const timelineSteps = timelineEvents.length > 0
+    ? timelineEvents.map((t: any) => ({
+        label: (t.status || '').replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+        time: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '',
+        note: t.note || '',
+        done: true,
+      }))
+    : [{ label: 'Order Placed', time: 'Just now', done: true }];
+
+  const lastDone = timelineSteps.filter((t: any) => t.done).length;
+
+  // Address
+  const addr = (order as any).shippingAddress || {};
+  const addressStr = typeof addr === 'string'
+    ? addr
+    : [addr.fullName, addr.address, addr.city, addr.state, addr.zipCode, addr.country].filter(Boolean).join(', ');
+
+  // Items
+  const items = (order as any).items || [];
+
+  const displayId = (order as any).orderNumber || `#${order.id}`;
+  const orderDate = (order as any).createdAt
+    ? new Date((order as any).createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : '';
+  const total = Number((order as any).total || 0);
+  const subtotal = Number((order as any).subtotal || total);
+  const tax = Number((order as any).tax || 0);
+  const shipping = Number((order as any).shipping || 0);
+  const discount = Number((order as any).discount || 0);
+  const paymentMethod = ((order as any).paymentMethod || 'card').toUpperCase();
+  const trackingNumber = (order as any).trackingNumber;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -110,8 +115,8 @@ export default function OrderDetailPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-base font-bold text-[#0F172A]">Order {order.id}</h1>
-            <p className="text-xs text-[#64748B]">Placed on {order.date}</p>
+            <h1 className="text-base font-bold text-[#0F172A]">Order {displayId}</h1>
+            <p className="text-xs text-[#64748B]">Placed on {orderDate}</p>
           </div>
           <div className="ml-auto">
             <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${status.color} ${status.bg} ${status.border}`}>
@@ -151,26 +156,45 @@ export default function OrderDetailPage() {
         <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
           <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
             <h2 className="text-sm font-bold text-[#0F172A]">Items Ordered</h2>
-            <span className="text-xs text-[#64748B]">{order.items.length} {order.items.length === 1 ? 'item' : 'items'}</span>
+            <span className="text-xs text-[#64748B]">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
           </div>
           <div className="divide-y divide-[#E2E8F0]">
-            {order.items.map((item: any) => (
-              <div key={item.id} className="flex gap-4 p-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-xl border border-[#E2E8F0] flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">{item.brand}</p>
-                  <p className="text-sm font-semibold text-[#0F172A] leading-snug mt-0.5">{item.name}</p>
-                  <p className="text-xs text-[#64748B] mt-1">Size: {item.size} · Color: {item.color} · Qty: {item.qty}</p>
-                  <p className="text-sm font-bold text-[#0F172A] mt-2">₹{item.price.toLocaleString()}</p>
+            {items.length > 0 ? items.map((item: any) => {
+              const imgUrl = item.product?.images?.[0] || item.product?.images?.[0]?.url;
+              const name = item.product?.name || item.productNameSnapshot || 'Product';
+              const variant = item.variantSnapshot || {};
+              const price = Number(item.price || 0);
+              const qty = item.quantity || 1;
+              return (
+                <div key={item.id} className="flex gap-4 p-4">
+                  {imgUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={imgUrl} alt={name} className="w-16 h-20 object-cover rounded-xl border border-[#E2E8F0] flex-shrink-0" />
+                  ) : (
+                    <div className="w-16 h-20 bg-[#F1F5F9] rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Package className="w-6 h-6 text-[#94A3B8]" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">FCISeller</p>
+                    <p className="text-sm font-semibold text-[#0F172A] leading-snug mt-0.5">{name}</p>
+                    <p className="text-xs text-[#64748B] mt-1">
+                      {variant.size ? `Size: ${variant.size}` : ''}
+                      {variant.color ? ` · Color: ${variant.color}` : ''}
+                      {` · Qty: ${qty}`}
+                    </p>
+                    <p className="text-sm font-bold text-[#0F172A] mt-2">₹{price.toLocaleString('en-IN')}</p>
+                  </div>
+                  {statusKey === 'delivered' && (
+                    <Link href={`/orders/${cleanId}/review`} className="flex items-center gap-1 text-xs font-semibold text-[#0F766E] hover:underline self-start mt-1 flex-shrink-0">
+                      <Star className="w-3.5 h-3.5" /> Rate
+                    </Link>
+                  )}
                 </div>
-                {order.status === 'delivered' && (
-                  <Link href={`/orders/${cleanId}/review`} className="flex items-center gap-1 text-xs font-semibold text-[#0F766E] hover:underline self-start mt-1 flex-shrink-0">
-                    <Star className="w-3.5 h-3.5" /> Rate
-                  </Link>
-                )}
-              </div>
-            ))}
+              );
+            }) : (
+              <div className="p-8 text-center text-[#94A3B8] text-sm">No items found</div>
+            )}
           </div>
         </div>
 
@@ -184,9 +208,9 @@ export default function OrderDetailPage() {
           </div>
           <div className="p-5">
             <div className="space-y-0">
-              {order.timeline.map((step: any, i: number) => {
-                const isLast = i === order.timeline.length - 1;
-                const isCurrent = i === lastDone - 1 && !order.timeline[i + 1]?.done;
+              {timelineSteps.map((step: any, i: number) => {
+                const isLast = i === timelineSteps.length - 1;
+                const isCurrent = i === lastDone - 1 && !timelineSteps[i + 1]?.done;
                 return (
                   <div key={i} className="flex gap-4">
                     <div className="flex flex-col items-center">
@@ -202,6 +226,7 @@ export default function OrderDetailPage() {
                     <div className="pb-6">
                       <p className={`text-sm font-semibold ${step.done ? 'text-[#0F172A]' : 'text-[#94A3B8]'}`}>{step.label}</p>
                       <p className="text-xs text-[#64748B]">{step.time}</p>
+                      {step.note && <p className="text-xs text-[#94A3B8] mt-0.5">{step.note}</p>}
                     </div>
                   </div>
                 );
@@ -218,8 +243,7 @@ export default function OrderDetailPage() {
             </div>
             <div>
               <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider mb-1">Delivery Address</p>
-              <p className="text-sm font-semibold text-[#0F172A]">Avinash Magar</p>
-              <p className="text-sm text-[#64748B] leading-relaxed">{order.address}</p>
+              <p className="text-sm text-[#64748B] leading-relaxed">{addressStr || 'Address not available'}</p>
             </div>
           </div>
         </div>
@@ -233,24 +257,24 @@ export default function OrderDetailPage() {
             <div className="flex items-center gap-2 pb-3 border-b border-[#E2E8F0]">
               <CreditCard className="w-4 h-4 text-[#64748B]" />
               <span className="text-sm text-[#64748B]">Paid via</span>
-              <span className="text-sm font-semibold text-[#0F172A] ml-auto">{order.paymentMethod}</span>
+              <span className="text-sm font-semibold text-[#0F172A] ml-auto">{paymentMethod}</span>
             </div>
             {[
-              { label: 'Subtotal', value: order.total },
-              { label: 'Discount', value: -order.discount, green: true },
-              { label: 'Shipping', value: order.shipping === 0 ? 'FREE' : `₹${order.shipping}`, green: order.shipping === 0 },
-              { label: 'GST (18%)', value: order.tax },
+              { label: 'Subtotal', value: subtotal },
+              { label: 'Discount', value: -discount, green: true },
+              { label: 'Shipping', value: shipping === 0 ? 'FREE' : `₹${shipping}`, green: shipping === 0 },
+              { label: 'GST (18%)', value: tax },
             ].map(({ label, value, green }) => (
               <div key={label} className="flex justify-between text-sm">
                 <span className="text-[#64748B]">{label}</span>
                 <span className={`font-medium ${green ? 'text-emerald-600' : 'text-[#0F172A]'}`}>
-                  {typeof value === 'string' ? value : value < 0 ? `− ₹${Math.abs(value)}` : `₹${value}`}
+                  {typeof value === 'string' ? value : value < 0 ? `− ₹${Math.abs(value).toLocaleString('en-IN')}` : `₹${value.toLocaleString('en-IN')}`}
                 </span>
               </div>
             ))}
             <div className="flex justify-between text-base font-bold border-t border-[#E2E8F0] pt-3">
               <span className="text-[#0F172A]">Total Paid</span>
-              <span className="text-[#0F766E]">₹{order.total.toLocaleString()}</span>
+              <span className="text-[#0F766E]">₹{total.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>

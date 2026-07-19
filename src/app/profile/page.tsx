@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useOrders } from '@/hooks/use-orders';
 import { useAuthStore } from '@/store';
 import { useRouter } from 'next/navigation';
 import {
@@ -34,11 +35,26 @@ const MOCK_USER = {
   phone: '+91 98765 43210',
 };
 
-const INITIAL_ORDERS = [
-  { id: '#AUR-78421', date: 'Jun 12, 2026', status: 'Delivered',  steps: 5, amount: 2999, items: 2, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-  { id: '#AUR-78316', date: 'Jun 03, 2026', status: 'Shipped',    steps: 3, amount: 1890,  items: 1, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-  { id: '#AUR-77904', date: 'May 25, 2026', status: 'Processing', steps: 1, amount: 4799, items: 3, color: 'text-amber-600 bg-amber-50 border-amber-200' },
-];
+// Maps backend status to stepper step index (0-5 for ORDER_TRACKING_STEPS)
+function statusToStep(status: string): number {
+  const s = (status || '').toLowerCase();
+  if (s === 'delivered') return 5;
+  if (s === 'out_for_delivery' || s === 'out for delivery') return 4;
+  if (s === 'in_transit' || s === 'shipped') return 3;
+  if (s === 'packed' || s === 'ready_to_ship') return 2;
+  if (s === 'confirmed' || s === 'processing') return 1;
+  return 0; // pending, cancelled, etc.
+}
+
+function statusToColor(status: string): string {
+  const s = (status || '').toLowerCase();
+  if (s === 'delivered') return 'text-emerald-600 bg-emerald-50 border-emerald-200';
+  if (s === 'shipped' || s === 'in_transit') return 'text-blue-600 bg-blue-50 border-blue-200';
+  if (s === 'processing' || s === 'confirmed' || s === 'packed') return 'text-amber-600 bg-amber-50 border-amber-200';
+  if (s === 'cancelled') return 'text-red-600 bg-red-50 border-red-200';
+  if (s.includes('return')) return 'text-rose-600 bg-rose-50 border-rose-200';
+  return 'text-gray-600 bg-gray-50 border-gray-200';
+}
 
 const MOCK_ADDRESSES = [
   { id: '1', type: 'Home', Icon: Home,       name: 'Avinash Magar', line1: '42 Sunshine Lane, Koregaon Park', city: 'Pune, Maharashtra – 411001', isDefault: true  },
@@ -150,8 +166,21 @@ export default function ProfilePage() {
     router.push('/');
   };
 
+  /* ── Real orders from backend ─────────────────────────────────────── */
+  const { data: ordersData } = useOrders(1, 20);
+  const realOrders = (ordersData?.data || []).map((o: any) => ({
+    id: o.orderNumber || `#${o.id}`,
+    _rawId: o.id,
+    date: o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+    status: (o.status || 'pending').charAt(0).toUpperCase() + (o.status || 'pending').slice(1).toLowerCase(),
+    steps: statusToStep(o.status || ''),
+    amount: Number(o.total || 0),
+    items: (o.items || []).length,
+    color: statusToColor(o.status || ''),
+  }));
+
   /* ── Return Request states ─────────────────────────────────────────── */
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<any[]>([]);
   const [activeReturnOrder, setActiveReturnOrder] = useState<string | null>(null);
   
   // Return Form inputs
@@ -294,7 +323,7 @@ export default function ProfilePage() {
             <p className="text-sm text-muted-foreground mt-0.5">Track shipping timelines, request returns and check refunds.</p>
           </div>
           
-          {orders.map(order => {
+          {(realOrders.length > 0 ? realOrders : orders).map((order: any) => {
             const isDelivered = order.status === 'Delivered';
             const isReturnMode = order.status === 'Return Requested' || order.status === 'Returned';
             const trackingSteps = isReturnMode ? RETURN_STEPS : ORDER_TRACKING_STEPS;
