@@ -265,7 +265,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 pb-16 font-sans transition-colors duration-300">
       
       {/* Container */}
-      <div className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 py-3">
+      <div className="container mx-auto px-4 sm:px-6 md:px-12 py-3">
         
         {/* Breadcrumb */}
         <div className="flex items-center gap-1 text-xs text-neutral-450 dark:text-neutral-500 mb-3.5">

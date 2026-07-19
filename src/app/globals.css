@@ -341,17 +341,47 @@
 }
 
 /* ============================================================
-   WEBSITE MAX WIDTH CONSTRAINT (1550px - 1920px)
+   WEBSITE MAX WIDTH CONSTRAINT (1550px - 1920px fluid)
    ============================================================ */
 .container {
-  max-width: 1550px !important;
   width: 100% !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  max-width: 100% !important;
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px !important;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px !important;
+  }
+}
+
+@media (min-width: 1550px) {
+  .container {
+    max-width: 1550px !important;
+  }
+}
+
+@media (min-width: 1680px) {
+  .container {
+    max-width: 1680px !important;
+  }
+}
+
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1800px !important;
+  }
 }
 
 @media (min-width: 1920px) {
   .container {
-    max-width: 1720px !important;
+    max-width: 1920px !important;
   }
 }

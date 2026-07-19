@@ -153,7 +153,7 @@ export default function Home() {
 
       {/* 1. Category Bar (Modern Floating Glass Track) */}
       <section className="mx-4 sm:mx-6 md:mx-12 my-6 rounded-2xl backdrop-blur-md bg-white/45 dark:bg-gray-950/40 border border-white/40 dark:border-white/5 py-4 px-6 shadow-md transition-all duration-300 relative z-10">
-        <div className="container mx-auto max-w-[1550px]">
+        <div className="container mx-auto">
           <div className="flex items-center justify-between gap-8 overflow-x-auto scrollbar-hide py-1">
             {mockCategories.map((category) => (
               <Link
@@ -310,7 +310,7 @@ export default function Home() {
       ) : null}
  
       {/* 3. Flash Sale Section (Glowing glass design with premium countdown) */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-10 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 relative z-10">
         <div className="bg-white/40 dark:bg-gray-950/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row justify-between items-baseline sm:items-center border-b border-gray-100 dark:border-gray-900 pb-5 mb-6 gap-4">
             <div className="flex items-center gap-3.5 flex-wrap">
@@ -348,7 +348,7 @@ export default function Home() {
       </section>
 
       {/* 4. Today's Deals (Slider) */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-8 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-8 relative z-10">
         <div className="bg-white/40 dark:bg-gray-950/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden">
           <div className="flex justify-between items-center px-6 sm:px-8 py-5 border-b border-gray-100 dark:border-gray-900 flex-wrap gap-4">
             <h2 className="text-base sm:text-lg font-extrabold uppercase text-gray-900 dark:text-gray-100 tracking-wider flex items-center gap-2">
@@ -376,7 +376,7 @@ export default function Home() {
       </section>
 
       {/* 5. Asymmetric Editorial Grid / Curator's Picks */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-10 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 relative z-10">
         <div className="text-center mb-8">
           <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 font-mono tracking-widest text-[9px] uppercase px-3 py-1 rounded-full border border-purple-500/20 mb-2">
             Curator's Drops
@@ -452,7 +452,7 @@ export default function Home() {
       </section>
 
       {/* 6. New Arrivals (Grid Layout) */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-10 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 relative z-10">
         <div className="bg-white/40 dark:bg-gray-950/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden p-6 sm:p-8">
           <div className="flex justify-between items-baseline border-b border-gray-100 dark:border-gray-900 pb-5 mb-6">
             <h2 className="text-base sm:text-lg font-extrabold uppercase text-gray-900 dark:text-gray-100 tracking-wider flex items-center gap-2">
@@ -473,7 +473,7 @@ export default function Home() {
       </section>
 
       {/* 7. Trending & Best Sellers (Side-by-side stacked Grids) */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
         
         {/* Trending Section */}
         <div className="bg-white/40 dark:bg-gray-950/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden p-6 sm:p-8">
@@ -510,7 +510,7 @@ export default function Home() {
       </section>
 
       {/* 8. Top Rated / Popular Products (Grid) */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-10 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 relative z-10">
         <div className="bg-white/40 dark:bg-gray-950/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden p-6 sm:p-8">
           <div className="flex justify-between items-baseline border-b border-gray-100 dark:border-gray-900 pb-5 mb-6">
             <h2 className="text-base sm:text-lg font-extrabold uppercase text-gray-900 dark:text-gray-100 tracking-wider flex items-center gap-2">
@@ -531,7 +531,7 @@ export default function Home() {
       </section>
 
       {/* 9. Instagram Social Feed Section */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-10 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 relative z-10">
         <div className="bg-white/40 dark:bg-gray-950/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/50 dark:border-white/5 p-6 sm:p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center p-3.5 rounded-full bg-teal-500/10 text-[#0d9488] mb-3">
@@ -573,7 +573,7 @@ export default function Home() {
       </section>
 
       {/* 10. Premium Newsletter Block */}
-      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 mt-10 pb-16 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 pb-16 relative z-10">
         <div className="bg-gradient-to-br from-[#f0f9f8] to-[#e6f4f2] dark:from-[#041a18] dark:to-[#020d0c] backdrop-blur-xl rounded-3xl border border-teal-500/20 dark:border-teal-500/10 p-8 sm:p-12 text-center shadow-lg overflow-hidden relative">
           
           {/* Animated Glow Particles */}
