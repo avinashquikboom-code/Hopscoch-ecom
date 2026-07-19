@@ -11,6 +11,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { MobileSearchOverlay } from '@/components/common/MobileSearchOverlay';
 import { useAuthStore, useCartStore, useThemeStore } from '@/store';
 import { resolveAvatarUrl } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const POPULAR_SEARCHES = [
   'Lehenga Choli',
@@ -130,7 +131,7 @@ export function Header() {
     : [];
 
   return (
-    <div className="w-full flex flex-col font-sans bg-white dark:bg-gray-950 border-b border-gray-200/80 dark:border-gray-800/80 shadow-sm sticky top-0 z-50">
+    <div className="w-full flex flex-col font-sans bg-white/75 dark:bg-gray-950/75 backdrop-blur-xl border-b border-gray-200/40 dark:border-gray-800/40 shadow-xs sticky top-0 z-50 transition-all duration-300">
       
       {/* 1. TOP UTILITY BAR (Clean, thin bar for location and preferences) */}
       <div className="w-full bg-[#f5f5f6] dark:bg-gray-900 py-1.5 px-4 sm:px-6 md:px-12 border-b border-gray-200 dark:border-gray-800 hidden md:block">
@@ -383,16 +384,22 @@ export function Header() {
             
             {/* Login Button (only when not authenticated, hidden on mobile) */}
             {!isAuthenticated && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05, translateY: -1 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={openLoginModal}
                 className="hidden md:inline-flex items-center h-8 px-4 border border-[#0F766E] text-[#0F766E] hover:bg-[#0F766E]/5 font-bold text-xs rounded-sm tracking-wider cursor-pointer bg-transparent transition-colors"
               >
                 LOGIN
-              </button>
+              </motion.button>
             )}
 
             {/* User Dropdown */}
-            <div className="relative group flex flex-col items-center cursor-pointer">
+            <motion.div 
+              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative group flex flex-col items-center cursor-pointer"
+            >
               {mounted && isAuthenticated && user ? (
                 <Link href="/profile" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
                   {/* Show real avatar if available, otherwise initials/icon */}
@@ -423,29 +430,41 @@ export function Header() {
                 <Link href="/wishlist" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">My Wishlist</Link>
                 <Link href="/faq" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">Help Center</Link>
               </div>
-            </div>
+            </motion.div>
 
             {/* Wishlist */}
-            <Link href="/wishlist" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
-              <Heart className="h-5 w-5" />
-              <span className="text-[10px] font-bold tracking-tight">Wishlist</span>
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link href="/wishlist" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
+                <Heart className="h-5 w-5" />
+                <span className="text-[10px] font-bold tracking-tight">Wishlist</span>
+              </Link>
+            </motion.div>
 
             {/* Bag/Cart */}
-            <Link href="/cart" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
-              <div className="relative">
-                <ShoppingBag className="h-5 w-5" />
-                {mounted && cartItemsCount > 0 && (
-                  <Badge className="absolute -top-1.5 -right-2 h-4 min-w-4 flex items-center justify-center p-0.5 bg-[#0d9488] text-white text-[8px] font-black rounded-full border border-white shadow-sm">
-                    {cartItemsCount}
-                  </Badge>
-                )}
-              </div>
-              <span className="text-[10px] font-bold tracking-tight">Bag</span>
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link href="/cart" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
+                <div className="relative">
+                  <ShoppingBag className="h-5 w-5" />
+                  {mounted && cartItemsCount > 0 && (
+                    <Badge className="absolute -top-1.5 -right-2 h-4 min-w-4 flex items-center justify-center p-0.5 bg-[#0d9488] text-white text-[8px] font-black rounded-full border border-white shadow-sm">
+                      {cartItemsCount}
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-[10px] font-bold tracking-tight">Bag</span>
+              </Link>
+            </motion.div>
 
             {/* Theme Toggle */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileTap={{ scale: 0.95 }}
               onClick={toggleTheme}
               className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none cursor-pointer bg-transparent border-none"
               aria-label="Toggle theme"
@@ -456,7 +475,7 @@ export function Header() {
                 <Moon className="h-5 w-5 text-gray-700" />
               )}
               <span className="text-[10px] font-bold tracking-tight">Theme</span>
-            </button>
+            </motion.button>
 
             {/* Mobile Actions: Search (Icon only on mobile) */}
             <Button

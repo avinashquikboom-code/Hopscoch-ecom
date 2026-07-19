@@ -13,10 +13,33 @@ export function cn(...inputs: ClassValue[]) {
 export function resolveAvatarUrl(url: string | null | undefined): string | null {
   if (!url || url.trim() === '') return null;
   const trimmed = url.trim();
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return trimmed;
+  let resolved = trimmed;
+  if (resolved.includes('api.fciseller.com')) {
+    resolved = resolved.replace(/https?:\/\/api\.fciseller\.com/g, API_BASE);
+  }
+  if (resolved.startsWith('http://') || resolved.startsWith('https://')) {
+    return resolved;
   }
   // Relative path — prepend API base
-  const path = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  const path = resolved.startsWith('/') ? resolved : `/${resolved}`;
+  return `${API_BASE}${path}`;
+}
+
+/**
+ * Resolves any image URL from the backend (rewriting production domains to the current local API base in development).
+ */
+export function resolveImageUrl(url: string | null | undefined): string {
+  if (!url || url.trim() === '') {
+    return 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600';
+  }
+  const trimmed = url.trim();
+  let resolved = trimmed;
+  if (resolved.includes('api.fciseller.com')) {
+    resolved = resolved.replace(/https?:\/\/api\.fciseller\.com/g, API_BASE);
+  }
+  if (resolved.startsWith('http://') || resolved.startsWith('https://')) {
+    return resolved;
+  }
+  const path = resolved.startsWith('/') ? resolved : `/${resolved}`;
   return `${API_BASE}${path}`;
 }

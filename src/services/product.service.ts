@@ -1,5 +1,6 @@
 import { Product, Category, Review, ProductFilters, PaginatedResponse } from '@/types';
 import { PAGINATION, API_BASE } from '@/constants';
+import { resolveImageUrl } from '@/lib/utils';
 
 function delay(ms = 300) {
   return new Promise((res) => setTimeout(res, ms));
@@ -39,8 +40,8 @@ export function getColorCode(colorName: string): string {
 function mapBackendProductToFrontend(raw: any): Product {
   const price = Number(raw.basePrice || raw.price || 0);
   const images = (raw.images && raw.images.length > 0)
-    ? raw.images.map((img: any) => img.url.startsWith('http') ? img.url : `${API_BASE}/${img.url}`)
-    : [raw.thumbnailUrl || 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600&auto=format&fit=crop&q=80'];
+    ? raw.images.map((img: any) => resolveImageUrl(img.url))
+    : [resolveImageUrl(raw.thumbnailUrl)];
 
   const variants = raw.variants?.map((v: any) => ({
     id: String(v.id),
@@ -267,14 +268,17 @@ export const productService = {
       if (!res.ok) throw new Error(json.message || 'Failed to fetch categories');
       const raw = json.data ?? json ?? [];
       if (Array.isArray(raw)) {
-        return raw.map((cat: any) => ({
+        const mapCategory = (cat: any): Category => ({
           id: String(cat.id),
           name: cat.name,
           slug: cat.slug,
+          parentId: cat.parentId ? String(cat.parentId) : undefined,
           productCount: cat.productCount || 0,
-          icon: cat.iconUrl || '👗',
-          image: cat.bannerUrl || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&auto=format&fit=crop&q=80',
-        }));
+          icon: (cat.iconUrl && (cat.iconUrl.includes('/') || cat.iconUrl.startsWith('http'))) ? resolveImageUrl(cat.iconUrl) : (cat.iconUrl || '👗'),
+          image: resolveImageUrl(cat.bannerUrl),
+          subcategories: cat.children ? cat.children.map(mapCategory) : undefined,
+        });
+        return raw.map(mapCategory);
       }
       return [];
     } catch (e) {
