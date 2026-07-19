@@ -104,12 +104,14 @@ export const orderService = {
     return normalizeOrder(json.data ?? json);
   },
 
-  /** Create a new order from the cart — expects { addressId } */
-  async createOrder(data: { addressId: string | number }): Promise<Order> {
+  /** Create a new order from the cart — accepts { addressId } or legacy CheckoutFormData */
+  async createOrder(data: any): Promise<Order> {
+    // Support both { addressId } (new) and old CheckoutFormData shape
+    const addressId = data.addressId ?? data.address?.id ?? '1';
     const res = await fetch(`${API_BASE}/api/orders`, {
       method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({ addressId: String(data.addressId) }),
+      body: JSON.stringify({ addressId: String(addressId) }),
     });
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };

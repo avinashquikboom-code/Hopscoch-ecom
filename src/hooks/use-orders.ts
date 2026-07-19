@@ -24,7 +24,7 @@ export function useCreateOrder() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (data: { addressId: string | number }) => orderService.createOrder(data),
+    mutationFn: (data: any) => orderService.createOrder(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['cart'] });
