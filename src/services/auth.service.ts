@@ -1,9 +1,14 @@
 import { LoginCredentials, RegisterCredentials, AuthResponse, User } from '@/types';
-import { STORAGE_KEYS } from '@/constants';
+import { STORAGE_KEYS, API_BASE } from '@/constants';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function delay(ms = 600) {
   return new Promise((res) => setTimeout(res, ms));
+}
+
+function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
 }
 
 function nameFromEmail(email: string): { firstName: string; lastName: string } {
@@ -124,8 +129,55 @@ export const authService = {
     return { ...user, ...data };
   },
 
+  /**
+   * Upload a profile avatar image to the real backend.
+   * Uses PATCH /api/users/me with multipart/form-data.
+   * Returns the updated user object with the new avatarUrl.
+   */
+  async uploadAvatar(file: File): Promise<User> {
+    const token = getStoredToken();
+    if (!token) {
+      throw { response: { data: { message: 'Not authenticated.' } } };
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const res = await fetch(`${API_BASE}/api/users/me`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw { response: { data: { message: err?.message || 'Avatar upload failed.' } } };
+    }
+
+    const json = await res.json();
+    // Backend wraps response in { data: { ... } }
+    const updated = json?.data ?? json;
+
+    // Merge avatarUrl into the current locally-stored user state so it persists
+    const stored = typeof window !== 'undefined'
+      ? localStorage.getItem(STORAGE_KEYS.USER_DATA)
+      : null;
+    let user: User = buildUser('user@fciseller.com');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed?.state?.user) user = parsed.state.user;
+      } catch {/* ignore */}
+    }
+
+    return { ...user, avatar: updated.avatarUrl ?? updated.avatar ?? user.avatar };
+  },
+
   async changePassword(_currentPassword: string, _newPassword: string): Promise<void> {
     await delay(500);
     // Mock: always succeeds
   },
 };
+

@@ -42,6 +42,8 @@ export interface Product {
   reviewCount: number;
   tags: string[];
   variants?: ProductVariant[];
+  sizes?: string[];
+  colors?: string[];
   specifications?: Record<string, string>;
   isNew: boolean;
   isFeatured: boolean;
@@ -58,6 +60,8 @@ export interface ProductVariant {
   price?: number;
   stock: number;
   image?: string;
+  color?: string;
+  size?: string;
 }
 
 export interface Category {

@@ -29,13 +29,23 @@ export default function CheckoutPage() {
   const [checkoutStep, setCheckoutStep] = useState<'shipping' | 'payment'>('shipping');
 
   // Form State - Contact & Shipping Details
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [streetAddress, setStreetAddress] = useState('');
   const [city, setCity] = useState('');
   const [stateProvince, setStateProvince] = useState('');
   const [zipPostal, setZipPostal] = useState('');
+  const [country, setCountry] = useState('India');
+
+  const countryOptions = [
+    'India', 'United States', 'United Kingdom', 'UAE (Dubai)',
+    'Bahrain', 'Malaysia', 'Mauritius', 'Fiji', 'Guyana',
+    'Suriname', 'Trinidad & Tobago', 'Australia', 'Canada',
+    'Germany', 'France', 'Japan', 'Singapore', 'Saudi Arabia',
+    'Qatar', 'Kuwait', 'Oman', 'South Africa', 'New Zealand',
+  ];
 
   // Form State - Payment details
   const [paymentTab, setPaymentTab] = useState<'card' | 'upi' | 'netbanking' | 'cod'>('card');
@@ -145,14 +155,14 @@ export default function CheckoutPage() {
         headers: authHeaders(),
         body: JSON.stringify({
           shippingAddress: {
-            fullName,
+            fullName: `${firstName} ${lastName}`.trim(),
             phone,
             email: emailAddress,
             streetAddress,
             city,
             state: stateProvince,
             zipCode: zipPostal,
-            country: 'India'
+            country: country,
           },
           paymentMethod: 'RAZORPAY',
         })
@@ -215,7 +225,7 @@ export default function CheckoutPage() {
           }
         },
         prefill: {
-          name: fullName,
+          name: `${firstName} ${lastName}`.trim(),
           email: emailAddress,
           contact: phone,
         },
@@ -332,14 +342,28 @@ export default function CheckoutPage() {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="fullname" className="text-xs font-bold text-gray-700">Full Name</Label>
+                      <Label htmlFor="firstname" className="text-xs font-bold text-gray-700">First Name</Label>
                       <Input 
-                        id="fullname"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        id="firstname"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
                         className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                        placeholder="Enter first name"
                       />
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastname" className="text-xs font-bold text-gray-700">Last Name</Label>
+                      <Input 
+                        id="lastname"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                        placeholder="Enter last name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="phone" className="text-xs font-bold text-gray-700">Phone Number</Label>
                       <Input 
@@ -349,17 +373,16 @@ export default function CheckoutPage() {
                         className="h-10 text-xs bg-white focus:border-[#0d9488]"
                       />
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-xs font-bold text-gray-700">Email Address</Label>
-                    <Input 
-                      id="email"
-                      type="email"
-                      value={emailAddress}
-                      onChange={(e) => setEmailAddress(e.target.value)}
-                      className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs font-bold text-gray-700">Email Address</Label>
+                      <Input 
+                        id="email"
+                        type="email"
+                        value={emailAddress}
+                        onChange={(e) => setEmailAddress(e.target.value)}
+                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -383,7 +406,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="state" className="text-xs font-bold text-gray-700">State</Label>
+                      <Label htmlFor="state" className="text-xs font-bold text-gray-700">State / Province</Label>
                       <Input 
                         id="state"
                         value={stateProvince}
@@ -392,7 +415,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="pincode" className="text-xs font-bold text-gray-700">Pincode</Label>
+                      <Label htmlFor="pincode" className="text-xs font-bold text-gray-700">Pincode / ZIP</Label>
                       <Input 
                         id="pincode"
                         value={zipPostal}
@@ -402,14 +425,28 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="country" className="text-xs font-bold text-gray-700">Country</Label>
+                    <select
+                      id="country"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="w-full h-10 text-xs bg-white border border-gray-200 rounded px-3 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488]"
+                    >
+                      {countryOptions.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="pt-4 border-t border-gray-150 flex justify-end">
-                    <Button 
-                      disabled={!fullName || !phone || !emailAddress || !streetAddress || !city || !zipPostal}
+                    <button 
+                      disabled={!firstName || !phone || !emailAddress || !streetAddress || !city || !zipPostal}
                       onClick={() => setCheckoutStep('payment')}
-                      className="bg-[#fb641b] hover:bg-[#fb641b]/95 text-white font-bold h-11 px-8 rounded-sm text-xs tracking-wider uppercase border-none cursor-pointer"
+                      className="bg-[#fb641b] hover:bg-[#fb641b]/95 text-white font-bold h-11 px-8 rounded-sm text-xs tracking-wider uppercase border-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Proceed to Payment
-                    </Button>
+                    </button>
                   </div>
                 </div>
               )}

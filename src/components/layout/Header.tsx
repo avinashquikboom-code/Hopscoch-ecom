@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { MobileSearchOverlay } from '@/components/common/MobileSearchOverlay';
 import { useAuthStore, useCartStore, useThemeStore } from '@/store';
+import { resolveAvatarUrl } from '@/lib/utils';
 
 const POPULAR_SEARCHES = [
   'Lehenga Choli',
@@ -155,6 +156,10 @@ export function Header() {
               >
                 <option value="EN">English</option>
                 <option value="HI">हिन्दी</option>
+                <option value="AR">العربية</option>
+                <option value="MS">Bahasa Melayu</option>
+                <option value="NL">Nederlands</option>
+                <option value="FR">Français</option>
               </select>
             </div>
 
@@ -168,6 +173,16 @@ export function Header() {
               >
                 <option value="INR">INR (₹)</option>
                 <option value="USD">USD ($)</option>
+                <option value="AED">AED (UAE/Dubai)</option>
+                <option value="BHD">BHD (Bahrain)</option>
+                <option value="MYR">MYR - RM (Malaysia)</option>
+                <option value="MUR">MUR ₨ (Mauritius)</option>
+                <option value="FJD">FJD FJ$ (Fiji)</option>
+                <option value="GYD">GYD G$ (Guyana)</option>
+                <option value="SRD">SRD Sr$ (Suriname)</option>
+                <option value="TTD">TTD TT$ (Trinidad &amp; Tobago)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="EUR">EUR (€)</option>
               </select>
             </div>
 
@@ -380,7 +395,19 @@ export function Header() {
             <div className="relative group flex flex-col items-center cursor-pointer">
               {mounted && isAuthenticated && user ? (
                 <Link href="/profile" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
-                  <User className="h-5 w-5" />
+                  {/* Show real avatar if available, otherwise initials/icon */}
+                  {(() => {
+                    const avatarUrl = resolveAvatarUrl((user as any).avatar ?? (user as any).avatarUrl);
+                    return avatarUrl ? (
+                      <div className="w-6 h-6 rounded-full overflow-hidden ring-1 ring-[#0d9488]/40">
+                        <img src={avatarUrl} alt={user.firstName} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#0d9488] to-[#0d9488]/60 flex items-center justify-center text-white text-[10px] font-bold">
+                        {user.firstName?.[0]}{user.lastName?.[0]}
+                      </div>
+                    );
+                  })()}
                   <span className="text-[10px] font-bold tracking-tight">{displayName}</span>
                 </Link>
               ) : (
@@ -511,6 +538,10 @@ export function Header() {
                   >
                     <option value="EN">English</option>
                     <option value="HI">हिन्दी</option>
+                    <option value="AR">العربية</option>
+                    <option value="MS">Bahasa Melayu</option>
+                    <option value="NL">Nederlands</option>
+                    <option value="FR">Français</option>
                   </select>
                 </div>
                 <div className="flex items-center justify-between">
@@ -522,6 +553,16 @@ export function Header() {
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
+                    <option value="AED">AED (Dubai)</option>
+                    <option value="BHD">BHD (Bahrain)</option>
+                    <option value="MYR">MYR (Malaysia)</option>
+                    <option value="MUR">MUR (Mauritius)</option>
+                    <option value="FJD">FJD (Fiji)</option>
+                    <option value="GYD">GYD (Guyana)</option>
+                    <option value="SRD">SRD (Suriname)</option>
+                    <option value="TTD">TTD (T&amp;T)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="EUR">EUR (€)</option>
                   </select>
                 </div>
               </div>

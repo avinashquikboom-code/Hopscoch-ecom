@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuthStore } from '@/store';
 import { useRouter } from 'next/navigation';
 import {
@@ -12,6 +12,8 @@ import {
 import { toast } from '@/components/ui/toast';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useUploadAvatar } from '@/hooks';
+import { resolveAvatarUrl } from '@/lib/utils';
 
 /* ── Nav items ─────────────────────────────────────────────────────────── */
 const NAV_ITEMS = [
@@ -97,10 +99,20 @@ export default function ProfilePage() {
   const router = useRouter();
   const storeUser    = useAuthStore((s: any) => s.user);
   const logoutAction = useAuthStore((s: any) => s.logout);
+  const uploadAvatar = useUploadAvatar();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Use store user or fallback to mock
   const user = storeUser || MOCK_USER;
 
+  // Resolve relative backend URL to full URL
+  const avatarUrl = resolveAvatarUrl((storeUser as any)?.avatar ?? (storeUser as any)?.avatarUrl);
+
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) uploadAvatar.mutate(file);
+    e.target.value = '';
+  };
   const [activeTab, setActiveTab] = useState('orders');
 
   /* ── Profile form state ────────────────────────────────────────────── */
@@ -208,10 +220,21 @@ export default function ProfilePage() {
             {/* Avatar row */}
             <div className="flex items-center gap-5 pb-6 border-b border-border/60">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0d9488] to-[#0d9488]/60 flex items-center justify-center shadow-lg shadow-[#0d9488]/20 ring-4 ring-background">
-                  <span className="text-2xl font-bold text-white">{initials}</span>
-                </div>
-                <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-[#0d9488] text-white flex items-center justify-center shadow hover:bg-[#0d9488]/90 transition-colors border-none cursor-pointer">
+                {/* Show real avatar if available, otherwise gradient initials */}
+                {avatarUrl ? (
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg ring-4 ring-background">
+                    <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0d9488] to-[#0d9488]/60 flex items-center justify-center shadow-lg shadow-[#0d9488]/20 ring-4 ring-background">
+                    <span className="text-2xl font-bold text-white">{initials}</span>
+                  </div>
+                )}
+                <button
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={uploadAvatar.isPending}
+                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-[#0d9488] text-white flex items-center justify-center shadow hover:bg-[#0d9488]/90 transition-colors border-none cursor-pointer disabled:opacity-60"
+                >
                   <Camera className="w-3 h-3" />
                 </button>
               </div>
@@ -532,12 +555,30 @@ export default function ProfilePage() {
             <div className="bg-card border border-border/60 rounded-2xl p-6 shadow-sm mb-4 text-center">
               <div className="flex justify-center mb-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0d9488] to-[#0d9488]/60 flex items-center justify-center shadow-xl shadow-[#0d9488]/25 ring-4 ring-background">
-                    <span className="text-2xl font-bold text-white">{initFull}</span>
-                  </div>
-                  <button className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-[#0d9488] text-white flex items-center justify-center shadow hover:bg-[#0d9488]/90 transition-colors border-none cursor-pointer">
+                  {/* Show real avatar if available, otherwise gradient initials */}
+                  {avatarUrl ? (
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-background shadow-xl">
+                      <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0d9488] to-[#0d9488]/60 flex items-center justify-center shadow-xl shadow-[#0d9488]/25 ring-4 ring-background">
+                      <span className="text-2xl font-bold text-white">{initFull}</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={uploadAvatar.isPending}
+                    className="absolute -bottom-1 -right-1 w-7 h-7 rounded-xl bg-[#0d9488] text-white flex items-center justify-center shadow hover:bg-[#0d9488]/90 transition-colors border-none cursor-pointer disabled:opacity-60"
+                  >
                     <Camera className="w-3 h-3" />
                   </button>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onAvatarChange}
+                  />
                 </div>
               </div>
               <p className="font-bold text-foreground text-base">{profile.firstName} {profile.lastName}</p>

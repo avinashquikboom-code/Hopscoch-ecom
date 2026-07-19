@@ -5,11 +5,61 @@ function delay(ms = 300) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
+const COLOR_MAP: Record<string, string> = {
+  black: '#000000',
+  white: '#ffffff',
+  red: '#ef4444',
+  blue: '#3b82f6',
+  green: '#22c55e',
+  yellow: '#eab308',
+  orange: '#f97316',
+  purple: '#a855f7',
+  pink: '#ec4899',
+  gray: '#6b7280',
+  grey: '#6b7280',
+  beige: '#f5f5dc',
+  brown: '#78350f',
+  navy: '#1e3a8a',
+  teal: '#0d9488',
+  olive: '#808000',
+  indigo: '#6366f1',
+  violet: '#8b5cf6',
+  magenta: '#d946ef',
+  gold: '#fbbf24',
+  silver: '#cbd5e1',
+};
+
+export function getColorCode(colorName: string): string {
+  if (!colorName) return '#cbd5e1';
+  const name = colorName.toLowerCase().trim();
+  if (name.startsWith('#')) return colorName;
+  return COLOR_MAP[name] || name;
+}
+
 function mapBackendProductToFrontend(raw: any): Product {
   const price = Number(raw.basePrice || raw.price || 0);
   const images = (raw.images && raw.images.length > 0)
     ? raw.images.map((img: any) => img.url.startsWith('http') ? img.url : `${API_BASE}/${img.url}`)
     : [raw.thumbnailUrl || 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600&auto=format&fit=crop&q=80'];
+
+  const variants = raw.variants?.map((v: any) => ({
+    id: String(v.id),
+    productId: String(v.productId),
+    name: 'variant',
+    value: v.size || v.color || '',
+    price: v.price ? Number(v.price) : price,
+    stock: v.stock !== undefined ? Number(v.stock) : 0,
+    image: undefined,
+    color: v.color || undefined,
+    size: v.size || undefined,
+  })) || [];
+
+  const sizes = Array.from(new Set(raw.variants?.map((v: any) => v.size).filter(Boolean) as string[])) as string[];
+  const colors = Array.from(new Set(raw.variants?.map((v: any) => v.color).filter(Boolean) as string[])) as string[];
+
+  const totalStock = raw.variants && raw.variants.length > 0
+    ? raw.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
+    : (raw.stock !== undefined ? Number(raw.stock) : 10);
 
   return {
     id: String(raw.id),
@@ -21,10 +71,13 @@ function mapBackendProductToFrontend(raw: any): Product {
     images: images,
     category: raw.category?.name || 'Collections',
     brand: raw.brand?.name || 'FCISeller',
-    stock: raw.stock !== undefined ? Number(raw.stock) : 10,
+    stock: totalStock,
     rating: Number(raw.avgRating || 4.5),
     reviewCount: Number(raw.reviewCount || 0),
     tags: raw.tags || [],
+    variants: variants,
+    sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL'],
+    colors: colors.length > 0 ? colors : ['Beige', 'Black', 'Olive'],
     isNew: raw.isNewArrival || false,
     isFeatured: raw.isFeatured || false,
     isTrending: raw.isTrending || false,

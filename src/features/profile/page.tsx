@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -9,10 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthStore } from '@/store';
-import { useUpdateProfile, useChangePassword } from '@/hooks';
-import { User, Lock, MapPin, Settings } from 'lucide-react';
+import { useUpdateProfile, useChangePassword, useUploadAvatar } from '@/hooks';
+import { User, Lock, MapPin, Camera } from 'lucide-react';
+import { resolveAvatarUrl } from '@/lib/utils';
 
 const profileSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -37,6 +38,17 @@ export default function ProfilePage() {
   const user = useAuthStore((state: any) => state.user);
   const updateProfile = useUpdateProfile();
   const changePassword = useChangePassword();
+  const uploadAvatar = useUploadAvatar();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const avatarUrl = resolveAvatarUrl(user?.avatar ?? user?.avatarUrl);
+
+  const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) uploadAvatar.mutate(file);
+    // reset so the same file can be re-selected
+    e.target.value = '';
+  };
 
   const {
     register: registerProfile,
@@ -89,11 +101,31 @@ export default function ProfilePage() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center text-center">
-                <Avatar className="w-24 h-24 mb-4">
-                  <AvatarFallback className="text-2xl">
-                    {user?.firstName?.[0]}{user?.lastName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
+                {/* Avatar with upload trigger */}
+                <div className="relative mb-4">
+                  <Avatar className="w-24 h-24">
+                    {avatarUrl && <AvatarImage src={avatarUrl} alt="Profile photo" />}
+                    <AvatarFallback className="text-2xl">
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <button
+                    type="button"
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={uploadAvatar.isPending}
+                    className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center shadow hover:bg-primary/90 transition-colors border-none cursor-pointer disabled:opacity-60"
+                    title="Change profile photo"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                  </button>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onAvatarChange}
+                  />
+                </div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                   {user?.firstName} {user?.lastName}
                 </h2>
@@ -102,6 +134,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         </div>
+
 
         {/* Profile Content */}
         <div className="lg:col-span-2">

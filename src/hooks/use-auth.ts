@@ -146,3 +146,20 @@ export function useChangePassword() {
     },
   });
 }
+
+export function useUploadAvatar() {
+  const queryClient = useQueryClient();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  return useMutation({
+    mutationFn: (file: File) => authService.uploadAvatar(file),
+    onSuccess: (data) => {
+      setUser(data);
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      toast.success('Profile photo updated!');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to upload photo');
+    },
+  });
+}

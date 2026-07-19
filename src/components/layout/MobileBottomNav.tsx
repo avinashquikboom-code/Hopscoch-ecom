@@ -4,14 +4,16 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, ShoppingBag, Heart, User, Search } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useCartStore, useWishlistStore } from '@/store';
+import { cn, resolveAvatarUrl } from '@/lib/utils';
+import { useCartStore, useWishlistStore, useAuthStore } from '@/store';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const { cart } = useCartStore();
   const wishlistStore = useWishlistStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const avatarUrl = resolveAvatarUrl((user as any)?.avatar ?? (user as any)?.avatarUrl);
   
   const cartItemsCount = cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
   const wishlistCount = wishlistStore.wishlist?.items.length || 0;
@@ -49,14 +51,35 @@ export function MobileBottomNav() {
               )}
             >
               <div className="relative">
-                <Icon
-                  className={cn(
-                    'w-6 h-6 transition-all duration-300',
-                    isActive
-                      ? 'text-primary scale-110'
-                      : 'text-muted-foreground group-hover:text-foreground'
-                  )}
-                />
+                {/* Profile tab: show real avatar image when authenticated */}
+                {item.href === '/profile' && mounted && isAuthenticated ? (
+                  avatarUrl ? (
+                    <div className={cn(
+                      'w-6 h-6 rounded-full overflow-hidden transition-all duration-300',
+                      isActive ? 'ring-2 ring-primary scale-110' : 'ring-1 ring-muted-foreground/40'
+                    )}>
+                      <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className={cn(
+                      'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300',
+                      isActive
+                        ? 'bg-primary text-primary-foreground scale-110'
+                        : 'bg-gradient-to-br from-[#0d9488] to-[#0d9488]/60 text-white'
+                    )}>
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </div>
+                  )
+                ) : (
+                  <Icon
+                    className={cn(
+                      'w-6 h-6 transition-all duration-300',
+                      isActive
+                        ? 'text-primary scale-110'
+                        : 'text-muted-foreground group-hover:text-foreground'
+                    )}
+                  />
+                )}
                 {mounted && item.badge && item.badge > 0 && (
                   <span className="absolute -top-1 -right-2 min-w-[18px] h-[18px] flex items-center justify-center bg-primary text-primary-foreground text-[10px] font-bold rounded-full animate-scale-in">
                     {item.badge > 9 ? '9+' : item.badge}

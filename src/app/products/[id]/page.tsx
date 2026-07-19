@@ -1,8 +1,6 @@
 'use client';
 import { useProducts } from '@/hooks/use-products';
-
-
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -11,6 +9,7 @@ import { Heart, Share2, Star, ShieldCheck, ChevronRight, Tag, MapPin, Truck, Hel
 import { useAddToCart, useAddToWishlist, useRemoveFromWishlist } from '@/hooks';
 import { useWishlistStore } from '@/store';
 import { toast } from '@/components/ui/toast';
+import { getColorCode } from '@/services/product.service';
 
 // Custom inline SVG icons for social platforms
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -49,9 +48,21 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('M');
+  const [selectedColor, setSelectedColor] = useState('');
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
   const [flyStyle, setFlyStyle] = useState<React.CSSProperties | null>(null);
+
+  useEffect(() => {
+    if (product) {
+      if (product.sizes && product.sizes.length > 0) {
+        setSelectedSize(product.sizes[0]);
+      }
+      if (product.colors && product.colors.length > 0) {
+        setSelectedColor(product.colors[0]);
+      }
+    }
+  }, [product]);
 
   // Cats catwalk video state
   const [isPlayingCatwalk, setIsPlayingCatwalk] = useState(false);
@@ -70,6 +81,14 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : undefined;
+
+  const getMatchedVariant = () => {
+    return product?.variants?.find(
+      (v) =>
+        v.size?.toLowerCase() === selectedSize.toLowerCase() &&
+        v.color?.toLowerCase() === selectedColor.toLowerCase()
+    );
+  };
 
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     const x = e.clientX;
@@ -90,8 +109,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       animation: 'flyToCart 0.8s cubic-bezier(0.2, 0.6, 0.4, 1) forwards',
     });
 
+    const matchedVariant = getMatchedVariant();
+
     addToCartMutation.mutate(
-      { productId: product.id, quantity: 1 },
+      { productId: product.id, quantity: 1, variantId: matchedVariant?.id },
       {
         onSuccess: () => {
           toast.success('Added to Cart successfully!');
@@ -102,8 +123,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   };
 
   const handleBuyNow = () => {
+    const matchedVariant = getMatchedVariant();
+
     addToCartMutation.mutate(
-      { productId: product.id, quantity: 1 },
+      { productId: product.id, quantity: 1, variantId: matchedVariant?.id },
       {
         onSuccess: () => {
           router.push('/checkout');
@@ -318,7 +341,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               <Button
                 onClick={(e) => handleAddToCart(e)}
                 disabled={addToCartMutation.isPending || product.stock === 0}
-                className="bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold h-13 rounded-sm border-none shadow-sm uppercase tracking-wider text-sm cursor-pointer"
+                className="bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold h-12 rounded-sm border-none shadow-sm uppercase tracking-wider text-sm cursor-pointer"
               >
                 {addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
               </Button>
@@ -326,7 +349,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               <Button
                 onClick={handleBuyNow}
                 disabled={addToCartMutation.isPending || product.stock === 0}
-                className="bg-[#ff9f00] hover:bg-[#ff9f00]/95 text-white font-bold h-13 rounded-sm border-none shadow-sm uppercase tracking-wider text-sm cursor-pointer"
+                className="bg-[#ff9f00] hover:bg-[#ff9f00]/95 text-white font-bold h-12 rounded-sm border-none shadow-sm uppercase tracking-wider text-sm cursor-pointer"
               >
                 {product.stock === 0 ? 'Out of Stock' : 'Buy Now'}
               </Button>
@@ -379,14 +402,21 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
             <div className="mb-5">
               <span className="text-xs font-bold text-gray-700 uppercase block mb-2">Available Colors</span>
               <div className="flex gap-2">
-                {['#0d9488', '#374151', '#9ca3af', '#d1d5db'].map((c, i) => (
-                  <div
-                    key={i}
-                    style={{ backgroundColor: c }}
-                    className="w-7 h-7 rounded-full border border-gray-300 shadow-xs cursor-pointer hover:scale-105 transition-transform"
-                    title={`Color option ${i + 1}`}
-                  />
-                ))}
+                {product.colors?.map((c, i) => {
+                  const hex = getColorCode(c);
+                  const isSelected = selectedColor === c;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedColor(c)}
+                      style={{ backgroundColor: hex }}
+                      className={`w-7 h-7 rounded-full border cursor-pointer hover:scale-105 transition-transform ${
+                        isSelected ? 'ring-2 ring-offset-2 ring-[#0d9488] border-transparent' : 'border-gray-300'
+                      }`}
+                      title={c}
+                    />
+                  );
+                })}
               </div>
             </div>
 
@@ -402,7 +432,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </button>
               </div>
               <div className="flex gap-2.5">
-                {['S', 'M', 'L', 'XL'].map((sz) => (
+                {product.sizes?.map((sz) => (
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
