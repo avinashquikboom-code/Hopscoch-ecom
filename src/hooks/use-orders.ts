@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderService } from '@/services';
-import { Order, CheckoutFormData } from '@/types';
+import { Order } from '@/types';
 import { toast } from '@/components/ui/toast';
 import { useRouter } from 'next/navigation';
 
@@ -24,7 +24,7 @@ export function useCreateOrder() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (data: CheckoutFormData) => orderService.createOrder(data),
+    mutationFn: (data: { addressId: string | number }) => orderService.createOrder(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['cart'] });

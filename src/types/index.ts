@@ -114,14 +114,17 @@ export interface Wishlist {
 // Order Types
 export interface Order {
   id: string;
-  userId: string;
-  orderNumber: string;
+  userId?: string;
+  orderNumber?: string;
   items: OrderItem[];
   shippingAddress: Address;
   billingAddress?: Address;
-  paymentMethod: PaymentMethod;
-  paymentStatus: PaymentStatus;
-  orderStatus: OrderStatus;
+  paymentMethod?: PaymentMethod | string;
+  paymentStatus?: PaymentStatus | string;
+  /** Backend DB status field (uppercase enum like PENDING, SHIPPED...) */
+  status?: string;
+  /** Alias for orderStatus — used by the storefront UI */
+  orderStatus?: OrderStatus;
   subtotal: number;
   shipping: number;
   tax: number;
@@ -134,6 +137,8 @@ export interface Order {
   estimatedDelivery?: string;
   trackingNumber?: string;
   trackingUrl?: string;
+  /** Order timeline events from the backend */
+  timeline?: Array<{ status: string; note?: string; createdAt: string }>;
 }
 
 export interface OrderItem {
