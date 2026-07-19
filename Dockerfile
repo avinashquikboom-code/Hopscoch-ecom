@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 # npm install, not ci: the committed lockfile omits platform-specific optional
 # deps (@emnapi/*) that resolve on linux, and ci hard-fails on any mismatch.
-RUN npm install --legacy-peer-deps --no-audit --no-fund
+RUN npm install --legacy-peer-deps --no-audit --no-fund --force
 
 # ---------- builder ----------
 FROM node:22-alpine AS builder
