@@ -1,5 +1,5 @@
 'use client';
-import { useProducts } from '@/hooks/use-products';
+import { useProducts, useProduct } from '@/hooks/use-products';
 import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -39,12 +39,12 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function ProductDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { data: productsData } = useProducts();
-  const mockProducts = productsData?.data || [];
-
   const router = useRouter();
   const unwrappedParams = use(params);
-  const product = mockProducts.find(p => p.id === unwrappedParams.id) || mockProducts[0];
+  
+  const { data: product, isLoading, isError } = useProduct(unwrappedParams.id);
+  const { data: productsData } = useProducts();
+  const mockProducts = productsData?.data || [];
   
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('M');
@@ -63,6 +63,33 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       }
     }
   }, [product]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 py-24 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-full border-4 border-teal-500/30 border-t-teal-500 animate-spin" />
+          <p className="text-xs font-mono uppercase tracking-widest text-[#0d9488] animate-pulse font-bold">Loading Product Details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !product) {
+    return (
+      <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 py-24 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center max-w-sm px-6">
+          <p className="text-sm font-semibold text-gray-500">Product could not be loaded or was not found.</p>
+          <Link href="/products">
+            <Button className="bg-[#0d9488] hover:bg-[#0c857a] text-white rounded-full">
+              Back to Catalog
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
 
   // Cats catwalk video state
   const [isPlayingCatwalk, setIsPlayingCatwalk] = useState(false);
@@ -238,7 +265,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 pb-16 font-sans transition-colors duration-300">
       
       {/* Container */}
-      <div className="container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 py-3">
+      <div className="container mx-auto max-w-[1550px] px-4 sm:px-6 md:px-12 py-3">
         
         {/* Breadcrumb */}
         <div className="flex items-center gap-1 text-xs text-neutral-450 dark:text-neutral-500 mb-3.5">

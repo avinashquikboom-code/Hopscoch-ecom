@@ -153,7 +153,7 @@ export default function StudioPage() {
       </section>
 
       {/* ── STUDIO PICKS ─────────────────────────────────────────────────── */}
-      <section className="container mx-auto max-w-6xl px-4 sm:px-6 py-16">
+      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 py-16">
         <div className="flex items-end justify-between mb-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -201,7 +201,7 @@ export default function StudioPage() {
 
       {/* ── EDITORIAL DROPS GRID ─────────────────────────────────────────── */}
       <section className="bg-[#0F172A] py-20">
-        <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="container mx-auto max-w-[1550px] px-4 sm:px-6">
           <div className="text-center mb-12">
             <span className="text-[10px] font-bold tracking-[0.3em] text-[#14B8A6] uppercase">Collections</span>
             <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mt-2" style={{ fontFamily: 'serif' }}>
@@ -228,7 +228,7 @@ export default function StudioPage() {
       </section>
 
       {/* ── STYLE GUIDE ──────────────────────────────────────────────────── */}
-      <section className="container mx-auto max-w-6xl px-4 sm:px-6 py-16">
+      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 py-16">
         <div className="flex items-end justify-between mb-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -257,7 +257,7 @@ export default function StudioPage() {
 
       {/* ── BEHIND THE SCENES ─────────────────────────────────────────────── */}
       <section className="bg-[#F0FDFA] py-16">
-        <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="container mx-auto max-w-[1550px] px-4 sm:px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -288,7 +288,7 @@ export default function StudioPage() {
       </section>
 
       {/* ── TRENDING INSIGHTS ─────────────────────────────────────────────── */}
-      <section className="container mx-auto max-w-6xl px-4 sm:px-6 py-16">
+      <section className="container mx-auto max-w-[1550px] px-4 sm:px-6 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <div className="flex items-center gap-2 mb-4">

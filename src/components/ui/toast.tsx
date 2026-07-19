@@ -522,7 +522,24 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     // 2. Fetch Interceptor
     const originalFetch = window.fetch;
     window.fetch = async function (...args) {
-      const url = typeof args[0] === "string" ? args[0] : (args[0] as Request).url;
+      if (!args[0]) {
+        return originalFetch.apply(this, args);
+      }
+      let url = "";
+      if (typeof args[0] === "string") {
+        url = args[0];
+      } else if (args[0] instanceof URL) {
+        url = args[0].toString();
+      } else if (args[0] && typeof args[0] === "object" && "url" in args[0]) {
+        url = (args[0] as any).url || "";
+      } else {
+        try {
+          url = (args[0] as any).toString() || "";
+        } catch (_) {
+          url = "";
+        }
+      }
+      
       const options = args[1] || {};
       const method = (options.method || "GET").toUpperCase();
       let reqData = options.body;

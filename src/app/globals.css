@@ -339,3 +339,19 @@
     min-width: 48px;
   }
 }
+
+/* ============================================================
+   WEBSITE MAX WIDTH CONSTRAINT (1550px - 1920px)
+   ============================================================ */
+.container {
+  max-width: 1550px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1720px !important;
+  }
+}
