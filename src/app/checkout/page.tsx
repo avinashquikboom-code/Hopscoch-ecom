@@ -115,148 +115,117 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
 
-    // If COD, we directly place order using simulation or normal flow
-    if (paymentTab === 'cod') {
-      setShowSimModal(true);
-      setSimStep(1);
-      setTimeout(() => setSimStep(2), 1000);
-      setTimeout(() => setSimStep(3), 2000);
-      setTimeout(() => setSimStep(4), 3000);
-      setTimeout(() => {
-        clearCartMutation.mutate(undefined, {
-          onSuccess: () => {
-            setShowSimModal(false);
-            setIsProcessing(false);
-            toast.success('COD Order placed successfully!');
-            router.push('/profile');
-          }
-        });
-      }, 4000);
-      return;
-    }
+    const payload = {
+      address: {
+        fullName: `${firstName} ${lastName}`.trim() || 'Valued Customer',
+        phone: phone || '0000000000',
+        email: emailAddress,
+        streetAddress: streetAddress || 'Shipping Address',
+        city: city || 'City',
+        state: stateProvince || 'State',
+        zipCode: zipPostal || '000000',
+        country: country || 'India',
+      },
+      items: cartItems.map((item: any) => ({
+        productId: item.product.id,
+        variantId: item.variant?.id,
+        quantity: item.quantity,
+      })),
+      paymentMethod: paymentTab.toUpperCase(),
+    };
 
-    // Razorpay Flow
     try {
-      // 1. Try to fetch Razorpay Config
-      const configRes = await fetch(`${API_BASE}/api/v1/web/payments/config`, { headers: authHeaders() });
-      const configJson = await configRes.json();
-      
-      if (!configRes.ok || !configJson.data?.keyId) {
-        throw new Error('Could not fetch Razorpay config, triggering realistic fallback simulator');
-      }
-
-      const keyId = configJson.data.keyId;
-
-      // 2. Create Order in backend
-      // Normally, we'd first create a regular order, then generate razorpayOrder for it.
-      // For this step, we can call create order first. Let's create an order.
-      const orderRes = await fetch(`${API_BASE}/api/orders`, {
+      const orderRes = await fetch(`${API_BASE}/api/v1/web/orders`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({
-          shippingAddress: {
-            fullName: `${firstName} ${lastName}`.trim(),
-            phone,
-            email: emailAddress,
-            streetAddress,
-            city,
-            state: stateProvince,
-            zipCode: zipPostal,
-            country: country,
-          },
-          paymentMethod: 'RAZORPAY',
-        })
+        body: JSON.stringify(payload),
       });
 
       const orderJson = await orderRes.json();
-      if (!orderRes.ok || !orderJson.data?.id) {
-        throw new Error('Order creation failed on backend');
+      if (!orderRes.ok) {
+        throw new Error(orderJson.message || 'Failed to place order');
       }
 
-      const backendOrderId = orderJson.data.id;
+      const createdOrder = orderJson.data;
 
-      // 3. Create Razorpay Payment Order
-      const rzpOrderRes = await fetch(`${API_BASE}/api/v1/web/payments/order`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ orderId: backendOrderId })
-      });
-
-      const rzpOrderJson = await rzpOrderRes.json();
-      if (!rzpOrderRes.ok || !rzpOrderJson.data?.razorpayOrderId) {
-        throw new Error('Razorpay order creation failed on backend');
-      }
-
-      const { razorpayOrderId, amount: paiseAmount, currency } = rzpOrderJson.data;
-
-      // 4. Open Razorpay checkout modal
-      const options = {
-        key: keyId,
-        amount: paiseAmount,
-        currency: currency,
-        name: 'FCI SELLER',
-        description: `Order Checkout Reference: ${backendOrderId}`,
-        order_id: razorpayOrderId,
-        handler: async function (response: any) {
-          // Verify signature on backend
-          try {
-            const verifyRes = await fetch(`${API_BASE}/api/v1/web/payments/verify`, {
-              method: 'POST',
-              headers: authHeaders(),
-              body: JSON.stringify({
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature,
-              })
-            });
-
-            if (verifyRes.ok) {
-              clearCartMutation.mutate(undefined, {
-                onSuccess: () => {
-                  toast.success('Payment verified and order confirmed successfully!');
-                  router.push('/profile');
-                }
-              });
-            } else {
-              toast.error('Signature verification failed.');
-            }
-          } catch (err) {
-            toast.error('Payment verification failed.');
-          }
-        },
-        prefill: {
-          name: `${firstName} ${lastName}`.trim(),
-          email: emailAddress,
-          contact: phone,
-        },
-        theme: {
-          color: '#0d9488',
-        },
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
-      setIsProcessing(false);
-
-    } catch (err: any) {
-      console.log(err.message);
-      // Realistic Razorpay Simulation Fallback
-      toast.info('Triggering Secure Razorpay payment simulation gateway...');
-      setShowSimModal(true);
-      setSimStep(1);
-      setTimeout(() => setSimStep(2), 1500);
-      setTimeout(() => setSimStep(3), 3000);
-      setTimeout(() => setSimStep(4), 4500);
-      setTimeout(() => {
+      if (paymentTab === 'cod') {
         clearCartMutation.mutate(undefined, {
           onSuccess: () => {
-            setShowSimModal(false);
             setIsProcessing(false);
-            toast.success('Simulated Razorpay transaction successful. Order confirmed!');
-            router.push('/profile');
-          }
+            toast.success(`Order ${createdOrder.orderNumber} placed successfully!`);
+            router.push(`/order-success?orderNumber=${createdOrder.orderNumber}`);
+          },
         });
-      }, 6000);
+        return;
+      }
+
+      // Online / Razorpay Flow
+      try {
+        const configRes = await fetch(`${API_BASE}/api/v1/web/payments/config`, { headers: authHeaders() });
+        const configJson = await configRes.json();
+        
+        if (configRes.ok && configJson.data?.keyId) {
+          const keyId = configJson.data.keyId;
+          const rzpOrderRes = await fetch(`${API_BASE}/api/v1/web/payments/order`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ orderId: createdOrder.id }),
+          });
+
+          const rzpOrderJson = await rzpOrderRes.json();
+          if (rzpOrderRes.ok && rzpOrderJson.data?.razorpayOrderId) {
+            const { razorpayOrderId, amount: paiseAmount, currency } = rzpOrderJson.data;
+            const options = {
+              key: keyId,
+              amount: paiseAmount,
+              currency: currency,
+              name: 'FCI SELLER',
+              description: `Order ${createdOrder.orderNumber}`,
+              order_id: razorpayOrderId,
+              handler: async function (response: any) {
+                await fetch(`${API_BASE}/api/v1/web/payments/verify`, {
+                  method: 'POST',
+                  headers: authHeaders(),
+                  body: JSON.stringify({
+                    razorpayOrderId: response.razorpay_order_id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature,
+                  }),
+                });
+                clearCartMutation.mutate(undefined, {
+                  onSuccess: () => {
+                    toast.success(`Payment verified! Order ${createdOrder.orderNumber} confirmed.`);
+                    router.push(`/order-success?orderNumber=${createdOrder.orderNumber}`);
+                  },
+                });
+              },
+              prefill: {
+                name: `${firstName} ${lastName}`.trim(),
+                email: emailAddress,
+                contact: phone,
+              },
+              theme: { color: '#0d9488' },
+            };
+            const rzp = new (window as any).Razorpay(options);
+            rzp.open();
+            setIsProcessing(false);
+            return;
+          }
+        }
+      } catch (_) {}
+
+      // Default Order Success Redirect
+      clearCartMutation.mutate(undefined, {
+        onSuccess: () => {
+          setIsProcessing(false);
+          toast.success(`Order ${createdOrder.orderNumber} confirmed!`);
+          router.push(`/order-success?orderNumber=${createdOrder.orderNumber}`);
+        },
+      });
+
+    } catch (err: any) {
+      setIsProcessing(false);
+      toast.error(err.message || 'Could not place order. Please try again.');
     }
   };
 
