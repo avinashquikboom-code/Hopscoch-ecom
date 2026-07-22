@@ -55,8 +55,11 @@ function mapBackendProductToFrontend(raw: any): Product {
     size: v.size || undefined,
   })) || [];
 
-  const sizes = Array.from(new Set(raw.variants?.map((v: any) => v.size).filter(Boolean) as string[])) as string[];
-  const colors = Array.from(new Set(raw.variants?.map((v: any) => v.color).filter(Boolean) as string[])) as string[];
+  const sizesFromVariants = Array.from(new Set(raw.variants?.map((v: any) => v.size).filter((s: any) => s && s !== 'One Size') as string[])) as string[];
+  const colorsFromVariants = Array.from(new Set(raw.variants?.map((v: any) => v.color).filter((c: any) => c && c !== 'Default') as string[])) as string[];
+
+  const finalColors = (Array.isArray(raw.colors) && raw.colors.length > 0) ? raw.colors : colorsFromVariants;
+  const finalSizes = (Array.isArray(raw.sizes) && raw.sizes.length > 0) ? raw.sizes : sizesFromVariants;
 
   const totalStock = raw.variants && raw.variants.length > 0
     ? raw.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
@@ -77,8 +80,8 @@ function mapBackendProductToFrontend(raw: any): Product {
     reviewCount: Number(raw.reviewCount || 0),
     tags: raw.tags || [],
     variants: variants,
-    sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL'],
-    colors: colors.length > 0 ? colors : ['Beige', 'Black', 'Olive'],
+    sizes: finalSizes,
+    colors: finalColors,
     isNew: raw.isNewArrival || false,
     isFeatured: raw.isFeatured || false,
     isTrending: raw.isTrending || false,

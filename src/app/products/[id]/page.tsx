@@ -47,7 +47,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const mockProducts = productsData?.data || [];
   
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState('M');
+  const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
@@ -57,9 +57,13 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     if (product) {
       if (product.sizes && product.sizes.length > 0) {
         setSelectedSize(product.sizes[0]);
+      } else {
+        setSelectedSize('');
       }
       if (product.colors && product.colors.length > 0) {
         setSelectedColor(product.colors[0]);
+      } else {
+        setSelectedColor('');
       }
     }
   }, [product]);
