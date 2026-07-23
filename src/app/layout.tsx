@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "FCISeller - Premium Lifestyle & Fashion",
+  title: "FCI Seller E-commerce - Premium Lifestyle & Fashion",
   description: "Discover a curated selection of essentials that blend architectural precision with contemporary ease. Experience the new standard of premium living.",
 };
 

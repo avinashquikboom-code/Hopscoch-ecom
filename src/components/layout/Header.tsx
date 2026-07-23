@@ -206,24 +206,10 @@ export function Header() {
           <div className="flex items-center gap-2">
             {/* Desktop FCISeller Logo */}
             <Link href="/" className="hidden md:flex items-center gap-2.5 select-none shrink-0">
-              <svg className="w-9 h-7.5 shrink-0" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="auraPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#0d9488" />
-                    <stop offset="100%" stopColor="#14b8a6" />
-                  </linearGradient>
-                  <linearGradient id="auraSecondary" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#0f766e" />
-                    <stop offset="100%" stopColor="#0d9488" />
-                  </linearGradient>
-                </defs>
-                <path d="M30 68 L50 20" stroke="url(#auraPrimary)" strokeWidth="12" strokeLinecap="round" />
-                <path d="M50 20 L70 68" stroke="url(#auraPrimary)" strokeWidth="12" strokeLinecap="round" />
-                <path d="M38 48 L62 48" stroke="url(#auraSecondary)" strokeWidth="10" strokeLinecap="round" />
-              </svg>
+              <img src="/logo.png" alt="FCI Seller Logo" className="w-9 h-9 object-contain shrink-0" />
               <div className="flex flex-col justify-center leading-none">
-                <span className="font-black text-sm tracking-widest text-[#282c3f] uppercase">FCI</span>
-                <span className="text-[7px] font-bold tracking-[0.25em] text-gray-500 uppercase mt-0.5">SELLER</span>
+                <span className="font-black text-sm tracking-wider text-[#282c3f] dark:text-white uppercase">FCI SELLER</span>
+                <span className="text-[7px] font-bold tracking-[0.2em] text-[#0d9488] uppercase mt-0.5">E-COMMERCE</span>
               </div>
             </Link>
 
@@ -239,14 +225,10 @@ export function Header() {
               </Button>
               
               <Link href="/" className="flex items-center gap-1.5 select-none shrink-0">
-                <svg className="w-7 h-5.5 shrink-0" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M30 68 L50 20" stroke="url(#auraPrimary)" strokeWidth="12" strokeLinecap="round" />
-                  <path d="M50 20 L70 68" stroke="url(#auraPrimary)" strokeWidth="12" strokeLinecap="round" />
-                  <path d="M38 48 L62 48" stroke="url(#auraSecondary)" strokeWidth="10" strokeLinecap="round" />
-                </svg>
+                <img src="/logo.png" alt="FCI Seller Logo" className="w-7 h-7 object-contain shrink-0" />
                 <div className="flex flex-col justify-center leading-none">
-                  <span className="font-black text-xs tracking-widest text-[#282c3f] uppercase">FCI</span>
-                  <span className="text-[6px] font-bold tracking-[0.25em] text-gray-500 uppercase mt-0.5">SELLER</span>
+                  <span className="font-black text-xs tracking-wider text-[#282c3f] dark:text-white uppercase">FCI SELLER</span>
+                  <span className="text-[6px] font-bold tracking-[0.2em] text-[#0d9488] uppercase mt-0.5">E-COMMERCE</span>
                 </div>
               </Link>
             </div>
