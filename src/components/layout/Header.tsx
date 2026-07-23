@@ -209,7 +209,6 @@ export function Header() {
               <img src="/logo.png" alt="FCI Seller Logo" className="w-9 h-9 object-contain shrink-0" />
               <div className="flex flex-col justify-center leading-none">
                 <span className="font-black text-sm tracking-wider text-[#282c3f] dark:text-white uppercase">FCI SELLER</span>
-                <span className="text-[7px] font-bold tracking-[0.2em] text-[#0d9488] uppercase mt-0.5">E-COMMERCE</span>
               </div>
             </Link>
 
@@ -228,7 +227,6 @@ export function Header() {
                 <img src="/logo.png" alt="FCI Seller Logo" className="w-7 h-7 object-contain shrink-0" />
                 <div className="flex flex-col justify-center leading-none">
                   <span className="font-black text-xs tracking-wider text-[#282c3f] dark:text-white uppercase">FCI SELLER</span>
-                  <span className="text-[6px] font-bold tracking-[0.2em] text-[#0d9488] uppercase mt-0.5">E-COMMERCE</span>
                 </div>
               </Link>
             </div>
