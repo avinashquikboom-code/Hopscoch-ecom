@@ -162,6 +162,14 @@ export default function CartPage() {
                   <span className="font-medium">Free</span>
                 </div>
 
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Estimated Tax</span>
+                  <span className="font-medium">
+                    {CURRENCY.SYMBOL}
+                    {(cart.taxAmount || 0).toLocaleString(CURRENCY.LOCALE)}
+                  </span>
+                </div>
+
                 <Separator />
 
                 <div className="flex justify-between text-lg font-bold">

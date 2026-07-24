@@ -17,6 +17,17 @@ interface CartState {
   openCart: () => void;
 }
 
+const calcTax = (items: CartItem[]) => {
+  return items.reduce((sum, i) => {
+    const p = i.product as any;
+    if (!p) return sum;
+    const isInclusive = (p.taxType || p.taxRule?.taxType) === 'INCLUSIVE';
+    if (isInclusive) return sum;
+    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.taxRule?.rate ? Number(p.taxRule.rate) : 18);
+    return sum + Math.round(((p.price * i.quantity * rate) / 100) * 100) / 100;
+  }, 0);
+};
+
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
@@ -24,12 +35,14 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
 
       setCart: (cart: Cart) => {
-        set({ cart });
+        const taxAmount = cart.taxAmount !== undefined ? cart.taxAmount : calcTax(cart.items || []);
+        set({ cart: { ...cart, taxAmount, total: cart.subtotal - cart.discount + taxAmount } });
       },
 
       addItem: (item: CartItem) => {
         set((state) => {
           if (!state.cart) {
+            const taxAmount = calcTax([item]);
             return {
               cart: {
                 id: 'temp',
@@ -37,7 +50,8 @@ export const useCartStore = create<CartState>()(
                 items: [item],
                 subtotal: item.product.price * item.quantity,
                 discount: 0,
-                total: item.product.price * item.quantity,
+                taxAmount,
+                total: item.product.price * item.quantity + taxAmount,
                 updatedAt: new Date().toISOString(),
               },
             };
@@ -64,13 +78,15 @@ export const useCartStore = create<CartState>()(
             0
           );
           const discount = state.cart.discount;
-          const total = subtotal - discount;
+          const taxAmount = calcTax(newItems);
+          const total = subtotal - discount + taxAmount;
 
           return {
             cart: {
               ...state.cart,
               items: newItems,
               subtotal,
+              taxAmount,
               total,
               updatedAt: new Date().toISOString(),
             },
@@ -91,13 +107,15 @@ export const useCartStore = create<CartState>()(
             0
           );
           const discount = state.cart.discount;
-          const total = subtotal - discount;
+          const taxAmount = calcTax(newItems);
+          const total = subtotal - discount + taxAmount;
 
           return {
             cart: {
               ...state.cart,
               items: newItems,
               subtotal,
+              taxAmount,
               total,
               updatedAt: new Date().toISOString(),
             },
@@ -116,13 +134,15 @@ export const useCartStore = create<CartState>()(
             0
           );
           const discount = state.cart.discount;
-          const total = subtotal - discount;
+          const taxAmount = calcTax(newItems);
+          const total = subtotal - discount + taxAmount;
 
           return {
             cart: {
               ...state.cart,
               items: newItems,
               subtotal,
+              taxAmount,
               total,
               updatedAt: new Date().toISOString(),
             },
@@ -138,6 +158,7 @@ export const useCartStore = create<CartState>()(
             items: [],
             subtotal: 0,
             discount: 0,
+            taxAmount: 0,
             total: 0,
             updatedAt: new Date().toISOString(),
           },
