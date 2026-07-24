@@ -61,6 +61,12 @@ function mapBackendProductToFrontend(raw: any): Product {
   const finalColors = (Array.isArray(raw.colors) && raw.colors.length > 0) ? raw.colors : colorsFromVariants;
   const finalSizes = (Array.isArray(raw.sizes) && raw.sizes.length > 0) ? raw.sizes : sizesFromVariants;
 
+  const effectiveTaxRule = raw.taxRule || raw.effectiveTaxRule || raw.category?.taxRule || null;
+  const taxPercent = raw.taxPercent !== undefined ? Number(raw.taxPercent) : (effectiveTaxRule ? Number(effectiveTaxRule.rate || 0) : 0);
+  const taxType = raw.taxType || (effectiveTaxRule ? (effectiveTaxRule.taxType || effectiveTaxRule.type || 'EXCLUSIVE') : 'NONE');
+  const taxAmount = raw.taxAmount !== undefined ? Number(raw.taxAmount) : Math.round(((price * taxPercent) / 100) * 100) / 100;
+  const hsnCode = raw.hsnCode || effectiveTaxRule?.hsnCode || null;
+
   const totalStock = raw.variants && raw.variants.length > 0
     ? raw.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
     : (raw.stock !== undefined ? Number(raw.stock) : 10);
@@ -85,6 +91,12 @@ function mapBackendProductToFrontend(raw: any): Product {
     isNew: raw.isNewArrival || false,
     isFeatured: raw.isFeatured || false,
     isTrending: raw.isTrending || false,
+    taxRule: effectiveTaxRule || undefined,
+    effectiveTaxRule,
+    taxPercent,
+    taxType,
+    taxAmount,
+    hsnCode,
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
   };

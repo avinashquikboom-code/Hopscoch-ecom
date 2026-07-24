@@ -95,7 +95,15 @@ export default function CheckoutPage() {
   const subtotal = cart?.subtotal || 0;
   const discount = cart?.discount || 0;
   const shippingCost = subtotal > 999 || subtotal === 0 ? 0 : 99;
-  const tax = subtotal * 0.18; // 18% GST standard luxury couture
+  const calculatedTax = cartItems.reduce((sum: number, item: any) => {
+    const p = item.product || {};
+    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.effectiveTaxRule?.rate ? Number(p.effectiveTaxRule.rate) : 18);
+    const isInclusive = (p.taxType || p.effectiveTaxRule?.taxType) === 'INCLUSIVE';
+    const itemTotal = (p.price || 0) * (item.quantity || 1);
+    if (isInclusive) return sum; // Tax is inclusive in price
+    return sum + ((itemTotal * rate) / 100);
+  }, 0);
+  const tax = cart?.taxAmount !== undefined ? Number(cart.taxAmount) : Math.round(calculatedTax * 100) / 100;
   const total = subtotal - discount + shippingCost + tax;
 
   const handleVerifyUpi = () => {

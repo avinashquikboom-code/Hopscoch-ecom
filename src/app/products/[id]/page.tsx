@@ -416,17 +416,35 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               </span>
             </div>
 
-            {/* Price block */}
-            <div className="flex items-baseline gap-2.5 border-b border-gray-100 pb-4 mb-4 flex-wrap">
-              <span className="text-2xl sm:text-3xl font-bold text-gray-900">₹{product.price}</span>
-              {product.originalPrice && (
-                <>
-                  <span className="text-base text-gray-400 line-through">₹{product.originalPrice}</span>
-                  <span className="text-base font-bold text-[#0d9488]">
-                    {discount}% Off
+            {/* Price & GST block */}
+            <div className="flex flex-col border-b border-gray-100 dark:border-neutral-800 pb-4 mb-4 gap-2">
+              <div className="flex items-baseline gap-2.5 flex-wrap">
+                <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">₹{product.price}</span>
+                {product.originalPrice && product.originalPrice > product.price && (
+                  <>
+                    <span className="text-base text-gray-400 line-through">₹{product.originalPrice}</span>
+                    <span className="text-base font-bold text-[#0d9488]">
+                      {discount}% Off
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {/* GST & Tax Indicator Badge */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {product.taxPercent && product.taxPercent > 0 ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300 border border-teal-200/80 dark:border-teal-800/60">
+                    🏷️ GST @ {product.taxPercent}% ({product.taxType === 'INCLUSIVE' ? 'Inclusive in price' : `+ ₹${(product.taxAmount || (product.price * product.taxPercent / 100)).toFixed(2)} GST`})
                   </span>
-                </>
-              )}
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-300">
+                    Inclusive of all applicable taxes
+                  </span>
+                )}
+                {product.hsnCode && (
+                  <span className="text-xs text-gray-400 dark:text-gray-500 font-mono">HSN: {product.hsnCode}</span>
+                )}
+              </div>
             </div>
 
             {/* Available Colors */}

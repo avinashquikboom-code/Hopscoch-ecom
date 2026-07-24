@@ -48,6 +48,18 @@ export interface Product {
   isNew: boolean;
   isFeatured: boolean;
   isTrending: boolean;
+  taxRule?: {
+    id?: number;
+    name?: string;
+    rate?: number;
+    taxType?: string;
+    hsnCode?: string;
+  };
+  effectiveTaxRule?: any;
+  taxPercent?: number;
+  taxType?: string;
+  taxAmount?: number;
+  hsnCode?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -91,6 +103,7 @@ export interface Cart {
   items: CartItem[];
   subtotal: number;
   discount: number;
+  taxAmount?: number;
   total: number;
   coupon?: Coupon;
   updatedAt: string;
