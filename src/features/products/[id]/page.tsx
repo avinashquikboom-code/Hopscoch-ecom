@@ -213,8 +213,17 @@ export default function ProductDetailsPage() {
           <div className="grid grid-cols-3 gap-4 pt-4 border-t">
             <div className="text-center">
               <Truck className="w-6 h-6 mx-auto mb-2 text-blue-600" />
-              <p className="text-sm font-medium">Free Shipping</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">On orders over ₹999</p>
+              {Number(product.shippingCharge || 0) > 0 ? (
+                <>
+                  <p className="text-sm font-medium">+ ₹{Number(product.shippingCharge).toFixed(2)} Shipping</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Per order charge</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium">Free Shipping</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">On orders over ₹999</p>
+                </>
+              )}
             </div>
             <div className="text-center">
               <Shield className="w-6 h-6 mx-auto mb-2 text-blue-600" />

@@ -60,6 +60,7 @@ export interface Product {
   taxType?: string;
   taxAmount?: number;
   hsnCode?: string;
+  shippingCharge?: number;
   createdAt: string;
   updatedAt: string;
 }

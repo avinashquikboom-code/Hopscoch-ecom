@@ -97,6 +97,7 @@ function mapBackendProductToFrontend(raw: any): Product {
     taxType,
     taxAmount,
     hsnCode,
+    shippingCharge: raw.shippingCharge !== undefined ? Number(raw.shippingCharge) : (raw.shipping_charge !== undefined ? Number(raw.shipping_charge) : 0),
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
   };
