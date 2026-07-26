@@ -97,7 +97,7 @@ export default function CheckoutPage() {
   const shippingCost = subtotal > 999 || subtotal === 0 ? 0 : 99;
   const calculatedTax = cartItems.reduce((sum: number, item: any) => {
     const p = item.product || {};
-    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.effectiveTaxRule?.rate ? Number(p.effectiveTaxRule.rate) : 18);
+    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.effectiveTaxRule?.rate ? Number(p.effectiveTaxRule.rate) : 0);
     const isInclusive = (p.taxType || p.effectiveTaxRule?.taxType) === 'INCLUSIVE';
     const itemTotal = (p.price || 0) * (item.quantity || 1);
     if (isInclusive) return sum; // Tax is inclusive in price

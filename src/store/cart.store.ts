@@ -23,7 +23,7 @@ const calcTax = (items: CartItem[]) => {
     if (!p) return sum;
     const isInclusive = (p.taxType || p.taxRule?.taxType) === 'INCLUSIVE';
     if (isInclusive) return sum;
-    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.taxRule?.rate ? Number(p.taxRule.rate) : 18);
+    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.taxRule?.rate ? Number(p.taxRule.rate) : 0);
     return sum + Math.round(((p.price * i.quantity * rate) / 100) * 100) / 100;
   }, 0);
 };
