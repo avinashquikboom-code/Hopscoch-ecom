@@ -126,7 +126,7 @@ export default function CheckoutPage() {
     const payload = {
       address: {
         fullName: `${firstName} ${lastName}`.trim() || 'Valued Customer',
-        phone: phone || '0000000000',
+        phone: phone || '',
         email: emailAddress,
         streetAddress: streetAddress || 'Shipping Address',
         city: city || 'City',
