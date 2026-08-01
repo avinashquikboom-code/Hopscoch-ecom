@@ -261,9 +261,9 @@ export default function OrderDetailPage() {
             </div>
             {[
               { label: 'Subtotal', value: subtotal },
-              { label: 'Discount', value: -discount, green: true },
+              ...(discount > 0 ? [{ label: 'Discount', value: -discount, green: true }] : []),
               { label: 'Shipping', value: shipping === 0 ? 'FREE' : `₹${shipping}`, green: shipping === 0 },
-              { label: 'GST (18%)', value: tax },
+              ...(tax > 0 ? [{ label: 'Taxes (GST)', value: tax }] : []),
             ].map(({ label, value, green }) => (
               <div key={label} className="flex justify-between text-sm">
                 <span className="text-[#64748B]">{label}</span>

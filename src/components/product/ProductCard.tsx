@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Product } from '@/types';
-import { Heart, Star, ShoppingBag, Eye } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Eye, Zap, BadgeCheck } from 'lucide-react';
 import { useAddToCart, useAddToWishlist } from '@/hooks';
 import { useWishlistStore, useAuthStore } from '@/store';
 import { useRouter } from 'next/navigation';
@@ -35,6 +35,24 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : undefined;
+
+  // === Offer badge priority stack ==========================================
+  // Rules: max 2 badges shown, priority: OUT_OF_STOCK > NEW > TRENDING > FEATURED > high_discount > sale
+  const topBadges: { label: string; className: string }[] = [];
+  if (product.isNew) {
+    topBadges.push({ label: 'NEW', className: 'bg-emerald-500 text-white' });
+  }
+  if (product.isTrending && topBadges.length < 2) {
+    topBadges.push({ label: 'TRENDING', className: 'bg-amber-500 text-white' });
+  }
+  if (product.isFeatured && topBadges.length < 2) {
+    topBadges.push({ label: 'FEATURED', className: 'bg-violet-600 text-white' });
+  }
+  if (discount && discount >= 40 && topBadges.length < 2) {
+    topBadges.push({ label: `${discount}% OFF`, className: 'bg-rose-500 text-white' });
+  }
+  // Bank offer teaser — shown when discount >= 10 and no other teaser
+  const showBankOffer = discount !== undefined && discount >= 10;
 
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -127,6 +145,20 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
             </div>
           )}
 
+          {/* === STACKED OFFER BADGES — top left === */}
+          {topBadges.length > 0 && product.stock > 0 && (
+            <div className="absolute top-2.5 left-2.5 z-20 flex flex-col gap-1">
+              {topBadges.map((b, i) => (
+                <span
+                  key={i}
+                  className={`text-[8px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm ${b.className}`}
+                >
+                  {b.label}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* Rating Badge — bottom left */}
           {product.rating > 0 && (
             <div className="absolute bottom-2.5 left-2.5 bg-white/85 dark:bg-neutral-950/85 backdrop-blur-md text-gray-800 dark:text-gray-200 text-[10px] font-black px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm border border-white/20 dark:border-white/5 z-10">
@@ -195,6 +227,20 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
             )}
           </div>
 
+          {/* Assured + bank offer teaser row */}
+          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+            {product.isFeatured && (
+              <span className="inline-flex items-center gap-0.5 text-[8px] font-black bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800 px-1.5 py-0.5 rounded-full">
+                <BadgeCheck className="w-2.5 h-2.5" /> Assured
+              </span>
+            )}
+            {showBankOffer && (
+              <span className="inline-flex items-center gap-0.5 text-[8px] font-black text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 px-1.5 py-0.5 rounded-full">
+                <Zap className="w-2 h-2" /> HDFC: Extra 10%
+              </span>
+            )}
+          </div>
+
           {/* Color swatches */}
           <div className="flex items-center gap-1.5 mt-1.5 pt-2 border-t border-gray-100 dark:border-neutral-900">
             {DEFAULT_COLORS.map((col, idx) => (
@@ -244,6 +290,17 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
             </span>
           </div>
         )}
+
+        {/* Stacked offer badges — list mode */}
+        {topBadges.length > 0 && product.stock > 0 && (
+          <div className="absolute top-2 left-2 z-20 flex flex-col gap-1">
+            {topBadges.map((b, i) => (
+              <span key={i} className={`text-[8px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase shadow-sm ${b.className}`}>
+                {b.label}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Product Information */}
@@ -290,6 +347,19 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
               </span>
             </>
           )}
+          {/* Assured + bank offer chips */}
+          <div className="w-full flex items-center gap-1.5 mt-1 flex-wrap">
+            {product.isFeatured && (
+              <span className="inline-flex items-center gap-0.5 text-[8px] font-black bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800 px-1.5 py-0.5 rounded-full">
+                <BadgeCheck className="w-2.5 h-2.5" /> Assured
+              </span>
+            )}
+            {showBankOffer && (
+              <span className="inline-flex items-center gap-0.5 text-[8px] font-black text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 px-1.5 py-0.5 rounded-full">
+                <Zap className="w-2 h-2" /> HDFC: Extra 10% off
+              </span>
+            )}
+          </div>
         </div>
       </div>
       

@@ -24,7 +24,12 @@ import {
   Flame,
   TrendingUp,
   Award,
-  Compass
+  Compass,
+  CreditCard,
+  Percent,
+  BadgePercent,
+  Building2,
+  Zap
 } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -54,6 +59,32 @@ const INSTAGRAM_POSTS = [
   { url: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80', likes: '1.7k', comments: '84' },
   { url: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80', likes: '3.1k', comments: '156' },
   { url: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80', likes: '1.5k', comments: '61' },
+];
+
+// === BANK OFFERS CONFIG ===================================================
+const BANK_OFFERS = [
+  { icon: '🏦', bank: 'HDFC Bank', title: '10% Instant Discount', sub: 'On credit & debit cards', color: 'from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300' },
+  { icon: '🏛️', bank: 'SBI Card', title: '5% Unlimited Cashback', sub: 'On SBI Credit Cards', color: 'from-teal-50 to-teal-100 dark:from-teal-950/40 dark:to-teal-900/20 border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300' },
+  { icon: '💳', bank: 'Axis Bank', title: '₹200 Off on ₹1500+', sub: 'Axis Ace & Flipkart cards', color: 'from-violet-50 to-violet-100 dark:from-violet-950/40 dark:to-violet-900/20 border-violet-200 dark:border-violet-800 text-violet-800 dark:text-violet-300' },
+  { icon: '🏧', bank: 'ICICI Bank', title: 'Extra 12% Off', sub: 'Amaze & Amazon Pay cards', color: 'from-orange-50 to-orange-100 dark:from-orange-950/40 dark:to-orange-900/20 border-orange-200 dark:border-orange-800 text-orange-800 dark:text-orange-300' },
+  { icon: '💰', bank: 'Kotak Bank', title: 'Flat ₹150 Cashback', sub: 'Kotak 811 & League cards', color: 'from-rose-50 to-rose-100 dark:from-rose-950/40 dark:to-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300' },
+];
+
+// === CATEGORY OFFER TILES (static fallback — admin replaces via banners) ===
+const CATEGORY_OFFER_TILES = [
+  { label: 'Women', badge: 'Up to 70% Off', gradient: 'from-rose-500 to-pink-600', href: '/products?category=Women', img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80' },
+  { label: 'Men', badge: 'Min 50% Off', gradient: 'from-slate-600 to-gray-800', href: '/products?category=Men', img: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&q=80' },
+  { label: 'Kids', badge: 'Flat 60% Off', gradient: 'from-amber-400 to-orange-500', href: '/products?category=Kids', img: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=400&q=80' },
+  { label: 'Accessories', badge: 'Up to 40% Off', gradient: 'from-violet-500 to-purple-700', href: '/products?category=Accessories', img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80' },
+  { label: 'Footwear', badge: 'Buy 2 Get 1 Free', gradient: 'from-teal-500 to-emerald-600', href: '/products?category=Footwear', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80' },
+  { label: 'Collections', badge: 'New In — 30% Off', gradient: 'from-indigo-500 to-blue-600', href: '/products?category=Collections', img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80' },
+];
+
+// === PROMOTIONAL MID-BANNERS (static fallback) =============================
+const PROMO_MINI_BANNERS = [
+  { title: 'New Season Arrivals', sub: 'Fresh drops every week', badge: 'NEW IN', color: 'from-teal-600 to-emerald-500', href: '/new-arrivals', img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80' },
+  { title: 'Festival Sale', sub: 'Upto 80% off on 50,000+ styles', badge: 'SALE', color: 'from-rose-500 to-pink-400', href: '/sale', img: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&q=80' },
+  { title: 'Bank & Card Offers', sub: 'Extra 10–15% on top banks', badge: 'EXTRA OFF', color: 'from-indigo-600 to-violet-500', href: '/products', img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80' },
 ];
 
 import { API_BASE } from '@/constants';
@@ -308,9 +339,32 @@ export default function Home() {
           )}
         </section>
       ) : null}
+
+      {/* 2b. BANK OFFER CALLOUT STRIP — Flipkart-style scrollable pill row */}
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-5 relative z-10">
+        <div className="flex items-center gap-2 mb-3">
+          <CreditCard className="w-4 h-4 text-teal-600" />
+          <span className="text-xs font-black uppercase tracking-widest text-gray-700 dark:text-gray-300">Bank & Card Offers</span>
+          <span className="ml-auto text-[10px] font-bold text-teal-600 hover:underline cursor-pointer">View all offers →</span>
+        </div>
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+          {BANK_OFFERS.map((offer, i) => (
+            <div
+              key={i}
+              className={`shrink-0 flex items-center gap-3 bg-gradient-to-r ${offer.color} border rounded-xl px-4 py-3 min-w-[220px] cursor-pointer group transition-all hover:shadow-md hover:-translate-y-0.5`}
+            >
+              <span className="text-2xl select-none">{offer.icon}</span>
+              <div className="min-w-0">
+                <p className="text-xs font-black leading-tight truncate">{offer.title}</p>
+                <p className="text-[10px] font-medium opacity-75 truncate mt-0.5">{offer.bank} · {offer.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
  
       {/* 3. Flash Sale Section (Glowing glass design with premium countdown) */}
-      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-10 relative z-10">
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-6 relative z-10">
         <div className="bg-white/40 dark:bg-gray-950/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/50 dark:border-white/5 overflow-hidden p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row justify-between items-baseline sm:items-center border-b border-gray-100 dark:border-gray-900 pb-5 mb-6 gap-4">
             <div className="flex items-center gap-3.5 flex-wrap">
@@ -344,6 +398,42 @@ export default function Home() {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 3b. CATEGORY OFFER TILES — Flipkart "Top Offers" style 2x3 grid */}
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-8 relative z-10">
+        <div className="flex items-center gap-2 mb-4">
+          <BadgePercent className="w-5 h-5 text-rose-500" />
+          <h2 className="text-base font-black uppercase tracking-wider text-gray-900 dark:text-gray-100">Top Offers by Category</h2>
+          <Link href="/products" className="ml-auto text-xs font-bold text-teal-600 hover:underline flex items-center gap-1">
+            See all <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          {CATEGORY_OFFER_TILES.map((tile, i) => (
+            <Link key={i} href={tile.href}
+              className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border border-white/20 dark:border-white/5"
+            >
+              {/* Background image */}
+              <Image
+                src={tile.img}
+                alt={tile.label}
+                fill
+                sizes="(max-width: 768px) 50vw, 16vw"
+                className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+              />
+              {/* Gradient overlay */}
+              <div className={`absolute inset-0 bg-gradient-to-t ${tile.gradient} opacity-60 group-hover:opacity-70 transition-opacity`} />
+              {/* Content */}
+              <div className="absolute inset-0 flex flex-col justify-end p-3 text-white">
+                <span className="text-[10px] font-black bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full w-fit mb-1.5 border border-white/30">
+                  {tile.badge}
+                </span>
+                <p className="text-xs font-black uppercase tracking-wider">{tile.label}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -469,6 +559,41 @@ export default function Home() {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 6b. PROMOTIONAL MID-BANNER ROW — 3-col editorial banners (Amazon-style) */}
+      <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-8 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {PROMO_MINI_BANNERS.map((banner, i) => (
+            <Link key={i} href={banner.href}
+              className="group relative rounded-2xl overflow-hidden h-36 sm:h-44 cursor-pointer shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border border-white/10 dark:border-white/5"
+            >
+              {/* Background photo */}
+              <Image
+                src={banner.img}
+                alt={banner.title}
+                fill
+                sizes="(max-width: 640px) 100vw, 33vw"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-500 brightness-50"
+              />
+              {/* Gradient colour tint */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${banner.color} opacity-60`} />
+              {/* Content */}
+              <div className="absolute inset-0 p-4 flex flex-col justify-between text-white">
+                <span className="text-[9px] font-black bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-2.5 py-0.5 w-fit tracking-widest uppercase">
+                  {banner.badge}
+                </span>
+                <div>
+                  <p className="text-sm font-black leading-tight">{banner.title}</p>
+                  <p className="text-[11px] font-medium opacity-80 mt-0.5">{banner.sub}</p>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold mt-2 opacity-90 group-hover:opacity-100 transition-opacity">
+                    Shop Now <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

@@ -51,23 +51,28 @@ export function Footer() {
             </h4>
             <ul className="space-y-3.5 text-sm">
               <li>
-                <Link href="/products?category=Fashion" className="text-muted-foreground hover:text-primary transition-colors">
-                  Fashion
+                <Link href="/products?category=Women" className="text-muted-foreground hover:text-primary transition-colors">
+                  Women
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=Electronics" className="text-muted-foreground hover:text-primary transition-colors">
-                  Electronics
+                <Link href="/products?category=Men" className="text-muted-foreground hover:text-primary transition-colors">
+                  Men
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=Home & Kitchen" className="text-muted-foreground hover:text-primary transition-colors">
-                  Home
+                <Link href="/products?category=Kids" className="text-muted-foreground hover:text-primary transition-colors">
+                  Kids
                 </Link>
               </li>
               <li>
-                <Link href="/products?category=Beauty & Personal Care" className="text-muted-foreground hover:text-primary transition-colors">
-                  Beauty
+                <Link href="/products?category=Accessories" className="text-muted-foreground hover:text-primary transition-colors">
+                  Accessories
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=Footwear" className="text-muted-foreground hover:text-primary transition-colors">
+                  Footwear
                 </Link>
               </li>
             </ul>
@@ -85,13 +90,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/sustainability" className="text-muted-foreground hover:text-primary transition-colors">
-                  Sustainability
+                <Link href="/faq" className="text-muted-foreground hover:text-primary transition-colors">
+                  FAQ & Help
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-muted-foreground hover:text-primary transition-colors">
-                  Shipping & Returns
+                <Link href="/return-policy" className="text-muted-foreground hover:text-primary transition-colors">
+                  Return Policy
                 </Link>
               </li>
               <li>
@@ -119,8 +124,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-muted-foreground hover:text-primary transition-colors">
-                  Cookie Policy
+                <Link href="/return-policy" className="text-muted-foreground hover:text-primary transition-colors">
+                  Refund Terms
                 </Link>
               </li>
             </ul>

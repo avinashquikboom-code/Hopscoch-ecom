@@ -44,6 +44,46 @@ const DISCOUNTS = [
   { label: '40% and above', value: 40 },
 ];
 
+// === CATEGORY HERO BANNERS CONFIG =========================================
+const CATEGORY_BANNERS: Record<string, { title: string; subtitle: string; bg: string; badge: string }> = {
+  Women: {
+    title: "Women's Couture & Ethnic Collection",
+    subtitle: "Explore handcrafted sarees, lehengas, kurtis, & western wear — Up to 70% Off",
+    bg: "from-rose-950 via-pink-900 to-purple-950",
+    badge: "WOMEN'S SPECIAL",
+  },
+  Men: {
+    title: "Men's Modern & Ethnic Wardrobe",
+    subtitle: "Premium suits, sherwanis, casual shirts, & jeans — Flat 50% Off",
+    bg: "from-slate-950 via-gray-900 to-zinc-900",
+    badge: "MEN'S EDITION",
+  },
+  Kids: {
+    title: "Kids' Fashion & Celebration Wear",
+    subtitle: "Vibrant, comfortable, & durable outfits for all age groups — Min 40% Off",
+    bg: "from-amber-950 via-orange-900 to-red-950",
+    badge: "KIDS' ZONE",
+  },
+  Accessories: {
+    title: "Designer Handbags, Jewelry & Accessories",
+    subtitle: "Complete your look with luxury handcrafted pieces — Extra 10% on Bank Cards",
+    bg: "from-violet-950 via-purple-900 to-indigo-950",
+    badge: "CRAFTED ACCESSORIES",
+  },
+  Footwear: {
+    title: "Luxury Footwear Collection",
+    subtitle: "Juttis, heels, formal shoes & sneakers — Buy 2 Get 1 Free",
+    bg: "from-teal-950 via-emerald-900 to-cyan-950",
+    badge: "FOOTWEAR SPOTLIGHT",
+  },
+  Collections: {
+    title: "GenZ & Runway Drops",
+    subtitle: "Fresh street style & avant-garde drops updated weekly",
+    bg: "from-blue-950 via-indigo-900 to-slate-950",
+    badge: "NEW DROPS",
+  },
+};
+
 const ITEMS_PER_PAGE = 12;
 
 /* ─── Filter Checkbox (Flipkart Style) ────────────────────────────────── */
@@ -590,6 +630,22 @@ function ProductsContent() {
           </div>
         </div>
       </div>
+
+      {/* Category Hero Banner — shown when specific category selected */}
+      {selectedCategory !== 'all' && CATEGORY_BANNERS[selectedCategory] && (
+        <div className="container mx-auto px-4 sm:px-6 md:px-12 mb-5">
+          <div className={`rounded-2xl bg-gradient-to-r ${CATEGORY_BANNERS[selectedCategory].bg} p-6 sm:p-8 text-white shadow-lg relative overflow-hidden border border-white/10`}>
+            <div className="relative z-10 max-w-2xl space-y-2">
+              <span className="text-[9px] font-black bg-white/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest border border-white/20">
+                {CATEGORY_BANNERS[selectedCategory].badge}
+              </span>
+              <h2 className="text-xl sm:text-3xl font-black tracking-tight">{CATEGORY_BANNERS[selectedCategory].title}</h2>
+              <p className="text-xs sm:text-sm text-gray-200 font-light">{CATEGORY_BANNERS[selectedCategory].subtitle}</p>
+            </div>
+            <div className="absolute right-[-20px] bottom-[-20px] w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+          </div>
+        </div>
+      )}
 
       <div className="container mx-auto px-4 sm:px-6 md:px-12">
         <div className="flex gap-4 items-start">
