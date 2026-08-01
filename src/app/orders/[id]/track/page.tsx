@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, CheckCircle, Clock, Truck, Package, MapPin, Copy, Check, Info } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, Truck, Package, MapPin, Copy, Check, ExternalLink } from 'lucide-react';
 
 import { API_BASE } from '@/constants';
 
@@ -22,14 +22,14 @@ export default function TrackOrderPage() {
     carrier: 'FCISeller Logistics',
     trackingNumber: 'Pending',
     status: 'PROCESSING',
-    estimatedDate: 'In 5-7 days',
+    trackingUrl: null,
     steps: [
-      { id: 0, label: 'Order Placed', time: 'Just now', detail: 'Order placed successfully', done: true },
-      { id: 1, label: 'Order Confirmed', time: 'Processing', detail: 'Confirming your order', done: true },
-      { id: 2, label: 'Packed & Dispatched', time: 'Pending', detail: 'Packing your order', done: false },
-      { id: 3, label: 'In Transit', time: 'Pending', detail: 'Courier in transit', done: false },
-      { id: 4, label: 'Out for Delivery', time: 'Pending', detail: 'Delivery agent will be assigned', done: false },
-      { id: 5, label: 'Delivered', time: 'Estimated', detail: 'Estimated delivery', done: false },
+      { id: 0, label: 'Order Placed', time: '', detail: 'Order placed successfully', done: true },
+      { id: 1, label: 'Order Confirmed', time: '', detail: 'Confirming your order', done: true },
+      { id: 2, label: 'Packed & Dispatched', time: '', detail: 'Packing your order', done: false },
+      { id: 3, label: 'In Transit', time: '', detail: 'Courier in transit', done: false },
+      { id: 4, label: 'Out for Delivery', time: '', detail: 'Delivery agent will be assigned', done: false },
+      { id: 5, label: 'Delivered', time: '', detail: 'Estimated delivery', done: false },
     ]
   });
 
@@ -40,27 +40,29 @@ export default function TrackOrderPage() {
         const res = await fetch(`${API_BASE}/api/v1/web/shipping/track/${cleanId}`, { headers: authHeaders() });
         const json = await res.json();
         
-        if (res.ok && Array.isArray(json.data) && json.data.length > 0) {
-          // If we got activities from Shiprocket!
-          const activities = json.data;
+        if (res.ok && json.data) {
+          const data = json.data;
+          const activities = data.activities || [];
           const steps = activities.map((act: any, idx: number) => ({
             id: idx,
             label: act.activity || 'Status Update',
-            time: act.date || act.time || '',
-            detail: act.location || 'In Transit',
+            time: act.date || '',
+            detail: act.location || 'Status updated',
             done: true
           }));
 
           setTrackingInfo({
-            carrier: 'Shiprocket Partner',
-            trackingNumber: activities[0].awb || 'Assigned',
-            status: 'IN_TRANSIT',
-            estimatedDate: 'Expected Soon',
-            steps
+            carrier: data.courierName || 'Logistics Partner',
+            trackingNumber: data.awbNumber || 'Pending',
+            status: data.status || 'SHIPPED',
+            trackingUrl: data.trackingUrl || null,
+            steps: steps.length > 0 ? steps : [
+              { id: 0, label: 'Order Confirmed', time: '', detail: 'Order is being processed', done: true }
+            ]
           });
         }
       } catch (err) {
-        console.error('Failed to load live tracking, using premium simulator fallback');
+        console.error('Failed to load tracking data:', err);
       } finally {
         setLoading(false);
       }
@@ -72,13 +74,14 @@ export default function TrackOrderPage() {
   }, [cleanId]);
 
   const handleCopy = () => {
+    if (!trackingInfo.trackingNumber || trackingInfo.trackingNumber === 'Pending') return;
     navigator.clipboard.writeText(trackingInfo.trackingNumber);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const doneSteps = trackingInfo.steps.filter((s: any) => s.done).length;
-  const progressPct = Math.round((doneSteps / trackingInfo.steps.length) * 100);
+  const progressPct = Math.min(100, Math.round((doneSteps / Math.max(1, trackingInfo.steps.length)) * 100));
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -104,16 +107,28 @@ export default function TrackOrderPage() {
                 <Truck className="w-5 h-5 text-[#0F766E]" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Carrier</p>
+                <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Courier Partner</p>
                 <p className="text-sm font-bold text-[#0F172A]">{trackingInfo.carrier}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">AWB Number</p>
+              <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">AWB / Tracking Number</p>
               <div className="flex items-center gap-1.5 justify-end">
-                <p className="text-sm font-bold text-[#0F172A] font-mono">{trackingInfo.trackingNumber}</p>
+                {trackingInfo.trackingUrl ? (
+                  <a
+                    href={trackingInfo.trackingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-bold text-[#0F766E] hover:underline flex items-center gap-1 font-mono"
+                  >
+                    {trackingInfo.trackingNumber}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                ) : (
+                  <p className="text-sm font-bold text-[#0F172A] font-mono">{trackingInfo.trackingNumber}</p>
+                )}
                 {trackingInfo.trackingNumber !== 'Pending' && (
-                  <button onClick={handleCopy} className="text-[#64748B] hover:text-[#0F766E] transition-colors cursor-pointer">
+                  <button onClick={handleCopy} className="text-[#64748B] hover:text-[#0F766E] transition-colors cursor-pointer ml-1">
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 )}
@@ -142,9 +157,8 @@ export default function TrackOrderPage() {
           
           <div className="relative pl-6 border-l-2 border-[#E2E8F0] space-y-6 ml-2.5">
             {trackingInfo.steps.map((step: any, index: number) => {
-              const isLast = index === trackingInfo.steps.length - 1;
               return (
-                <div key={step.id} className="relative">
+                <div key={step.id || index} className="relative">
                   {/* Step Dot */}
                   <span className={`absolute -left-[31px] top-0.5 w-4.5 h-4.5 rounded-full border-2 bg-white flex items-center justify-center transition-colors ${
                     step.done ? 'border-[#0D9488] bg-[#0D9488]' : 'border-[#CBD5E1]'
