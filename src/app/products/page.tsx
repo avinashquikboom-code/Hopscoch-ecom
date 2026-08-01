@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import {
   SlidersHorizontal, X, ChevronDown, ChevronUp,
   Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  LayoutGrid, List, Star
+  LayoutGrid, List, Star, Sparkles, Camera
 } from 'lucide-react';
 
 const SORT_OPTIONS = [
@@ -195,12 +195,34 @@ function ProductsContent() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Read from URL params on mount
+  // Visual search state
+  const [visualSearchResults, setVisualSearchResults] = useState<{
+    exactMatches: any[];
+    similarMatches: any[];
+    extractedAttributes: any;
+    wasFallback: boolean;
+  } | null>(null);
+
+  // Read from URL params and visual search results on mount
   useEffect(() => {
     const category = searchParams.get('category');
     if (category) setSelectedCategory(category);
-    const search = searchParams.get('search');
+    const search = searchParams.get('search') || searchParams.get('q');
     if (search) setSearchQuery(search.toLowerCase());
+    // Check if this is a visual search landing
+    const isVisual = searchParams.get('visualSearch') === '1';
+    if (isVisual) {
+      try {
+        const stored = sessionStorage.getItem('visual_search_results');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setVisualSearchResults(parsed);
+        }
+      } catch { /* ignore */ }
+    } else {
+      // Clear any stale visual results
+      setVisualSearchResults(null);
+    }
   }, [searchParams]);
 
   // Reset to page 1 whenever filters change
@@ -684,6 +706,87 @@ function ProductsContent() {
                 ))}
                 {selectedDiscount && (
                   <FilterChip label={`Discount: ${selectedDiscount}% & above`} onRemove={() => { setSelectedDiscount(null); resetPage(); }} />
+                )}
+              </div>
+            )}
+
+            {/* ══ VISUAL SEARCH RESULTS BANNER ══════════════════════════════ */}
+            {visualSearchResults && (
+              <div className="mb-5 rounded-xl border border-teal-200 dark:border-teal-800 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-950/30 dark:to-emerald-950/20 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center shrink-0">
+                      <Sparkles className="w-4.5 h-4.5 text-teal-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-teal-900 dark:text-teal-200">
+                        AI Visual Search Results
+                      </p>
+                      <p className="text-xs text-teal-700 dark:text-teal-400 mt-0.5">
+                        {(visualSearchResults.exactMatches?.length ?? 0) + (visualSearchResults.similarMatches?.length ?? 0)} styles matched
+                        {visualSearchResults.wasFallback ? ' (similar items)' : ''} by Gemini Vision
+                      </p>
+                      {/* Attribute pills */}
+                      {visualSearchResults.extractedAttributes && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {Object.entries(visualSearchResults.extractedAttributes)
+                            .filter(([k, v]) => v && k !== 'confidence')
+                            .map(([key, val]) => (
+                              <span key={key} className="px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-800/40 text-[10px] font-bold text-teal-800 dark:text-teal-300 capitalize">
+                                {key}: {String(val)}
+                              </span>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      sessionStorage.removeItem('visual_search_results');
+                      setVisualSearchResults(null);
+                      router.push('/products');
+                    }}
+                    className="shrink-0 p-1.5 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/40 text-teal-600 transition-colors cursor-pointer border-none bg-transparent"
+                    title="Clear visual search"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Visual search product sections */}
+                {(visualSearchResults.exactMatches?.length > 0 || visualSearchResults.similarMatches?.length > 0) ? (
+                  <div className="mt-4 space-y-5">
+                    {visualSearchResults.exactMatches?.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-teal-700 dark:text-teal-400 mb-2.5">
+                          Exact Matches ({visualSearchResults.exactMatches.length})
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
+                          {visualSearchResults.exactMatches.slice(0, 10).map((product: any) => (
+                            <ProductCard key={product.id} product={product} viewMode="grid" />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {visualSearchResults.similarMatches?.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-500 mb-2.5">
+                          Similar Styles ({visualSearchResults.similarMatches.length})
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
+                          {visualSearchResults.similarMatches.slice(0, 10).map((product: any) => (
+                            <ProductCard key={product.id} product={product} viewMode="grid" />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-4 py-6 text-center">
+                    <Camera className="w-8 h-8 text-teal-300 mx-auto mb-2" />
+                    <p className="text-sm text-teal-700 dark:text-teal-400 font-semibold">No exact matches found</p>
+                    <p className="text-xs text-teal-600/70 dark:text-teal-500 mt-0.5">Browse all products below or try a different image</p>
+                  </div>
                 )}
               </div>
             )}

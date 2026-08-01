@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Trash2, ShoppingBag, ArrowRight, Truck, Tag, Gift, Percent, Check, AlertCircle } from 'lucide-react';
-import { useCart, useUpdateCartItem, useRemoveFromCart, useApplyCoupon, useRemoveCoupon } from '@/hooks';
+import { useCart, useUpdateCartItem, useRemoveFromCart, useApplyCoupon, useRemoveCoupon, useGiftWrapConfig } from '@/hooks';
 import { toast } from '@/components/ui/toast';
 
 const AVAILABLE_COUPONS = [
@@ -17,6 +17,7 @@ const AVAILABLE_COUPONS = [
 ];
 
 export default function CartPage() {
+  const { data: giftWrapConfig } = useGiftWrapConfig();
   const router = useRouter();
   const { data: cart, isLoading } = useCart();
   const updateCartItemMutation = useUpdateCartItem();
@@ -31,11 +32,16 @@ export default function CartPage() {
   const cartItems = cart?.items || [];
   
   // Totals calculations
-  const subtotal = cart?.subtotal || 0;
-  const discount = cart?.discount || 0;
-  const shipping = subtotal > 999 || subtotal === 0 ? 0 : 99;
-  const giftWrapCost = giftWrap ? 30 : 0;
-  const total = subtotal - discount + shipping + giftWrapCost;
+  const subtotal = Number(cart?.subtotal || 0);
+  const discount = Number(cart?.discount || 0);
+  const shipping = Number(cart?.shippingAmount !== undefined ? cart.shippingAmount : (subtotal > 999 || subtotal === 0 ? 0 : 99));
+  const totalExclusiveTax = Number((cart as any)?.totalExclusiveTax || 0);
+  const totalInclusiveTax = Number((cart as any)?.totalInclusiveTax || 0);
+  const taxAmount = Number(cart?.taxAmount || 0);
+  const giftWrapEnabled = giftWrapConfig?.enabled ?? true;
+  const giftWrapCharge = giftWrapConfig?.charge ?? 49;
+  const giftWrapCost = giftWrap ? giftWrapCharge : 0;
+  const total = Number((cart as any)?.total !== undefined ? (cart as any).total + giftWrapCost : (subtotal - discount + shipping + totalExclusiveTax + giftWrapCost));
 
   const handleQtyChange = (itemId: string, currentQty: number, delta: number) => {
     const newQty = currentQty + delta;
@@ -198,7 +204,8 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* Gift Wrap Addition Option (Couture details) */}
+              {/* Gift Wrap Addition Option — shown only if enabled by admin */}
+              {giftWrapEnabled && (
               <div className="bg-[#fcf8f2] dark:bg-[#251b0f]/20 border border-amber-200/50 dark:border-amber-900/30 p-4.5 rounded-2xl shadow-xs flex flex-col gap-3">
                 <div className="flex items-start gap-3">
                   <input
@@ -211,7 +218,7 @@ export default function CartPage() {
                   <div className="text-xs flex-1">
                     <label htmlFor="gift-wrap-check" className="font-bold text-amber-800 dark:text-amber-300 cursor-pointer flex items-center gap-1.5">
                       <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      <span>Add Premium Gift Wrap (+₹30)</span>
+                      <span>Add Premium Gift Wrap (+₹{giftWrapCharge})</span>
                     </label>
                     <p className="text-amber-700/80 dark:text-amber-400/80 mt-0.5">We will pack this in a luxury matte black gift box with a customized message.</p>
                   </div>
@@ -225,6 +232,7 @@ export default function CartPage() {
                   />
                 )}
               </div>
+              )}
 
             </div>
 
@@ -319,10 +327,27 @@ export default function CartPage() {
                     <span>{shipping === 0 ? <span className="text-[#0d9488] dark:text-teal-400 font-bold">FREE</span> : `₹${shipping}`}</span>
                   </div>
 
+                  {totalExclusiveTax > 0 ? (
+                    <div className="flex justify-between font-bold">
+                      <span>GST / Tax (Exclusive)</span>
+                      <span>+₹{totalExclusiveTax.toFixed(2)}</span>
+                    </div>
+                  ) : totalInclusiveTax > 0 ? (
+                    <div className="flex justify-between text-[11px] text-teal-600 dark:text-teal-400 font-medium">
+                      <span>Taxes</span>
+                      <span>Included in price (₹{totalInclusiveTax.toFixed(2)} GST)</span>
+                    </div>
+                  ) : taxAmount > 0 ? (
+                    <div className="flex justify-between">
+                      <span>Estimated Tax</span>
+                      <span>₹{taxAmount.toFixed(2)}</span>
+                    </div>
+                  ) : null}
+
                   {giftWrap && (
                     <div className="flex justify-between text-amber-800 dark:text-amber-400 font-bold">
                       <span>Gift Wrapping</span>
-                      <span>₹30.00</span>
+                      <span>₹{giftWrapCharge.toFixed(2)}</span>
                     </div>
                   )}
 
@@ -337,7 +362,11 @@ export default function CartPage() {
 
                 <div className="mt-5 space-y-2">
                   <Button 
-                    onClick={() => router.push('/checkout')}
+                    onClick={() => {
+                      // Persist gift-wrap selection so checkout can include it in order payload
+                      sessionStorage.setItem('cart_gift_wrap', JSON.stringify({ giftWrap, giftMessage }));
+                      router.push('/checkout');
+                    }}
                     className="w-full bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold h-11 text-xs tracking-wider uppercase rounded-lg border-none shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <span>Proceed to Checkout</span>

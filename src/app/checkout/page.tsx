@@ -28,6 +28,10 @@ export default function CheckoutPage() {
 
   const [checkoutStep, setCheckoutStep] = useState<'shipping' | 'payment'>('shipping');
 
+  // Gift wrap — restored from sessionStorage (set by cart page)
+  const [giftWrap, setGiftWrap] = useState(false);
+  const [giftMessage, setGiftMessage] = useState('');
+
   // Form State - Contact & Shipping Details
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -86,25 +90,30 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  // Smooth scroll to top on step change
+  // Restore gift-wrap selection persisted from cart page
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('cart_gift_wrap');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.giftWrap) setGiftWrap(parsed.giftWrap);
+        if (parsed?.giftMessage) setGiftMessage(parsed.giftMessage);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [checkoutStep]);
 
   const cartItems = cart?.items || [];
-  const subtotal = cart?.subtotal || 0;
-  const discount = cart?.discount || 0;
-  const shippingCost = subtotal > 999 || subtotal === 0 ? 0 : 99;
-  const calculatedTax = cartItems.reduce((sum: number, item: any) => {
-    const p = item.product || {};
-    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.effectiveTaxRule?.rate ? Number(p.effectiveTaxRule.rate) : 0);
-    const isInclusive = (p.taxType || p.effectiveTaxRule?.taxType) === 'INCLUSIVE';
-    const itemTotal = (p.price || 0) * (item.quantity || 1);
-    if (isInclusive) return sum; // Tax is inclusive in price
-    return sum + ((itemTotal * rate) / 100);
-  }, 0);
-  const tax = cart?.taxAmount !== undefined ? Number(cart.taxAmount) : Math.round(calculatedTax * 100) / 100;
-  const total = subtotal - discount + shippingCost + tax;
+  const subtotal = Number(cart?.subtotal || 0);
+  const discount = Number(cart?.discount || 0);
+  const shippingCost = Number(cart?.shippingAmount !== undefined ? cart.shippingAmount : (cart?.shippingFee !== undefined ? cart.shippingFee : (subtotal > 999 || subtotal === 0 ? 0 : 99)));
+  const totalExclusiveTax = Number((cart as any)?.totalExclusiveTax || 0);
+  const totalInclusiveTax = Number((cart as any)?.totalInclusiveTax || 0);
+  const taxAmount = Number(cart?.taxAmount || 0);
+  const total = Number(cart?.total !== undefined ? cart.total : (subtotal - discount + shippingCost + totalExclusiveTax));
 
   const handleVerifyUpi = () => {
     if (upiId.includes('@')) {
@@ -140,6 +149,8 @@ export default function CheckoutPage() {
         quantity: item.quantity,
       })),
       paymentMethod: paymentTab.toUpperCase(),
+      giftWrap,
+      giftMessage: giftWrap ? giftMessage : undefined,
     };
 
     try {
@@ -159,6 +170,7 @@ export default function CheckoutPage() {
       if (paymentTab === 'cod') {
         clearCartMutation.mutate(undefined, {
           onSuccess: () => {
+            sessionStorage.removeItem('cart_gift_wrap');
             setIsProcessing(false);
             toast.success(`Order ${createdOrder.orderNumber} placed successfully!`);
             router.push(`/order-success?orderNumber=${createdOrder.orderNumber}`);
@@ -202,6 +214,7 @@ export default function CheckoutPage() {
                 });
                 clearCartMutation.mutate(undefined, {
                   onSuccess: () => {
+                    sessionStorage.removeItem('cart_gift_wrap');
                     toast.success(`Payment verified! Order ${createdOrder.orderNumber} confirmed.`);
                     router.push(`/order-success?orderNumber=${createdOrder.orderNumber}`);
                   },
@@ -642,10 +655,29 @@ export default function CheckoutPage() {
                     <span>Delivery Charges</span>
                     <span>{shippingCost === 0 ? <span className="text-[#0d9488] font-bold">FREE</span> : `₹${shippingCost}`}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>GST (18%)</span>
-                    <span className="text-gray-800">₹{tax.toFixed(2)}</span>
-                  </div>
+                  {totalExclusiveTax > 0 ? (
+                    <div className="flex justify-between">
+                      <span>GST / Tax (Exclusive)</span>
+                      <span className="text-gray-800">₹{totalExclusiveTax.toFixed(2)}</span>
+                    </div>
+                  ) : totalInclusiveTax > 0 ? (
+                    <div className="flex justify-between text-[11px] text-emerald-600 font-medium">
+                      <span>Taxes</span>
+                      <span>Included in price (₹{totalInclusiveTax.toFixed(2)} GST)</span>
+                    </div>
+                  ) : taxAmount > 0 ? (
+                    <div className="flex justify-between">
+                      <span>Estimated Tax</span>
+                      <span className="text-gray-800">₹{taxAmount.toFixed(2)}</span>
+                    </div>
+                  ) : null}
+
+                  {giftWrap && (
+                    <div className="flex justify-between text-amber-800 font-bold">
+                      <span>Gift Wrapping</span>
+                      <span>Billed by server</span>
+                    </div>
+                  )}
 
                   <div className="border-t border-gray-150 pt-3 mt-3 flex justify-between items-baseline font-black text-gray-900 text-sm">
                     <span>Total Amount</span>

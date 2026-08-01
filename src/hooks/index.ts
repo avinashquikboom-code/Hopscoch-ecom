@@ -4,3 +4,4 @@ export * from './use-wishlist';
 export * from './use-auth';
 export * from './use-orders';
 export * from './use-addresses';
+export * from './use-gift-wrap';

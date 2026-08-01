@@ -105,6 +105,11 @@ export interface Cart {
   subtotal: number;
   discount: number;
   taxAmount?: number;
+  totalExclusiveTax?: number;
+  totalInclusiveTax?: number;
+  taxBreakdown?: any[];
+  shippingAmount?: number;
+  shippingFee?: number;
   total: number;
   coupon?: Coupon;
   updatedAt: string;

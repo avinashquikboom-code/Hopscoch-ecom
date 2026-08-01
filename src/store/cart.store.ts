@@ -52,25 +52,32 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
 
       setCart: (cart: Cart) => {
-        const taxAmount = cart.taxAmount !== undefined ? cart.taxAmount : calcTax(cart.items || []);
-        set({ cart: { ...cart, taxAmount, total: cart.subtotal - cart.discount + taxAmount } });
+        const taxInfo = calcTax(cart.items || []);
+        const totalExclusiveTax = cart.totalExclusiveTax !== undefined ? cart.totalExclusiveTax : taxInfo.totalExclusiveTax;
+        const totalInclusiveTax = cart.totalInclusiveTax !== undefined ? cart.totalInclusiveTax : taxInfo.totalInclusiveTax;
+        const taxAmount = cart.taxAmount !== undefined ? cart.taxAmount : taxInfo.totalTax;
+        const total = cart.total !== undefined ? cart.total : (cart.subtotal - cart.discount + totalExclusiveTax);
+        set({ cart: { ...cart, taxAmount, totalExclusiveTax, totalInclusiveTax, total } as any });
       },
 
       addItem: (item: CartItem) => {
         set((state) => {
           if (!state.cart) {
-            const taxAmount = calcTax([item]);
+            const taxInfo = calcTax([item]);
+            const subtotal = item.product.price * item.quantity;
             return {
               cart: {
                 id: 'temp',
                 userId: '',
                 items: [item],
-                subtotal: item.product.price * item.quantity,
+                subtotal,
                 discount: 0,
-                taxAmount,
-                total: item.product.price * item.quantity + taxAmount,
+                taxAmount: taxInfo.totalTax,
+                totalExclusiveTax: taxInfo.totalExclusiveTax,
+                totalInclusiveTax: taxInfo.totalInclusiveTax,
+                total: subtotal + taxInfo.totalExclusiveTax,
                 updatedAt: new Date().toISOString(),
-              },
+              } as any,
             };
           }
 
@@ -95,18 +102,20 @@ export const useCartStore = create<CartState>()(
             0
           );
           const discount = state.cart.discount;
-          const taxAmount = calcTax(newItems);
-          const total = subtotal - discount + taxAmount;
+          const taxInfo = calcTax(newItems);
+          const total = subtotal - discount + taxInfo.totalExclusiveTax;
 
           return {
             cart: {
               ...state.cart,
               items: newItems,
               subtotal,
-              taxAmount,
+              taxAmount: taxInfo.totalTax,
+              totalExclusiveTax: taxInfo.totalExclusiveTax,
+              totalInclusiveTax: taxInfo.totalInclusiveTax,
               total,
               updatedAt: new Date().toISOString(),
-            },
+            } as any,
           };
         });
       },
@@ -124,18 +133,20 @@ export const useCartStore = create<CartState>()(
             0
           );
           const discount = state.cart.discount;
-          const taxAmount = calcTax(newItems);
-          const total = subtotal - discount + taxAmount;
+          const taxInfo = calcTax(newItems);
+          const total = subtotal - discount + taxInfo.totalExclusiveTax;
 
           return {
             cart: {
               ...state.cart,
               items: newItems,
               subtotal,
-              taxAmount,
+              taxAmount: taxInfo.totalTax,
+              totalExclusiveTax: taxInfo.totalExclusiveTax,
+              totalInclusiveTax: taxInfo.totalInclusiveTax,
               total,
               updatedAt: new Date().toISOString(),
-            },
+            } as any,
           };
         });
       },
@@ -151,18 +162,20 @@ export const useCartStore = create<CartState>()(
             0
           );
           const discount = state.cart.discount;
-          const taxAmount = calcTax(newItems);
-          const total = subtotal - discount + taxAmount;
+          const taxInfo = calcTax(newItems);
+          const total = subtotal - discount + taxInfo.totalExclusiveTax;
 
           return {
             cart: {
               ...state.cart,
               items: newItems,
               subtotal,
-              taxAmount,
+              taxAmount: taxInfo.totalTax,
+              totalExclusiveTax: taxInfo.totalExclusiveTax,
+              totalInclusiveTax: taxInfo.totalInclusiveTax,
               total,
               updatedAt: new Date().toISOString(),
-            },
+            } as any,
           };
         });
       },

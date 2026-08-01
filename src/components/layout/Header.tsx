@@ -3,12 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Heart, User, Menu, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X, Sun, Moon } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X, Sun, Moon, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { MobileSearchOverlay } from '@/components/common/MobileSearchOverlay';
+import { VisualSearchModal } from '@/components/common/VisualSearchModal';
 import { useAuthStore, useCartStore, useThemeStore } from '@/store';
 import { resolveAvatarUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -38,6 +39,7 @@ export function Header() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
   
   // Language & Currency states
   const [language, setLanguage] = useState<'EN' | 'HI'>('EN');
@@ -253,11 +255,21 @@ export function Header() {
             <Input
                 type="search"
                 placeholder="Search for products, brands and more"
-                className="w-full pl-10 pr-4 py-2.5 h-10 rounded-md bg-[#f5f5f6] dark:bg-gray-800 border border-transparent dark:border-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:border-gray-200 focus:ring-0 text-gray-800 dark:text-gray-100 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-500 font-normal outline-none transition-all"
+                className="w-full pl-10 pr-10 py-2.5 h-10 rounded-md bg-[#f5f5f6] dark:bg-gray-800 border border-transparent dark:border-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:border-gray-200 focus:ring-0 text-gray-800 dark:text-gray-100 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-500 font-normal outline-none transition-all"
                 value={searchQuery}
                 onFocus={() => setSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              {/* Camera / AI Image Search trigger */}
+              <button
+                type="button"
+                onClick={() => { setSearchFocused(false); setIsVisualSearchOpen(true); }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-400 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors cursor-pointer border-none bg-transparent"
+                title="Search by image (AI)"
+                aria-label="Search by image"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
             </form>
 
             {/* LIVE SEARCH DROPDOWN OVERLAY */}
@@ -457,20 +469,41 @@ export function Header() {
               <span className="text-[10px] font-bold tracking-tight">Theme</span>
             </motion.button>
 
-            {/* Mobile Actions: Search (Icon only on mobile) */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden h-9 w-9 text-gray-800 rounded-full hover:bg-gray-100"
-              onClick={() => setIsMobileSearchOpen(true)}
-            >
-              <Search className="h-5 w-5" />
-            </Button>
+            {/* Mobile Actions: Search + Camera icons on mobile */}
+            <div className="md:hidden flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 text-gray-800 rounded-full hover:bg-gray-100"
+                onClick={() => setIsVisualSearchOpen(true)}
+                aria-label="Search by image"
+              >
+                <Camera className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 text-gray-800 rounded-full hover:bg-gray-100"
+                onClick={() => setIsMobileSearchOpen(true)}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+            </div>
 
           </div>
 
         </div>
       </div>
+
+      {/* Visual Search Modal */}
+      <VisualSearchModal
+        isOpen={isVisualSearchOpen}
+        onClose={() => setIsVisualSearchOpen(false)}
+        onResultsReady={(_results, queryStr) => {
+          setIsVisualSearchOpen(false);
+          router.push(`/products?visualSearch=1&q=${encodeURIComponent(queryStr)}`);
+        }}
+      />
 
       {/* 3. MOBILE DRAWER NAVIGATION */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
