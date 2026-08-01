@@ -18,14 +18,31 @@ interface CartState {
 }
 
 const calcTax = (items: CartItem[]) => {
-  return items.reduce((sum, i) => {
+  let totalExclusiveTax = 0;
+  let totalInclusiveTax = 0;
+
+  items.forEach((i) => {
     const p = i.product as any;
-    if (!p) return sum;
-    const isInclusive = (p.taxType || p.taxRule?.taxType) === 'INCLUSIVE';
-    if (isInclusive) return sum;
-    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.taxRule?.rate ? Number(p.taxRule.rate) : 0);
-    return sum + Math.round(((p.price * i.quantity * rate) / 100) * 100) / 100;
-  }, 0);
+    if (!p) return;
+    const rate = p.taxPercent !== undefined ? Number(p.taxPercent) : (p.taxRule?.rate ? Number(p.taxRule.rate) : (p.effectiveTaxRule?.rate ? Number(p.effectiveTaxRule.rate) : 0));
+    if (!rate || rate <= 0) return;
+    const rawType = (p.taxType || p.taxRule?.taxType || p.effectiveTaxRule?.taxType || 'EXCLUSIVE').toString().toUpperCase();
+    const isInclusive = rawType === 'INCLUSIVE';
+    const lineTotal = (p.price || 0) * (i.quantity || 1);
+    if (isInclusive) {
+      const taxVal = Math.round((lineTotal - (lineTotal / (1 + rate / 100))) * 100) / 100;
+      totalInclusiveTax += taxVal;
+    } else {
+      const taxVal = Math.round((lineTotal * (rate / 100)) * 100) / 100;
+      totalExclusiveTax += taxVal;
+    }
+  });
+
+  return {
+    totalExclusiveTax: Math.round(totalExclusiveTax * 100) / 100,
+    totalInclusiveTax: Math.round(totalInclusiveTax * 100) / 100,
+    totalTax: Math.round((totalExclusiveTax + totalInclusiveTax) * 100) / 100,
+  };
 };
 
 export const useCartStore = create<CartState>()(
