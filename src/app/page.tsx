@@ -401,39 +401,48 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3b. CATEGORY OFFER TILES — Flipkart "Top Offers" style 2x3 grid */}
+      {/* 3b. CATEGORY OFFER TILES — Dynamic live categories with Cloudinary/S3 image URLs */}
       <section className="container mx-auto px-4 sm:px-6 md:px-12 mt-8 relative z-10">
         <div className="flex items-center gap-2 mb-4">
           <BadgePercent className="w-5 h-5 text-rose-500" />
           <h2 className="text-base font-black uppercase tracking-wider text-gray-900 dark:text-gray-100">Top Offers by Category</h2>
-          <Link href="/products" className="ml-auto text-xs font-bold text-teal-600 hover:underline flex items-center gap-1">
+          <Link href="/categories" className="ml-auto text-xs font-bold text-teal-600 hover:underline flex items-center gap-1">
             See all <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          {CATEGORY_OFFER_TILES.map((tile, i) => (
-            <Link key={i} href={tile.href}
-              className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border border-white/20 dark:border-white/5"
-            >
-              {/* Background image */}
-              <Image
-                src={tile.img}
-                alt={tile.label}
-                fill
-                sizes="(max-width: 768px) 50vw, 16vw"
-                className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-              />
-              {/* Gradient overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-t ${tile.gradient} opacity-60 group-hover:opacity-70 transition-opacity`} />
-              {/* Content */}
-              <div className="absolute inset-0 flex flex-col justify-end p-3 text-white">
-                <span className="text-[10px] font-black bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full w-fit mb-1.5 border border-white/30">
-                  {tile.badge}
-                </span>
-                <p className="text-xs font-black uppercase tracking-wider">{tile.label}</p>
-              </div>
-            </Link>
-          ))}
+          {(mockCategories.length > 0 ? mockCategories.slice(0, 6) : CATEGORY_OFFER_TILES).map((item: any, i: number) => {
+            const label = item.name || item.label;
+            const href = item.name ? `/products?category=${encodeURIComponent(item.name)}` : item.href;
+            const imgSrc = item.image || item.icon || item.img;
+            const isImage = typeof imgSrc === 'string' && (imgSrc.startsWith('http') || imgSrc.startsWith('/'));
+            const gradient = item.gradient || ['from-rose-500 to-pink-600', 'from-slate-600 to-gray-800', 'from-amber-400 to-orange-500', 'from-violet-500 to-purple-700', 'from-teal-500 to-emerald-600', 'from-indigo-500 to-blue-600'][i % 6];
+
+            return (
+              <Link key={item.id || i} href={href}
+                className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer shadow-md hover:shadow-xl transition-all hover:-translate-y-1 border border-white/20 dark:border-white/5 bg-gray-900 flex items-center justify-center"
+              >
+                {isImage ? (
+                  <img
+                    src={imgSrc}
+                    alt={label}
+                    className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <span className="text-5xl select-none z-10">{imgSrc || '👗'}</span>
+                )}
+                {/* Gradient overlay */}
+                <div className={`absolute inset-0 bg-gradient-to-t ${gradient} opacity-50 group-hover:opacity-65 transition-opacity`} />
+                {/* Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-3 text-white z-10">
+                  <span className="text-[10px] font-black bg-white/25 backdrop-blur-sm px-2 py-0.5 rounded-full w-fit mb-1.5 border border-white/30">
+                    {item.badge || `${item.productCount || 'Top'} Offers`}
+                  </span>
+                  <p className="text-xs font-black uppercase tracking-wider leading-tight">{label}</p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
