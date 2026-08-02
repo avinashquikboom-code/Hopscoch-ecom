@@ -325,16 +325,23 @@ export const productService = {
       if (!res.ok) throw new Error(json.message || 'Failed to fetch categories');
       const raw = json.data ?? json ?? [];
       if (Array.isArray(raw)) {
-        const mapCategory = (cat: any): Category => ({
-          id: String(cat.id),
-          name: cat.name,
-          slug: cat.slug,
-          parentId: cat.parentId ? String(cat.parentId) : undefined,
-          productCount: cat.productCount || 0,
-          icon: (cat.iconUrl && (cat.iconUrl.includes('/') || cat.iconUrl.startsWith('http'))) ? resolveImageUrl(cat.iconUrl) : (cat.iconUrl || '👗'),
-          image: resolveImageUrl(cat.bannerUrl),
-          subcategories: cat.children ? cat.children.map(mapCategory) : undefined,
-        });
+        const mapCategory = (cat: any): Category => {
+          const rawIcon = cat.iconUrl || cat.icon || '';
+          const isIconImage = typeof rawIcon === 'string' && (rawIcon.includes('/') || rawIcon.startsWith('http') || rawIcon.includes('.'));
+          const resolvedIcon = isIconImage ? resolveImageUrl(rawIcon) : (rawIcon || '👗');
+          const resolvedImage = resolveImageUrl(cat.bannerUrl || cat.iconUrl || cat.image || cat.imageUrl);
+
+          return {
+            id: String(cat.id),
+            name: cat.name,
+            slug: cat.slug,
+            parentId: cat.parentId ? String(cat.parentId) : undefined,
+            productCount: cat.productCount || 0,
+            icon: resolvedIcon,
+            image: resolvedImage,
+            subcategories: cat.children ? cat.children.map(mapCategory) : undefined,
+          };
+        };
         return raw.map(mapCategory);
       }
       return [];

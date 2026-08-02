@@ -7,8 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Resolves a potentially relative avatar URL from the backend (e.g. /uploads/file.jpg)
- * into a full absolute URL. Returns null if the input is empty/null.
+ * Resolves a potentially relative avatar URL from the backend into a full absolute URL.
  */
 export function resolveAvatarUrl(url: string | null | undefined): string | null {
   if (!url || url.trim() === '') return null;
@@ -20,19 +19,50 @@ export function resolveAvatarUrl(url: string | null | undefined): string | null 
   if (resolved.startsWith('http://') || resolved.startsWith('https://')) {
     return resolved;
   }
-  // Relative path — prepend API base
   const path = resolved.startsWith('/') ? resolved : `/${resolved}`;
   return `${API_BASE}${path}`;
 }
 
 /**
- * Resolves any image URL from the backend (rewriting production domains to the current local API base in development).
+ * Resolves any image URL from the backend (rewriting production domains, relative paths,
+ * JSON strings, arrays, and fallback placeholdering).
  */
-export function resolveImageUrl(url: string | null | undefined): string {
-  if (!url || url.trim() === '') {
-    return 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600';
+export function resolveImageUrl(url?: any): string {
+  const fallback = 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600';
+  if (!url) return fallback;
+
+  // 1. Handle object or array inputs
+  if (typeof url === 'object') {
+    if (Array.isArray(url)) {
+      url = url[0];
+    } else {
+      url = url.url || url.imageUrl || url.image_url || url.path || url.src || '';
+    }
+    if (!url) return fallback;
   }
-  const trimmed = url.trim();
+
+  if (typeof url !== 'string') return fallback;
+
+  let trimmed = url.trim();
+  if (!trimmed) return fallback;
+
+  // 2. Handle JSON stringified arrays or objects
+  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return resolveImageUrl(parsed);
+    } catch { /* continue string handling */ }
+  }
+
+  // 3. Strip surrounding quotes
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    trimmed = trimmed.slice(1, -1).trim();
+  }
+
+  if (trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+
   let resolved = trimmed;
   if (resolved.includes('api.fciseller.com')) {
     resolved = resolved.replace(/https?:\/\/api\.fciseller\.com/g, API_BASE);
