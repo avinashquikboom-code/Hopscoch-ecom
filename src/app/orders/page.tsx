@@ -32,8 +32,27 @@ function getStatus(status: string) {
 
 export default function OrdersPage() {
   const router = useRouter();
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const isAuthenticated = !!(token && token !== 'undefined' && token !== 'null' && token.trim() !== '');
+
   const { data, isLoading, isError, refetch } = useOrders(1, 20);
   const orders = data?.data || [];
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-900 flex flex-col items-center justify-center gap-4 px-4">
+        <ShoppingBag className="w-16 h-16 text-teal-600" />
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Please log in to view your orders</h2>
+        <p className="text-sm text-gray-500 max-w-sm text-center">Sign in to track active deliveries, view purchase history, and manage order returns.</p>
+        <Link
+          href="/login"
+          className="px-6 py-2.5 bg-[#0F766E] text-white rounded-xl text-sm font-semibold hover:bg-[#115E59] transition-colors shadow-md"
+        >
+          Sign In / Register
+        </Link>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

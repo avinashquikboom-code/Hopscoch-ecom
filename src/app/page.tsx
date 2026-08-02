@@ -290,7 +290,7 @@ export default function Home() {
                   transition={{ delay: 0.4, duration: 0.5 }}
                   className="mt-3 sm:mt-5"
                 >
-                  <Link href={banners[activeSlide].link || '/products'}>
+                  <Link href={(!banners[activeSlide].link || banners[activeSlide].link === '/offer' || banners[activeSlide].link === '/offers') ? '/deals' : banners[activeSlide].link}>
                     <motion.button 
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}

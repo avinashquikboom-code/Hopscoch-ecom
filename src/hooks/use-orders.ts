@@ -5,9 +5,14 @@ import { toast } from '@/components/ui/toast';
 import { useRouter } from 'next/navigation';
 
 export function useOrders(page = 1, limit = 10) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const isAuthenticated = !!(token && token !== 'undefined' && token !== 'null' && token.trim() !== '');
+
   return useQuery({
     queryKey: ['orders', page, limit],
     queryFn: () => orderService.getOrders(page, limit),
+    enabled: isAuthenticated,
+    retry: false,
   });
 }
 

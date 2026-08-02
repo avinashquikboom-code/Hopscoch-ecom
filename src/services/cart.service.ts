@@ -6,7 +6,11 @@ import { productService } from './product.service';
 // ── Auth helper ────────────────────────────────────────────────────────────
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('auth_token');
+  const token = localStorage.getItem('auth_token');
+  if (!token || token === 'undefined' || token === 'null' || token.trim() === '') {
+    return null;
+  }
+  return token;
 }
 
 function authHeaders(): Record<string, string> {
