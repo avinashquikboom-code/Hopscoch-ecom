@@ -67,17 +67,13 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
 
   const handleQuickAddSize = (e: React.MouseEvent, size: string) => {
     e.stopPropagation();
-    if (!isAuthenticated) {
-      openLoginModal();
-      return;
-    }
     if (product.stock === 0) return;
     
     // Find variant for selected size if it exists
     const variant = product.variants?.find(v => v.value.toLowerCase() === size.toLowerCase());
     
     addToCart.mutate(
-      { productId: product.id, quantity: 1, variantId: variant?.id },
+      { productId: product.id, quantity: 1, variantId: variant?.id, product },
       {
         onSuccess: () => {
           toast.success(`Added size ${size} of ${product.name} to Cart`);

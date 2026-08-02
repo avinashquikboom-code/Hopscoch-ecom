@@ -1,6 +1,7 @@
 import { Cart, CartItem } from '@/types';
 import { API_BASE } from '@/constants';
 import { resolveImageUrl } from '@/lib/utils';
+import { productService } from './product.service';
 
 // ── Auth helper ────────────────────────────────────────────────────────────
 function getToken(): string | null {
@@ -98,8 +99,12 @@ function getGuestCart(): Cart {
 }
 
 function recalcGuestCart(cart: Cart): Cart {
-  const subtotal = cart.items.reduce((s, i) => s + (i.product?.price || 0) * (i.quantity || 1), 0);
-  const total = subtotal - (cart.discount || 0);
+  const subtotal = cart.items.reduce((s, i) => {
+    const unitPrice = Number(i.variant?.price ?? i.product?.price ?? 0);
+    return s + unitPrice * Number(i.quantity || 1);
+  }, 0);
+  const discount = Number(cart.discount || 0);
+  const total = Math.max(0, subtotal - discount);
   return { ...cart, subtotal, total };
 }
 
@@ -125,16 +130,18 @@ export const cartService = {
     }
   },
 
-  async addToCart(productId: string, quantity = 1, variantId?: string): Promise<Cart> {
+  async addToCart(productId: string, quantity = 1, variantId?: string, productData?: any): Promise<Cart> {
     const token = getToken();
 
-    if (token && variantId) {
+    if (token) {
       // Authenticated: call backend API
       try {
+        const body: any = { productId: Number(productId), quantity };
+        if (variantId) body.variantId = Number(variantId);
         const res = await fetch(`${API_BASE}/api/cart`, {
           method: 'POST',
           headers: authHeaders(),
-          body: JSON.stringify({ productId: Number(productId), variantId: Number(variantId), quantity }),
+          body: JSON.stringify(body),
         });
         if (res.ok) {
           // Fetch fresh cart after add
@@ -143,22 +150,44 @@ export const cartService = {
       } catch { /* fall through to guest */ }
     }
 
-    // Guest or no variantId: add to local store and persist
+    // Guest or API fallback: populate full product details
+    let fullProduct = productData;
+    if (!fullProduct || !fullProduct.price) {
+      try {
+        fullProduct = await productService.getProductById(productId);
+      } catch {
+        fullProduct = { id: productId, name: 'Product', price: 0, images: [] };
+      }
+    }
+
     const cart = getGuestCart();
-    const existing = cart.items.findIndex(
+    const existingIndex = cart.items.findIndex(
       (i) => i.productId === productId && (i.variant?.id ?? 'default') === (variantId ?? 'default')
     );
 
-    if (existing >= 0) {
-      cart.items[existing].quantity += quantity;
+    if (existingIndex >= 0) {
+      cart.items[existingIndex].quantity += quantity;
+      if ((!cart.items[existingIndex].product.price || cart.items[existingIndex].product.price === 0) && fullProduct.price > 0) {
+        cart.items[existingIndex].product = fullProduct;
+      }
     } else {
+      const matchedVariant = fullProduct.variants?.find((v: any) => String(v.id) === String(variantId));
       cart.items.push({
         id: `${productId}:${variantId || 'default'}:${Date.now()}`,
         productId,
         quantity,
         addedAt: new Date().toISOString(),
-        product: { id: productId, name: '', price: 0, images: [], stock: 0 } as any,
-        variant: variantId ? { id: variantId } as any : undefined,
+        product: fullProduct,
+        variant: matchedVariant ? {
+          id: String(matchedVariant.id),
+          productId: String(productId),
+          name: 'variant',
+          value: matchedVariant.value || matchedVariant.size || matchedVariant.color || '',
+          price: Number(matchedVariant.price || fullProduct.price || 0),
+          stock: Number(matchedVariant.stock || 10),
+          color: matchedVariant.color,
+          size: matchedVariant.size,
+        } : undefined,
       } as CartItem);
     }
 

@@ -140,7 +140,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     const matchedVariant = getMatchedVariant();
 
     addToCartMutation.mutate(
-      { productId: product.id, quantity: 1, variantId: matchedVariant?.id },
+      { productId: product.id, quantity: 1, variantId: matchedVariant?.id, product },
       {
         onSuccess: () => {
           toast.success('Added to Cart successfully!');
@@ -154,7 +154,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     const matchedVariant = getMatchedVariant();
 
     addToCartMutation.mutate(
-      { productId: product.id, quantity: 1, variantId: matchedVariant?.id },
+      { productId: product.id, quantity: 1, variantId: matchedVariant?.id, product },
       {
         onSuccess: () => {
           router.push('/checkout');
