@@ -91,6 +91,69 @@ export default function CheckoutPage() {
     };
   }, []);
 
+  // Saved Addresses State
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | 'new' | null>(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [saveAddressForFuture, setSaveAddressForFuture] = useState(true);
+
+  // Auto-fill helper
+  const applySavedAddress = (addr: any) => {
+    if (!addr) return;
+    const nameParts = (addr.fullName || '').trim().split(' ');
+    setFirstName(nameParts[0] || '');
+    setLastName(nameParts.slice(1).join(' ') || '');
+    setPhone(addr.phone || '');
+    if (addr.email) setEmailAddress(addr.email);
+    setStreetAddress(addr.line2 ? `${addr.line1}, ${addr.line2}` : addr.line1 || '');
+    setCity(addr.city || '');
+    setStateProvince(addr.state || '');
+    setZipPostal(addr.pincode || addr.zipCode || '');
+    setCountry(addr.country || 'India');
+  };
+
+  // Fetch saved addresses from GET /api/addresses on mount
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      if (!token || token === 'undefined' || token === 'null' || token.startsWith('mock_token_')) {
+        setSelectedAddressId('new');
+        setShowAddressForm(true);
+        return;
+      }
+
+      setIsLoadingAddresses(true);
+      try {
+        const res = await fetch(`${API_BASE}/api/addresses`, { headers: authHeaders() });
+        if (res.ok) {
+          const json = await res.json();
+          const list = json.data ?? json ?? [];
+          if (Array.isArray(list) && list.length > 0) {
+            setSavedAddresses(list);
+            const defaultAddr = list.find((a: any) => a.isDefault) || list[0];
+            setSelectedAddressId(defaultAddr.id);
+            applySavedAddress(defaultAddr);
+            setShowAddressForm(false);
+          } else {
+            setSelectedAddressId('new');
+            setShowAddressForm(true);
+          }
+        } else {
+          setSelectedAddressId('new');
+          setShowAddressForm(true);
+        }
+      } catch {
+        setSelectedAddressId('new');
+        setShowAddressForm(true);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+  }, []);
+
   // Restore gift-wrap selection persisted from cart page
   useEffect(() => {
     try {
@@ -132,6 +195,27 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
+
+    // Save address for future use if selectedAddressId === 'new' and save checkbox is true
+    if (selectedAddressId === 'new' && saveAddressForFuture && firstName && streetAddress && city) {
+      try {
+        await fetch(`${API_BASE}/api/addresses`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            fullName: `${firstName} ${lastName}`.trim(),
+            phone,
+            line1: streetAddress,
+            city,
+            state: stateProvince,
+            pincode: zipPostal,
+            country,
+            type: 'home',
+            isDefault: savedAddresses.length === 0,
+          }),
+        });
+      } catch { /* non-blocking */ }
+    }
 
     const payload = {
       address: {
@@ -324,111 +408,230 @@ export default function CheckoutPage() {
                     <ArrowLeft className="w-3.5 h-3.5" /> Back to Shipping
                   </button>
                 )}
-              </div>
-
-              {/* STEP 1: SHIPPING DETAILS */}
+              </div>              {/* STEP 1: SHIPPING DETAILS */}
               {checkoutStep === 'shipping' && (
                 <div className="bg-white border border-gray-250/60 rounded-sm p-5 shadow-xs space-y-4">
-                  <h2 className="text-sm font-black uppercase text-gray-800 tracking-wider border-b border-gray-150 pb-2.5">Delivery Details</h2>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstname" className="text-xs font-bold text-gray-700">First Name</Label>
-                      <Input 
-                        id="firstname"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                        placeholder="Enter first name"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastname" className="text-xs font-bold text-gray-700">Last Name</Label>
-                      <Input 
-                        id="lastname"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                        placeholder="Enter last name"
-                      />
-                    </div>
+                  <div className="flex justify-between items-center border-b border-gray-150 pb-2.5">
+                    <h2 className="text-sm font-black uppercase text-gray-800 tracking-wider">Delivery Details</h2>
+                    {savedAddresses.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAddressForm(!showAddressForm)}
+                        className="text-xs text-[#0d9488] font-bold hover:underline border-none bg-transparent cursor-pointer"
+                      >
+                        {showAddressForm ? 'Hide Form' : (selectedAddressId === 'new' ? 'Using New Address' : 'Edit / Manual Form')}
+                      </button>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-xs font-bold text-gray-700">Phone Number</Label>
-                      <Input 
-                        id="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                      />
+                  {/* Saved Address Cards Grid */}
+                  {isLoadingAddresses ? (
+                    <div className="py-4 text-center text-xs text-gray-500 font-semibold animate-pulse">
+                      Loading saved addresses...
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-xs font-bold text-gray-700">Email Address</Label>
-                      <Input 
-                        id="email"
-                        type="email"
-                        value={emailAddress}
-                        onChange={(e) => setEmailAddress(e.target.value)}
-                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                      />
-                    </div>
-                  </div>
+                  ) : savedAddresses.length > 0 ? (
+                    <div className="space-y-3">
+                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Select Saved Address:</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {savedAddresses.map((addr: any) => {
+                          const isSelected = selectedAddressId === addr.id;
+                          return (
+                            <div
+                              key={addr.id}
+                              onClick={() => {
+                                setSelectedAddressId(addr.id);
+                                applySavedAddress(addr);
+                              }}
+                              className={`p-3.5 rounded-lg border-2 cursor-pointer transition-all relative ${
+                                isSelected
+                                  ? 'border-[#0d9488] bg-[#0d9488]/5 shadow-sm'
+                                  : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'
+                              }`}
+                            >
+                              <div className="flex items-start gap-2.5">
+                                <input
+                                  type="radio"
+                                  name="saved_address"
+                                  checked={isSelected}
+                                  onChange={() => {}}
+                                  className="mt-1 text-[#0d9488] focus:ring-[#0d9488]"
+                                />
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-xs font-extrabold text-gray-900">{addr.fullName}</span>
+                                    {addr.isDefault && (
+                                      <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-teal-100 text-teal-800">
+                                        Default
+                                      </span>
+                                    )}
+                                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-gray-200 text-gray-700">
+                                      {addr.type || 'Home'}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                                    {addr.line1}{addr.line2 ? `, ${addr.line2}` : ''}, {addr.city}, {addr.state} - <span className="font-bold">{addr.pincode}</span>
+                                  </p>
+                                  <p className="text-[11px] font-semibold text-gray-500 mt-1">
+                                    📞 {addr.phone}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="street" className="text-xs font-bold text-gray-700">Street Address</Label>
-                    <Input 
-                      id="street"
-                      value={streetAddress}
-                      onChange={(e) => setStreetAddress(e.target.value)}
-                      className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                    />
-                  </div>
+                        {/* Card: Add New Address Option */}
+                        <div
+                          onClick={() => {
+                            setSelectedAddressId('new');
+                            setShowAddressForm(true);
+                            setFirstName('');
+                            setLastName('');
+                            setPhone('');
+                            setStreetAddress('');
+                            setCity('');
+                            setStateProvince('');
+                            setZipPostal('');
+                          }}
+                          className={`p-3.5 rounded-lg border-2 border-dashed cursor-pointer transition-all flex flex-col items-center justify-center text-center ${
+                            selectedAddressId === 'new'
+                              ? 'border-[#0d9488] bg-[#0d9488]/5 text-[#0d9488]'
+                              : 'border-gray-300 hover:border-[#0d9488] text-gray-600'
+                          }`}
+                        >
+                          <span className="text-xl font-bold">+</span>
+                          <span className="text-xs font-bold mt-0.5">Deliver to New Address</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
 
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="city" className="text-xs font-bold text-gray-700">City</Label>
-                      <Input 
-                        id="city"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="state" className="text-xs font-bold text-gray-700">State / Province</Label>
-                      <Input 
-                        id="state"
-                        value={stateProvince}
-                        onChange={(e) => setStateProvince(e.target.value)}
-                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="pincode" className="text-xs font-bold text-gray-700">Pincode / ZIP</Label>
-                      <Input 
-                        id="pincode"
-                        value={zipPostal}
-                        onChange={(e) => setZipPostal(e.target.value)}
-                        className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                      />
-                    </div>
-                  </div>
+                  {/* Manual Entry Form — shown if user has no saved addresses, selected 'new', or clicked Edit Form */}
+                  {(savedAddresses.length === 0 || selectedAddressId === 'new' || showAddressForm) && (
+                    <div className="space-y-4 pt-2 border-t border-gray-150 mt-4">
+                      {savedAddresses.length > 0 && (
+                        <p className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                          {selectedAddressId === 'new' ? 'New Address Details:' : 'Edit Address Details:'}
+                        </p>
+                      )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="country" className="text-xs font-bold text-gray-700">Country</Label>
-                    <select
-                      id="country"
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
-                      className="w-full h-10 text-xs bg-white border border-gray-200 rounded px-3 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488]"
-                    >
-                      {countryOptions.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                  </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="firstname" className="text-xs font-bold text-gray-700">First Name</Label>
+                          <Input 
+                            id="firstname"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                            placeholder="Enter first name"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="lastname" className="text-xs font-bold text-gray-700">Last Name</Label>
+                          <Input 
+                            id="lastname"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                            placeholder="Enter last name"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="phone" className="text-xs font-bold text-gray-700">Phone Number</Label>
+                          <Input 
+                            id="phone"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                            placeholder="10-digit mobile number"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email" className="text-xs font-bold text-gray-700">Email Address</Label>
+                          <Input 
+                            id="email"
+                            type="email"
+                            value={emailAddress}
+                            onChange={(e) => setEmailAddress(e.target.value)}
+                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                            placeholder="name@example.com"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="street" className="text-xs font-bold text-gray-700">Street Address</Label>
+                        <Input 
+                          id="street"
+                          value={streetAddress}
+                          onChange={(e) => setStreetAddress(e.target.value)}
+                          className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                          placeholder="House No, Building, Street Name"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="city" className="text-xs font-bold text-gray-700">City</Label>
+                          <Input 
+                            id="city"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="state" className="text-xs font-bold text-gray-700">State / Province</Label>
+                          <Input 
+                            id="state"
+                            value={stateProvince}
+                            onChange={(e) => setStateProvince(e.target.value)}
+                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="pincode" className="text-xs font-bold text-gray-700">Pincode / ZIP</Label>
+                          <Input 
+                            id="pincode"
+                            value={zipPostal}
+                            onChange={(e) => setZipPostal(e.target.value)}
+                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="country" className="text-xs font-bold text-gray-700">Country</Label>
+                        <select
+                          id="country"
+                          value={country}
+                          onChange={(e) => setCountry(e.target.value)}
+                          className="w-full h-10 text-xs bg-white border border-gray-200 rounded px-3 focus:outline-none focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488]"
+                        >
+                          {countryOptions.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Save address checkbox for new addresses */}
+                      {selectedAddressId === 'new' && (
+                        <div className="flex items-center gap-2 pt-1">
+                          <Checkbox
+                            id="save_address"
+                            checked={saveAddressForFuture}
+                            onCheckedChange={(c) => setSaveAddressForFuture(!!c)}
+                          />
+                          <Label htmlFor="save_address" className="text-xs font-medium text-gray-700 cursor-pointer">
+                            Save this address to my account for future orders
+                          </Label>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="pt-4 border-t border-gray-150 flex justify-end">
                     <button 
