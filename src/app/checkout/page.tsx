@@ -51,8 +51,8 @@ export default function CheckoutPage() {
     'Qatar', 'Kuwait', 'Oman', 'South Africa', 'New Zealand',
   ];
 
-  // Form State - Payment details
-  const [paymentTab, setPaymentTab] = useState<'card' | 'upi' | 'netbanking' | 'cod'>('card');
+  // Form State - Payment details (Razorpay & COD)
+  const [paymentTab, setPaymentTab] = useState<'razorpay' | 'cod'>('razorpay');
   
   // Card
   const [cardholderName, setCardholderName] = useState('');
@@ -448,28 +448,12 @@ export default function CheckoutPage() {
 
                   <div className="flex border-b border-gray-200">
                     <button
-                      onClick={() => setPaymentTab('card')}
+                      onClick={() => setPaymentTab('razorpay')}
                       className={`py-2.5 px-4 text-xs font-bold border-b-2 flex items-center gap-1.5 transition-all cursor-pointer ${
-                        paymentTab === 'card' ? 'border-[#0d9488] text-[#0d9488]' : 'border-transparent text-gray-500'
+                        paymentTab === 'razorpay' ? 'border-[#0d9488] text-[#0d9488]' : 'border-transparent text-gray-500'
                       }`}
                     >
-                      <CreditCard className="w-4 h-4" /> Credit/Debit Card
-                    </button>
-                    <button
-                      onClick={() => setPaymentTab('upi')}
-                      className={`py-2.5 px-4 text-xs font-bold border-b-2 flex items-center gap-1.5 transition-all cursor-pointer ${
-                        paymentTab === 'upi' ? 'border-[#0d9488] text-[#0d9488]' : 'border-transparent text-gray-500'
-                      }`}
-                    >
-                      <QrCode className="w-4 h-4" /> UPI / GooglePay
-                    </button>
-                    <button
-                      onClick={() => setPaymentTab('netbanking')}
-                      className={`py-2.5 px-4 text-xs font-bold border-b-2 flex items-center gap-1.5 transition-all cursor-pointer ${
-                        paymentTab === 'netbanking' ? 'border-[#0d9488] text-[#0d9488]' : 'border-transparent text-gray-500'
-                      }`}
-                    >
-                      <Building className="w-4 h-4" /> Net Banking
+                      <CreditCard className="w-4 h-4" /> Online Payment (Razorpay)
                     </button>
                     <button
                       onClick={() => setPaymentTab('cod')}
@@ -477,96 +461,28 @@ export default function CheckoutPage() {
                         paymentTab === 'cod' ? 'border-[#0d9488] text-[#0d9488]' : 'border-transparent text-gray-500'
                       }`}
                     >
-                      <ShoppingBag className="w-4 h-4" /> COD
+                      <ShoppingBag className="w-4 h-4" /> Cash on Delivery (COD)
                     </button>
                   </div>
 
                   <div className="p-4 bg-gray-50 border border-gray-150 rounded-sm">
-                    {paymentTab === 'card' && (
-                      <div className="space-y-4">
-                        <div className="space-y-1">
-                          <Label htmlFor="card-name" className="text-xxs uppercase tracking-wider font-bold">Name on Card</Label>
-                          <Input id="card-name" placeholder="John Doe" value={cardholderName} onChange={e => setCardholderName(e.target.value)} className="h-9 text-xs bg-white" />
-                        </div>
-                        <div className="space-y-1">
-                          <Label htmlFor="card-number" className="text-xxs uppercase tracking-wider font-bold">Card Number</Label>
-                          <Input id="card-number" placeholder="4312 •••• •••• 8901" value={cardNumber} onChange={e => setCardNumber(e.target.value)} className="h-9 text-xs bg-white font-mono" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <Label htmlFor="card-exp" className="text-xxs uppercase tracking-wider font-bold">Expiry Date</Label>
-                            <Input id="card-exp" placeholder="MM/YY" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} className="h-9 text-xs bg-white font-mono" />
+                    {paymentTab === 'razorpay' && (
+                      <div className="space-y-3.5">
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-sm p-4 text-xs text-emerald-800 space-y-2">
+                          <div className="flex items-center gap-2 font-bold text-sm text-emerald-900">
+                            <Shield className="w-5 h-5 text-[#0d9488]" />
+                            <span>Razorpay Secure Payment Gateway</span>
                           </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="card-cvv" className="text-xxs uppercase tracking-wider font-bold">CVV</Label>
-                            <Input id="card-cvv" type="password" placeholder="•••" value={cvv} onChange={e => setCvv(e.target.value)} className="h-9 text-xs bg-white font-mono" />
+                          <p className="text-gray-600 leading-relaxed">
+                            Upon clicking <strong>Proceed to Payment</strong>, Razorpay's encrypted checkout window will open. You can complete your transaction using:
+                          </p>
+                          <div className="grid grid-cols-2 gap-2 text-xxs font-bold text-gray-700 pt-1">
+                            <div className="bg-white p-2 border border-gray-200 rounded text-center">💳 Credit & Debit Cards</div>
+                            <div className="bg-white p-2 border border-gray-200 rounded text-center">📱 UPI (Google Pay, PhonePe, Paytm)</div>
+                            <div className="bg-white p-2 border border-gray-200 rounded text-center">🏦 Net Banking (All Indian Banks)</div>
+                            <div className="bg-white p-2 border border-gray-200 rounded text-center">👛 Wallets & EMI Options</div>
                           </div>
                         </div>
-                        <div className="bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20 text-[10px] text-emerald-700 font-bold flex items-center gap-1.5">
-                          <Shield className="w-4 h-4 shrink-0" /> Secured online settlement by Razorpay
-                        </div>
-                      </div>
-                    )}
-
-                    {paymentTab === 'upi' && (
-                      <div className="space-y-4">
-                        <div className="space-y-1.5">
-                          <Label htmlFor="upi-vpa" className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Enter UPI ID</Label>
-                          <div className="flex gap-2">
-                            <Input
-                              id="upi-vpa"
-                              value={upiId}
-                              onChange={(e) => { setUpiId(e.target.value); setIsUpiVerified(false); }}
-                              placeholder="mobileNumber@ybl / username@upi"
-                              className="bg-white border-gray-200 text-xs py-2 h-9 flex-1 font-semibold"
-                            />
-                            <Button 
-                              onClick={handleVerifyUpi}
-                              className="bg-[#0d9488] hover:bg-[#0d9488]/90 text-white text-xs font-bold px-4 h-9 cursor-pointer"
-                            >
-                              Verify
-                            </Button>
-                          </div>
-                          {isUpiVerified && (
-                            <p className="text-[10px] font-bold text-[#388e3c] flex items-center gap-1">
-                              <Check className="w-3.5 h-3.5" /> Checked & Verified!
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="border-t border-gray-150 pt-4 flex flex-col items-center">
-                          <button
-                            onClick={() => setShowQrCode(!showQrCode)}
-                            className="text-xs font-bold text-[#0d9488] hover:underline flex items-center gap-1 border-none bg-transparent cursor-pointer"
-                          >
-                            <QrCode className="w-4 h-4" />
-                            <span>{showQrCode ? 'Hide QR Code' : 'Generate Secure QR Code for Scanning'}</span>
-                          </button>
-                          
-                          {showQrCode && (
-                            <div className="mt-3.5 p-3.5 bg-white border border-gray-250 rounded-sm shadow-sm flex flex-col items-center gap-2">
-                              <div className="w-32 h-32 relative bg-gray-50 flex items-center justify-center border border-gray-100 font-mono text-sm font-bold text-center">
-                                Razorpay QR Code
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {paymentTab === 'netbanking' && (
-                      <div className="space-y-4">
-                        <Label htmlFor="bank-select" className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Select Bank</Label>
-                        <select
-                          id="bank-select"
-                          value={selectedBank}
-                          onChange={(e) => setSelectedBank(e.target.value)}
-                          className="w-full bg-white border border-gray-250 rounded px-3 py-2 text-xs font-semibold"
-                        >
-                          <option value="HDFC">HDFC Bank</option>
-                          <option value="ICICI">ICICI Bank</option>
-                          <option value="SBI">State Bank of India</option>
-                        </select>
                       </div>
                     )}
 
