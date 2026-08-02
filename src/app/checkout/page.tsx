@@ -18,7 +18,8 @@ import { API_BASE } from '@/constants';
 
 function authHeaders(): HeadersInit {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-  return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+  const validToken = (token && token !== 'undefined' && token !== 'null' && token.trim() !== '' && !token.startsWith('mock_token_')) ? token : null;
+  return { 'Content-Type': 'application/json', ...(validToken ? { Authorization: `Bearer ${validToken}` } : {}) };
 }
 
 export default function CheckoutPage() {

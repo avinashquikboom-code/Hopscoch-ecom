@@ -146,12 +146,20 @@ class ApiClient {
 
   private getToken(): string | null {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    if (!token || token === 'undefined' || token === 'null' || token.trim() === '' || token.startsWith('mock_token_')) {
+      return null;
+    }
+    return token;
   }
 
   private getRefreshToken(): string | null {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    const token = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    if (!token || token === 'undefined' || token === 'null' || token.trim() === '' || token.startsWith('mock_token_')) {
+      return null;
+    }
+    return token;
   }
 
   private setToken(token: string): void {

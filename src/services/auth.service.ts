@@ -48,41 +48,102 @@ function buildAuthResponse(user: User): AuthResponse {
   return { user, token } as unknown as AuthResponse;
 }
 
-// ── Mock Auth Service (no backend required) ────────────────────────────────
+// ── Real Auth Service (connects to backend /api/auth/*) ──────────────────────
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    await delay(700);
-    // Accept any non-empty email + password with min 4 chars
-    if (!credentials.email || !credentials.password || credentials.password.length < 4) {
-      throw { response: { data: { message: 'Invalid email or password.' } } };
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || 'Invalid email or password.');
+      }
+      const data = json.data ?? json;
+      const token = data.accessToken || data.token;
+      const refreshToken = data.refreshToken;
+      const user = data.user;
+
+      if (typeof window !== 'undefined') {
+        if (token) localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+        if (refreshToken) localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      }
+      return { user, token } as unknown as AuthResponse;
+    } catch (e: any) {
+      throw { response: { data: { message: e.message || 'Invalid email or password.' } } };
     }
-    const user = buildUser(credentials.email);
-    return buildAuthResponse(user);
   },
 
   async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-    await delay(800);
-    if (!credentials.email || !credentials.password) {
-      throw { response: { data: { message: 'Please fill all fields.' } } };
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+          firstName: (credentials as any).firstName || (credentials as any).name || nameFromEmail(credentials.email).firstName,
+          lastName: (credentials as any).lastName || nameFromEmail(credentials.email).lastName,
+          phone: (credentials as any).phone || '',
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.message || 'Registration failed.');
+      }
+      const data = json.data ?? json;
+      const token = data.accessToken || data.token;
+      const refreshToken = data.refreshToken;
+      const user = data.user;
+
+      if (typeof window !== 'undefined') {
+        if (token) localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+        if (refreshToken) localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      }
+      return { user, token } as unknown as AuthResponse;
+    } catch (e: any) {
+      throw { response: { data: { message: e.message || 'Registration failed.' } } };
     }
-    const user = buildUser(credentials.email, {
-      firstName: (credentials as any).firstName || nameFromEmail(credentials.email).firstName,
-      lastName:  (credentials as any).lastName  || nameFromEmail(credentials.email).lastName,
-    });
-    return buildAuthResponse(user);
   },
 
   async logout(): Promise<void> {
-    await delay(300);
     if (typeof window !== 'undefined') {
+      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+      if (token) {
+        fetch(`${API_BASE}/api/auth/logout`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {});
+      }
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER_DATA);
     }
   },
 
-  async refreshToken(_refreshToken: string): Promise<AuthResponse> {
-    await delay(300);
-    throw { response: { data: { message: 'Session expired.' } } };
+  async refreshToken(refreshToken: string): Promise<AuthResponse> {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || 'Session expired.');
+      const data = json.data ?? json;
+      const token = data.accessToken || data.token;
+      if (typeof window !== 'undefined' && token) {
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+      }
+      return { user: data.user, token } as unknown as AuthResponse;
+    } catch (e: any) {
+      throw { response: { data: { message: e.message || 'Session expired.' } } };
+    }
   },
 
   async forgotPassword(email: string): Promise<void> {

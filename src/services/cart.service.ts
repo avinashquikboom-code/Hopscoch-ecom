@@ -7,7 +7,7 @@ import { productService } from './product.service';
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   const token = localStorage.getItem('auth_token');
-  if (!token || token === 'undefined' || token === 'null' || token.trim() === '') {
+  if (!token || token === 'undefined' || token === 'null' || token.trim() === '' || token.startsWith('mock_token_')) {
     return null;
   }
   return token;
