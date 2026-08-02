@@ -116,9 +116,40 @@ function saveGuestCart(cart: Cart) {
 
 // ── Main cart service ──────────────────────────────────────────────────────
 export const cartService = {
+  async mergeGuestCart(): Promise<void> {
+    const token = getToken();
+    if (!token) return;
+    const guestCart = getGuestCart();
+    if (!guestCart.items || guestCart.items.length === 0) return;
+
+    for (const item of guestCart.items) {
+      try {
+        const body: any = {
+          productId: Number(item.productId),
+          quantity: item.quantity,
+        };
+        if (item.variant?.id) {
+          body.variantId = Number(item.variant.id);
+        }
+        await fetch(`${API_BASE}/api/cart`, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify(body),
+        });
+      } catch { /* ignore individual merge errors */ }
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('guest_cart');
+    }
+  },
+
   async getCart(): Promise<Cart> {
     const token = getToken();
     if (!token) return getGuestCart();
+
+    // Auto-merge guest cart items into persistent user cart on login
+    await this.mergeGuestCart();
 
     try {
       const res = await fetch(`${API_BASE}/api/cart`, { headers: authHeaders() });
