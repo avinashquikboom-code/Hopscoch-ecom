@@ -71,6 +71,11 @@ function mapBackendProductToFrontend(raw: any): Product {
     ? raw.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
     : (raw.stock !== undefined ? Number(raw.stock) : 10);
 
+  const catObj = raw.category;
+  // If the product belongs to a subcategory, use the parent category name for
+  // filter consistency (e.g. "Kurtis" under "Women" → category = "Women")
+  const effectiveCategory = catObj?.parent?.name || catObj?.name || 'Collections';
+
   return {
     id: String(raw.id),
     name: raw.name,
@@ -79,7 +84,8 @@ function mapBackendProductToFrontend(raw: any): Product {
     originalPrice: price,
     discount: raw.discountValue ? Number(raw.discountValue) : 0,
     images: images,
-    category: raw.category?.name || 'Collections',
+    category: effectiveCategory,
+    subcategory: catObj?.parent ? catObj.name : undefined,
     brand: raw.brand?.name || 'FCISeller',
     stock: totalStock,
     rating: Number(raw.avgRating || 4.5),

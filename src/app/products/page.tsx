@@ -276,7 +276,10 @@ function ProductsContent() {
   let filtered = [...mockProducts];
 
   if (selectedCategory !== 'all') {
-    filtered = filtered.filter(p => p.category === selectedCategory);
+    filtered = filtered.filter(p =>
+      p.category === selectedCategory ||
+      (p as any).subcategory === selectedCategory
+    );
   }
   if (searchQuery) {
     filtered = filtered.filter(p =>
