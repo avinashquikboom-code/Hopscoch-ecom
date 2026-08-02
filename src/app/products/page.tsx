@@ -206,9 +206,9 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
 function ProductsContent() {
   const { data: categoriesData } = useCategories();
   const mockCategories = categoriesData || [];
-  // Fetch full catalog with a high limit so local category/price/brand filters work
-  // across ALL products, not just the first 12. The API (catalogRoutes) supports limit up to 1000.
-  const { data: productsData } = useProducts(undefined, 1, 1000);
+  // Fetch full catalog (limit=500, within backend max) so local category/price/brand
+  // filters work across ALL products. Catalog is ~250 products; 500 provides headroom.
+  const { data: productsData } = useProducts(undefined, 1, 500);
   const mockProducts = productsData?.data || [];
 
   const searchParams = useSearchParams();
