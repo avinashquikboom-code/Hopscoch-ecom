@@ -138,11 +138,11 @@ export const DISCOUNT_RANGES = [
 
 // Social Media Links
 export const SOCIAL_LINKS = {
-  FACEBOOK: 'https://facebook.com/hopscotch',
-  TWITTER: 'https://twitter.com/hopscotch',
-  INSTAGRAM: 'https://instagram.com/hopscotch',
-  YOUTUBE: 'https://youtube.com/hopscotch',
-  LINKEDIN: 'https://linkedin.com/hopscotch',
+  FACEBOOK: 'https://facebook.com/fciseller',
+  TWITTER: 'https://twitter.com/fciseller',
+  INSTAGRAM: 'https://instagram.com/fciseller',
+  YOUTUBE: 'https://youtube.com/fciseller',
+  LINKEDIN: 'https://linkedin.com/fciseller',
 } as const;
 
 // Contact Info
