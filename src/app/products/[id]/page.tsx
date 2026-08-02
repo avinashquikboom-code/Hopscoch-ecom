@@ -46,12 +46,22 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const { data: productsData } = useProducts();
   const mockProducts = productsData?.data || [];
   
+  // ── All hooks must be declared unconditionally before any early returns ──
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
   const [flyStyle, setFlyStyle] = useState<React.CSSProperties | null>(null);
+  const [isPlayingCatwalk, setIsPlayingCatwalk] = useState(false);
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
+  const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({ display: 'none' });
+
+  const addToCartMutation = useAddToCart();
+  const addToWishlistMutation = useAddToWishlist();
+  const removeFromWishlistMutation = useRemoveFromWishlist();
+  // Safe: product?.id — returns undefined when product is null (during loading/error)
+  const isInWishlist = useWishlistStore((state) => state.isInWishlist(product?.id ?? ''));
 
   useEffect(() => {
     if (product) {
@@ -68,6 +78,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     }
   }, [product]);
 
+  // ── Early returns AFTER all hooks ───────────────────────────────────────
   if (isLoading) {
     return (
       <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950/50 py-24 flex items-center justify-center">
@@ -94,21 +105,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     );
   }
 
-
-  // Cats catwalk video state
-  const [isPlayingCatwalk, setIsPlayingCatwalk] = useState(false);
-
-  // Size chart modal state
-  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
-
-  // Zoom states
-  const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({ display: 'none' });
-
-  const addToCartMutation = useAddToCart();
-  const addToWishlistMutation = useAddToWishlist();
-  const removeFromWishlistMutation = useRemoveFromWishlist();
-  const isInWishlist = useWishlistStore((state) => state.isInWishlist(product.id));
-
+  // product is confirmed non-null below this point
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : undefined;
