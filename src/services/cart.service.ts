@@ -2,15 +2,11 @@ import { Cart, CartItem } from '@/types';
 import { API_BASE } from '@/constants';
 import { resolveImageUrl } from '@/lib/utils';
 import { productService } from './product.service';
+import { fetchWithAuth, getValidToken } from '@/lib/api-client';
 
 // ── Auth helper ────────────────────────────────────────────────────────────
 function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  const token = localStorage.getItem('auth_token');
-  if (!token || token === 'undefined' || token === 'null' || token.trim() === '' || token.startsWith('mock_token_')) {
-    return null;
-  }
-  return token;
+  return getValidToken();
 }
 
 function authHeaders(): Record<string, string> {
@@ -27,50 +23,40 @@ function mapBackendCart(raw: any): Cart {
     const p = item.product || {};
     const images =
       p.images && p.images.length > 0
-        ? p.images.map((img: any) => resolveImageUrl(img.url || img))
-        : [resolveImageUrl(p.thumbnailUrl)];
+        ? p.images.map(resolveImageUrl)
+        : [resolveImageUrl(p.imageUrl)];
 
     return {
       id: String(item.id),
-      cartId: String(item.cartId || raw.id),
-      productId: String(item.productId),
-      variantId: item.variantId ? String(item.variantId) : undefined,
-      quantity: Number(item.quantity || 1),
+      productId: String(item.productId || p.id),
+      quantity: item.quantity,
+      addedAt: item.createdAt || new Date().toISOString(),
       product: {
-        id: String(p.id),
-        name: p.name || '',
+        id: String(p.id || item.productId),
+        name: p.name || 'Product',
+        slug: p.slug || '',
         description: p.description || '',
-        price: Number(p.basePrice || p.price || 0),
-        originalPrice: Number(p.basePrice || p.price || 0),
-        discount: 0,
+        price: Number(item.price || item.unitPrice || p.price || p.basePrice || 0),
+        salePrice: p.salePrice ? Number(p.salePrice) : undefined,
         images,
-        category: p.category?.name || '',
-        brand: p.brand?.name || '',
-        stock: Number(p.stock || 0),
-        rating: Number(p.avgRating || 4.5),
-        reviewCount: Number(p.reviewCount || 0),
+        category: p.category?.name || p.category || '',
+        stock: p.stock || 99,
+        isNew: p.isNew || false,
+        rating: p.rating || 4.5,
+        reviewCount: p.reviewCount || 0,
         tags: p.tags || [],
-        variants: [],
-        sizes: [],
-        colors: [],
-        isNew: false,
-        isFeatured: false,
-        isTrending: false,
-        taxPercent: Number(p.taxPercent || 0),
-        taxType: p.taxType || 'NONE',
-        taxAmount: Number(p.taxAmount || 0),
-        shippingCharge: Number(p.shippingCharge || 0),
-        createdAt: p.createdAt,
-        updatedAt: p.updatedAt,
-      } as any,
+        createdAt: p.createdAt || new Date().toISOString(),
+        updatedAt: p.updatedAt || new Date().toISOString(),
+      },
       variant: item.variant
         ? {
             id: String(item.variant.id),
-            productId: String(item.variant.productId),
-            name: 'variant',
-            value: item.variant.size || item.variant.color || '',
-            price: Number(item.variant.price || 0),
-            stock: Number(item.variant.stock || 0),
+            productId: String(item.productId),
+            name: item.variant.name || 'Default',
+            value: item.variant.value || item.variant.size || item.variant.color || '',
+            price: Number(item.variant.price || item.price || p.price || 0),
+            stock: item.variant.stock || 10,
+            sku: item.variant.sku,
             color: item.variant.color,
             size: item.variant.size,
           }
@@ -78,48 +64,64 @@ function mapBackendCart(raw: any): Cart {
     };
   });
 
+  const subtotal = Number(raw.subtotal !== undefined ? raw.subtotal : (raw.total || 0));
+  const discount = Number(raw.discountAmount || raw.discount || 0);
+  const taxAmount = Number(raw.taxAmount || 0);
+  const shippingAmount = Number(raw.shippingFee !== undefined ? raw.shippingFee : (raw.shippingAmount !== undefined ? raw.shippingAmount : (subtotal > 999 || subtotal === 0 ? 0 : 99)));
+  const total = Number(raw.total !== undefined ? raw.total : (subtotal - discount + shippingAmount + taxAmount));
+
   return {
-    id: String(raw.id),
+    id: String(raw.id || 'server'),
     userId: String(raw.userId || ''),
     items,
-    subtotal: Number(raw.subtotal || 0),
-    discount: Number(raw.discount || 0),
-    taxAmount: Number(raw.taxAmount || 0),
-    totalExclusiveTax: Number(raw.totalExclusiveTax || 0),
-    totalInclusiveTax: Number(raw.totalInclusiveTax || 0),
-    shippingAmount: Number(raw.shippingAmount || 0),
-    total: Number(raw.total || 0),
+    subtotal,
+    discount,
+    taxAmount,
+    shippingAmount,
+    shippingFee: shippingAmount,
+    total,
+    couponCode: raw.couponCode,
     updatedAt: raw.updatedAt || new Date().toISOString(),
   } as any;
 }
 
-// ── Guest-cart helpers (localStorage, for unauthenticated users) ──────────
+// ── Guest Cart Helpers (localStorage) ──────────────────────────────────────
+const GUEST_CART_KEY = 'guest_cart';
+
 function getGuestCart(): Cart {
+  if (typeof window === 'undefined') {
+    return { id: 'guest', userId: '', items: [], subtotal: 0, discount: 0, total: 0, updatedAt: new Date().toISOString() } as any;
+  }
   try {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('guest_cart') : null;
-    if (stored) return JSON.parse(stored);
-  } catch { /* ignore */ }
-  return { id: 'guest', userId: '', items: [], subtotal: 0, discount: 0, total: 0, updatedAt: new Date().toISOString() } as any;
-}
-
-function recalcGuestCart(cart: Cart): Cart {
-  const subtotal = cart.items.reduce((s, i) => {
-    const unitPrice = Number(i.variant?.price ?? i.product?.price ?? 0);
-    return s + unitPrice * Number(i.quantity || 1);
-  }, 0);
-  const discount = Number(cart.discount || 0);
-  const total = Math.max(0, subtotal - discount);
-  return { ...cart, subtotal, total };
-}
-
-function saveGuestCart(cart: Cart) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('guest_cart', JSON.stringify(cart));
+    const raw = localStorage.getItem(GUEST_CART_KEY);
+    if (!raw) return { id: 'guest', userId: '', items: [], subtotal: 0, discount: 0, total: 0, updatedAt: new Date().toISOString() } as any;
+    return JSON.parse(raw);
+  } catch {
+    return { id: 'guest', userId: '', items: [], subtotal: 0, discount: 0, total: 0, updatedAt: new Date().toISOString() } as any;
   }
 }
 
-// ── Main cart service ──────────────────────────────────────────────────────
+function saveGuestCart(cart: Cart): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
+  } catch { /* ignore */ }
+}
+
+function recalcGuestCart(cart: Cart): Cart {
+  const subtotal = cart.items.reduce((sum, item) => {
+    const unitPrice = item.variant?.price || (item.product as any)?.salePrice || item.product.price || 0;
+    return sum + unitPrice * item.quantity;
+  }, 0);
+  const discount = cart.discount || 0;
+  const shippingAmount = subtotal > 999 || subtotal === 0 ? 0 : 99;
+  const total = Math.max(0, subtotal - discount + shippingAmount);
+  return { ...cart, subtotal, shippingAmount, shippingFee: shippingAmount, total, updatedAt: new Date().toISOString() };
+}
+
+// ── Cart Service Export ───────────────────────────────────────────────────
 export const cartService = {
+  /** Merge local guest cart into authenticated backend cart upon login */
   async mergeGuestCart(): Promise<void> {
     const token = getToken();
     if (!token) return;
@@ -135,16 +137,15 @@ export const cartService = {
         if (item.variant?.id) {
           body.variantId = Number(item.variant.id);
         }
-        await fetch(`${API_BASE}/api/cart`, {
+        await fetchWithAuth(`${API_BASE}/api/cart`, {
           method: 'POST',
-          headers: authHeaders(),
           body: JSON.stringify(body),
         });
       } catch { /* ignore individual merge errors */ }
     }
 
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('guest_cart');
+      localStorage.removeItem(GUEST_CART_KEY);
     }
   },
 
@@ -156,7 +157,7 @@ export const cartService = {
     await this.mergeGuestCart();
 
     try {
-      const res = await fetch(`${API_BASE}/api/cart`, { headers: authHeaders() });
+      const res = await fetchWithAuth(`${API_BASE}/api/cart`);
       if (!res.ok) return getGuestCart();
       const json = await res.json();
       return mapBackendCart(json.data ?? json);
@@ -169,17 +170,15 @@ export const cartService = {
     const token = getToken();
 
     if (token) {
-      // Authenticated: call backend API
+      // Authenticated: call backend API with fetchWithAuth
       try {
         const body: any = { productId: Number(productId), quantity };
         if (variantId) body.variantId = Number(variantId);
-        const res = await fetch(`${API_BASE}/api/cart`, {
+        const res = await fetchWithAuth(`${API_BASE}/api/cart`, {
           method: 'POST',
-          headers: authHeaders(),
           body: JSON.stringify(body),
         });
         if (res.ok) {
-          // Fetch fresh cart after add
           return this.getCart();
         }
       } catch { /* fall through to guest */ }
@@ -236,9 +235,8 @@ export const cartService = {
 
     if (token) {
       try {
-        const res = await fetch(`${API_BASE}/api/cart/${itemId}`, {
+        const res = await fetchWithAuth(`${API_BASE}/api/cart/${itemId}`, {
           method: 'PATCH',
-          headers: authHeaders(),
           body: JSON.stringify({ quantity }),
         });
         if (res.ok) return this.getCart();
@@ -258,9 +256,8 @@ export const cartService = {
 
     if (token) {
       try {
-        const res = await fetch(`${API_BASE}/api/cart/${itemId}`, {
+        const res = await fetchWithAuth(`${API_BASE}/api/cart/${itemId}`, {
           method: 'DELETE',
-          headers: authHeaders(),
         });
         if (res.ok) return this.getCart();
       } catch { /* fall through */ }
@@ -279,7 +276,7 @@ export const cartService = {
 
     if (token) {
       try {
-        await fetch(`${API_BASE}/api/cart`, { method: 'DELETE', headers: authHeaders() });
+        await fetchWithAuth(`${API_BASE}/api/cart`, { method: 'DELETE' });
       } catch { /* ignore */ }
     }
 
@@ -306,11 +303,15 @@ export const cartService = {
     const val = validCoupons[code.toUpperCase()];
     if (!val) throw { response: { data: { message: 'Invalid coupon code.' } } };
     const discount = val < 1 ? Math.round(cart.subtotal * val) : val;
-    return { ...cart, discount, total: cart.subtotal - discount };
+    const updated = { ...cart, discount, total: Math.max(0, cart.subtotal - discount + (cart.shippingAmount || 0)), couponCode: code.toUpperCase() };
+    if (!getToken()) saveGuestCart(updated);
+    return updated;
   },
 
   async removeCoupon(): Promise<Cart> {
     const cart = await this.getCart();
-    return { ...cart, discount: 0, total: cart.subtotal };
+    const updated = { ...cart, discount: 0, total: cart.subtotal + (cart.shippingAmount || 0), couponCode: undefined };
+    if (!getToken()) saveGuestCart(updated);
+    return updated;
   },
 };

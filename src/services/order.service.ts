@@ -1,57 +1,89 @@
-import { apiClient } from '@/lib/axios';
-import { API_ENDPOINTS } from '@/constants';
-import { Order, PaginatedResponse } from '@/types';
 import { API_BASE } from '@/constants';
+import { Order, PaginatedResponse } from '@/types';
+import { fetchWithAuth } from '@/lib/api-client';
 
-// ── Response normalizer ─────────────────────────────────────────────────────
-// Maps the backend's DB order shape to the storefront Order type
+// ── Convert status string to wizard step index ──────────────────────────────
+function statusToStep(status: string): number {
+  const map: Record<string, number> = {
+    pending: 1,
+    payment_pending: 1,
+    confirmed: 2,
+    processing: 2,
+    packed: 3,
+    shipped: 3,
+    in_transit: 4,
+    out_for_delivery: 4,
+    delivered: 5,
+  };
+  return map[(status || '').toLowerCase()] ?? 1;
+}
+
+// ── Convert status string to badge styling ──────────────────────────────────
+function statusToColor(status: string): string {
+  const map: Record<string, string> = {
+    pending:           'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+    payment_pending:   'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+    confirmed:         'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+    processing:        'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    packed:            'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+    shipped:           'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+    in_transit:        'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
+    out_for_delivery:  'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
+    delivered:         'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+    cancelled:         'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    return_requested:  'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+    returned:          'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
+    refund_processing: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    refund_completed:  'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
+  };
+  return map[(status || '').toLowerCase()] ?? 'bg-teal-500/10 text-teal-600 border-teal-500/20';
+}
+
+// ── Normalize raw backend order object to UI shape ─────────────────────────
 function normalizeOrder(raw: any): Order {
-  const addr = raw.address || raw.shippingAddress || {};
+  const addr = raw.shippingAddress || raw.address || {};
+  const shippingAddress = {
+    fullName:      addr.fullName || `${addr.firstName || ''} ${addr.lastName || ''}`.trim() || 'Customer',
+    phone:         addr.phone || addr.phoneNumber || '',
+    streetAddress: addr.streetAddress || addr.line1 || addr.addressLine1 || '',
+    city:          addr.city || '',
+    state:         addr.state || addr.stateProvince || '',
+    zipCode:       addr.zipCode || addr.pincode || addr.zipPostal || '',
+    country:       addr.country || 'India',
+  };
 
-  const shippingAddress = typeof addr === 'string'
-    ? { fullName: '', address: addr, city: '', state: '', zipCode: '', country: '' }
-    : {
-        fullName: addr.fullName || `${raw.user?.firstName || ''} ${raw.user?.lastName || ''}`.trim(),
-        address: addr.line1 || addr.addressLine1 || addr.address || '',
-        city: addr.city || '',
-        state: addr.state || '',
-        zipCode: addr.pincode || addr.zipCode || addr.zip || '',
-        country: addr.country || 'India',
-      };
-
-  const items = (raw.items || raw.orderItems || []).map((item: any) => ({
-    id: String(item.id),
-    orderId: String(raw.id),
-    productId: String(item.productId),
-    variantId: item.variantId ? String(item.variantId) : undefined,
-    quantity: item.quantity || 1,
-    price: Number(item.priceSnapshot ?? item.price ?? 0),
-    product: {
-      id: String(item.productId),
-      name: item.productNameSnapshot || item.product?.name || 'Product',
-      images: item.product?.images?.map((img: any) => img.url || img) || [],
-    },
-    variantSnapshot: item.variantSnapshot || {},
-  }));
-
-  const timeline = (raw.timeline || []).map((t: any) => ({
-    status: t.status,
-    note: t.note || '',
-    createdAt: t.createdAt,
-  }));
+  const timeline = [
+    { title: 'Order Placed', time: raw.createdAt ? new Date(raw.createdAt).toLocaleString() : '', done: true },
+    { title: 'Confirmed',    time: raw.confirmedAt ? new Date(raw.confirmedAt).toLocaleString() : '', done: statusToStep(raw.status) >= 2 },
+    { title: 'Shipped',      time: raw.shippedAt ? new Date(raw.shippedAt).toLocaleString() : '', done: statusToStep(raw.status) >= 3 },
+    { title: 'Out for Delivery', time: '', done: statusToStep(raw.status) >= 4 },
+    { title: 'Delivered',    time: raw.deliveredAt ? new Date(raw.deliveredAt).toLocaleString() : '', done: statusToStep(raw.status) >= 5 },
+  ];
 
   return {
     id: String(raw.id),
-    orderNumber: raw.orderNumber || String(raw.id),
-    status: (raw.status || 'PENDING').toLowerCase(),
-    paymentStatus: raw.payment?.status?.toLowerCase() || 'pending',
-    paymentMethod: raw.payment?.method?.toLowerCase() || 'card',
-    subtotal: Number(raw.subtotal || 0),
-    tax: Number(raw.taxAmount || 0),
-    shipping: Number(raw.shippingAmount || 0),
-    discount: Number(raw.discountAmount || 0),
-    total: Number(raw.totalAmount || 0),
-    items,
+    orderNumber: raw.orderNumber || `#${raw.id}`,
+    status: raw.status || 'pending',
+    step: statusToStep(raw.status),
+    color: statusToColor(raw.status),
+    total: Number(raw.total || 0),
+    subtotal: Number(raw.subtotal || raw.total || 0),
+    taxAmount: Number(raw.taxAmount || 0),
+    shippingFee: Number(raw.shippingFee || raw.shippingCost || 0),
+    discountAmount: Number(raw.discountAmount || 0),
+    paymentMethod: raw.paymentMethod || 'COD',
+    paymentStatus: raw.paymentStatus || 'PENDING',
+    items: (raw.items || []).map((i: any) => ({
+      id: String(i.id),
+      product: {
+        id: String(i.product?.id || i.productId),
+        name: i.product?.name || i.title || 'Product',
+        images: i.product?.images || (i.product?.imageUrl ? [i.product.imageUrl] : []),
+      },
+      quantity: i.quantity || 1,
+      unitPrice: Number(i.unitPrice || i.price || 0),
+      totalPrice: Number(i.totalPrice || (i.unitPrice || 0) * (i.quantity || 1)),
+    })),
     shippingAddress,
     timeline,
     trackingNumber: raw.shipment?.awb || raw.trackingNumber || null,
@@ -60,21 +92,14 @@ function normalizeOrder(raw: any): Order {
   } as any;
 }
 
-// ── Helper to read auth token ────────────────────────────────────────────────
-function authHeaders(): HeadersInit {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-  return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
-}
-
 export const orderService = {
   /** List the authenticated user's orders (paginated) */
   async getOrders(
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Order>> {
-    const res = await fetch(
-      `${API_BASE}/api/orders?page=${page}&limit=${limit}`,
-      { headers: authHeaders() }
+    const res = await fetchWithAuth(
+      `${API_BASE}/api/orders?page=${page}&limit=${limit}`
     );
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
@@ -95,9 +120,8 @@ export const orderService = {
   /** Get a single order by numeric ID */
   async getOrderById(id: string): Promise<Order> {
     const numericId = id.replace(/\D/g, '') || id;
-    const res = await fetch(
-      `${API_BASE}/api/orders/${numericId}`,
-      { headers: authHeaders() }
+    const res = await fetchWithAuth(
+      `${API_BASE}/api/orders/${numericId}`
     );
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
@@ -106,11 +130,9 @@ export const orderService = {
 
   /** Create a new order from the cart — accepts { addressId } or legacy CheckoutFormData */
   async createOrder(data: any): Promise<Order> {
-    // Support both { addressId } (new) and old CheckoutFormData shape
     const addressId = data.addressId ?? data.address?.id ?? '1';
-    const res = await fetch(`${API_BASE}/api/orders`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/orders`, {
       method: 'POST',
-      headers: authHeaders(),
       body: JSON.stringify({ addressId: String(addressId) }),
     });
     const json = await res.json();
@@ -119,40 +141,35 @@ export const orderService = {
   },
 
   /** Cancel an order */
-  async cancelOrder(id: string, _reason?: string): Promise<Order> {
+  async cancelOrder(id: string, reason?: string): Promise<Order> {
     const numericId = id.replace(/\D/g, '') || id;
-    const res = await fetch(
-      `${API_BASE}/api/orders/${numericId}/cancel`,
-      { method: 'PATCH', headers: authHeaders() }
-    );
+    const res = await fetchWithAuth(`${API_BASE}/api/orders/${numericId}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ reason: reason || 'Cancelled by user' }),
+    });
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
     return normalizeOrder(json.data ?? json);
   },
 
-  /** Submit a return request via shipping service */
+  /** Return request */
   async returnOrder(id: string, reason: string): Promise<Order> {
     const numericId = id.replace(/\D/g, '') || id;
-    const res = await fetch(`${API_BASE}/api/v1/web/shipping/return`, {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ orderId: numericId, reason }),
+    const res = await fetchWithAuth(`${API_BASE}/api/orders/${numericId}/return`, {
+      method: 'PATCH',
+      body: JSON.stringify({ reason }),
     });
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
-    // Return the existing order after return request
-    return orderService.getOrderById(id);
+    return normalizeOrder(json.data ?? json);
   },
 
-  /** Get live tracking info for an order */
+  /** Track order */
   async trackOrder(id: string): Promise<any> {
     const numericId = id.replace(/\D/g, '') || id;
-    const res = await fetch(
-      `${API_BASE}/api/v1/web/shipping/track/${numericId}`,
-      { headers: authHeaders() }
-    );
+    const res = await fetchWithAuth(`${API_BASE}/api/orders/${numericId}`);
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
-    return json.data ?? json;
+    return normalizeOrder(json.data ?? json);
   },
 };

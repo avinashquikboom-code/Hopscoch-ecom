@@ -15,6 +15,7 @@ import { useCart, useClearCart } from '@/hooks';
 import { toast } from '@/components/ui/toast';
 
 import { API_BASE } from '@/constants';
+import { fetchWithAuth } from '@/lib/api-client';
 
 function authHeaders(): HeadersInit {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
@@ -125,7 +126,7 @@ export default function CheckoutPage() {
 
       setIsLoadingAddresses(true);
       try {
-        const res = await fetch(`${API_BASE}/api/addresses`, { headers: authHeaders() });
+        const res = await fetchWithAuth(`${API_BASE}/api/addresses`);
         if (res.ok) {
           const json = await res.json();
           const list = json.data ?? json ?? [];
