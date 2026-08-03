@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useOrder, useCancelOrder, useReturnOrder } from '@/hooks/use-orders';
 import { toast } from '@/components/ui/toast';
+import { resolveImageUrl } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; Icon: any }> = {
   pending:           { label: 'Pending',           color: 'text-amber-700 dark:text-amber-400',   bg: 'bg-amber-50 dark:bg-amber-950/40',   border: 'border-amber-200 dark:border-amber-800',   Icon: Clock },
@@ -241,7 +242,8 @@ export default function OrderDetailPage() {
 
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {items.map((item: any) => {
-              const imgUrl = item.product?.images?.[0];
+              const rawImg = item.product?.images?.[0] || item.product?.imageUrl || item.imageUrl || item.image || item.variantSnapshot?.imageUrl || item.variantSnapshot?.image;
+              const imgUrl = resolveImageUrl(rawImg);
               const name = item.product?.name || 'Product Item';
               const unitPrice = Number(item.unitPrice || item.price || 0);
               const totalPrice = Number(item.totalPrice || unitPrice * (item.quantity || 1));
@@ -252,7 +254,14 @@ export default function OrderDetailPage() {
                   <div className="flex items-center gap-4">
                     {imgUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={imgUrl} alt={name} className="w-16 h-20 object-cover rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex-shrink-0" />
+                      <img
+                        src={imgUrl}
+                        alt={name}
+                        className="w-16 h-20 object-cover rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex-shrink-0"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600';
+                        }}
+                      />
                     ) : (
                       <div className="w-16 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center flex-shrink-0">
                         <Package className="w-6 h-6 text-slate-400" />

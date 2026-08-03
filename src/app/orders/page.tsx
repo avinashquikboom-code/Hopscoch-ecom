@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
+import { resolveImageUrl } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; Icon: any }> = {
   pending:           { label: 'Pending',           color: 'text-amber-700 dark:text-amber-400',   bg: 'bg-amber-50 dark:bg-amber-950/40',   border: 'border-amber-200 dark:border-amber-800',   Icon: Clock },
@@ -252,7 +253,8 @@ export default function OrdersPage() {
                   {itemCount > 0 && (
                     <div className="flex items-center gap-3 overflow-x-auto py-1">
                       {items.slice(0, 4).map((item: any, i: number) => {
-                        const imgUrl = item.product?.images?.[0];
+                        const rawImg = item.product?.images?.[0] || item.product?.imageUrl || item.imageUrl || item.image || item.variantSnapshot?.imageUrl || item.variantSnapshot?.image;
+                        const imgUrl = resolveImageUrl(rawImg);
                         const name = item.product?.name || 'Product';
                         return (
                           <div key={i} className="relative group flex-shrink-0">
@@ -262,6 +264,9 @@ export default function OrdersPage() {
                                 src={imgUrl}
                                 alt={name}
                                 className="w-16 h-18 sm:w-20 sm:h-22 object-cover rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600';
+                                }}
                               />
                             ) : (
                               <div className="w-16 h-18 sm:w-20 sm:h-22 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center">

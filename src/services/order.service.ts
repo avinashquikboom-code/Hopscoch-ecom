@@ -1,6 +1,7 @@
 import { API_BASE } from '@/constants';
 import { Order, PaginatedResponse } from '@/types';
 import { fetchWithAuth } from '@/lib/api-client';
+import { resolveImageUrl } from '@/lib/utils';
 
 // ── Convert status string to wizard step index ──────────────────────────────
 function statusToStep(status: string): number {
@@ -73,17 +74,33 @@ function normalizeOrder(raw: any): Order {
     discountAmount: Number(raw.discountAmount || 0),
     paymentMethod: raw.paymentMethod || 'COD',
     paymentStatus: raw.paymentStatus || 'PENDING',
-    items: (raw.items || []).map((i: any) => ({
-      id: String(i.id),
-      product: {
-        id: String(i.product?.id || i.productId),
-        name: i.product?.name || i.title || 'Product',
-        images: i.product?.images || (i.product?.imageUrl ? [i.product.imageUrl] : []),
-      },
-      quantity: i.quantity || 1,
-      unitPrice: Number(i.unitPrice || i.price || 0),
-      totalPrice: Number(i.totalPrice || (i.unitPrice || 0) * (i.quantity || 1)),
-    })),
+    items: (raw.items || []).map((i: any) => {
+      let resolvedImages: string[] = [];
+      const prodImgs = i.product?.images || i.productImages || i.images;
+      if (Array.isArray(prodImgs) && prodImgs.length > 0) {
+        resolvedImages = prodImgs
+          .map((img: any) => resolveImageUrl(img))
+          .filter((url: string) => Boolean(url));
+      } else if (i.product?.imageUrl || i.imageUrl || i.image || i.variantSnapshot?.imageUrl || i.variantSnapshot?.image) {
+        resolvedImages = [resolveImageUrl(i.product?.imageUrl || i.imageUrl || i.image || i.variantSnapshot?.imageUrl || i.variantSnapshot?.image)];
+      }
+
+      if (resolvedImages.length === 0) {
+        resolvedImages = ['https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600'];
+      }
+
+      return {
+        id: String(i.id),
+        product: {
+          id: String(i.product?.id || i.productId || ''),
+          name: i.product?.name || i.productNameSnapshot || i.title || 'Product',
+          images: resolvedImages,
+        },
+        quantity: i.quantity || 1,
+        unitPrice: Number(i.unitPrice || i.price || i.priceSnapshot || 0),
+        totalPrice: Number(i.totalPrice || (i.unitPrice || i.price || i.priceSnapshot || 0) * (i.quantity || 1)),
+      };
+    }),
     shippingAddress,
     timeline,
     trackingNumber: raw.shipment?.awb || raw.trackingNumber || null,
