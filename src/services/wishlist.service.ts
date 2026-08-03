@@ -2,9 +2,16 @@ import { API_BASE } from '@/constants';
 import { fetchWithAuth } from '@/lib/api-client';
 import { Wishlist, WishlistItem } from '@/types';
 import { useWishlistStore } from '@/store';
+import { resolveImageUrl } from '@/lib/utils';
 
 function normalizeWishlistItem(raw: any): WishlistItem {
   const p = raw.product || {};
+  const rawImages = Array.isArray(p.images) && p.images.length > 0
+    ? p.images.map((i: any) => typeof i === 'string' ? i : (i.url || i.imageUrl))
+    : [p.imageUrl || p.thumbnailUrl];
+
+  const images = rawImages.map((img: any) => resolveImageUrl(img)).filter(Boolean);
+
   return {
     id: String(raw.id || raw.productId),
     productId: String(raw.productId || p.id),
@@ -15,7 +22,7 @@ function normalizeWishlistItem(raw: any): WishlistItem {
       description: p.description || '',
       price: Number(p.price || p.basePrice || 0),
       originalPrice: p.compareAtPrice ? Number(p.compareAtPrice) : (p.originalPrice ? Number(p.originalPrice) : undefined),
-      images: Array.isArray(p.images) ? p.images.map((i: any) => typeof i === 'string' ? i : (i.url || i.imageUrl)) : [p.imageUrl || 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600'],
+      images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600'],
       category: typeof p.category === 'string' ? p.category : (p.category?.name || 'clothing'),
       brand: typeof p.brand === 'string' ? p.brand : (p.brand?.name || 'Hopscotch'),
       rating: p.rating || 4.5,

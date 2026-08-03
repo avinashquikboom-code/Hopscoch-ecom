@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,30 @@ import { useWishlistStore } from '@/store';
 import { useWishlist, useAddToCart, useRemoveFromWishlist } from '@/hooks';
 import { Heart, Trash2, ShoppingCart, Share2, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/toast';
+
+function WishlistCardImage({ src, alt, href }: { src?: string; alt: string; href: string }) {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <Link href={href} className="relative aspect-[3/4] block w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800">
+      {!imgError && src ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 640px) 150px, 240px"
+          className="object-cover object-top transition-transform duration-500 group-hover:scale-102"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="w-full h-full bg-neutral-100 dark:bg-neutral-800 flex flex-col items-center justify-center text-neutral-400 gap-1.5 p-4 text-center">
+          <span className="text-3xl">🛍️</span>
+          <span className="text-[10px] font-medium text-neutral-400">Image unavailable</span>
+        </div>
+      )}
+    </Link>
+  );
+}
 
 export default function WishlistPage() {
   const { isLoading } = useWishlist();
@@ -96,15 +121,11 @@ export default function WishlistPage() {
 
                   <div>
                     {/* Image */}
-                    <Link href={`/products/${product.id}`} className="relative aspect-[3/4] block w-full overflow-hidden bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-100 dark:border-neutral-850">
-                      <Image
-                        src={product.images[0]}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 640px) 150px, 240px"
-                        className="object-cover object-top transition-transform duration-500 group-hover:scale-102"
-                      />
-                    </Link>
+                    <WishlistCardImage
+                      src={product.images[0]}
+                      alt={product.name}
+                      href={`/products/${product.id}`}
+                    />
 
                     {/* Details */}
                     <div className="p-3">
