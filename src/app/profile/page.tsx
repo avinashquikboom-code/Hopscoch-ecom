@@ -27,7 +27,7 @@ import {
 import { useOrders } from '@/hooks/use-orders';
 import { useWishlist } from '@/hooks/use-wishlist';
 import { toast } from '@/components/ui/toast';
-import { resolveAvatarUrl } from '@/lib/utils';
+import { resolveAvatarUrl, resolveImageUrl } from '@/lib/utils';
 import { Address } from '@/types';
 
 /* ── Status formatters ─────────────────────────────────────────────────── */
@@ -540,10 +540,19 @@ export default function ProfilePage() {
                               {/* Item Thumbnails Preview */}
                               <div className="flex items-center gap-2 pt-1">
                                 {(order.items || []).slice(0, 3).map((item: any, idx: number) => {
-                                  const img = item.product?.images?.[0];
+                                  const rawImg = item.product?.images?.[0] || item.product?.imageUrl || item.imageUrl || item.image || item.variantSnapshot?.imageUrl || item.variantSnapshot?.image;
+                                  const img = resolveImageUrl(rawImg);
                                   return img ? (
                                     /* eslint-disable-next-line @next/next/no-img-element */
-                                    <img key={idx} src={img} alt="Product" className="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
+                                    <img
+                                      key={idx}
+                                      src={img}
+                                      alt="Product"
+                                      className="w-10 h-10 object-cover rounded-lg border border-slate-200 dark:border-slate-700"
+                                      onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600';
+                                      }}
+                                    />
                                   ) : (
                                     <div key={idx} className="w-10 h-10 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center">
                                       <Package className="w-4 h-4 text-slate-400" />
