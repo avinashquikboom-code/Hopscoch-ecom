@@ -96,12 +96,15 @@ export function VisualSearchModal({ isOpen, onClose, onResultsReady }: Props) {
         throw new Error(json.message || 'Visual search failed');
       }
       const data: VisualSearchResult = json.data ?? json;
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response structure received from visual search service.');
+      }
       setResult(data);
       setPhase('done');
       // Persist results to sessionStorage for products page
       sessionStorage.setItem('visual_search_results', JSON.stringify(data));
       // Build a descriptive query string from extracted attributes
-      const attrs = data.extractedAttributes;
+      const attrs = data.extractedAttributes || {};
       const queryParts = [attrs.color, attrs.category, attrs.style, attrs.material].filter(Boolean);
       const queryStr = queryParts.join(' ').trim() || 'visual search';
       onResultsReady(data, queryStr);

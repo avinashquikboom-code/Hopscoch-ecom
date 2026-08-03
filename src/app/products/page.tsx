@@ -772,7 +772,7 @@ function ProductsContent() {
             )}
 
             {/* ══ VISUAL SEARCH RESULTS BANNER ══════════════════════════════ */}
-            {visualSearchResults && (
+            {visualSearchResults && typeof visualSearchResults === 'object' && (
               <div className="mb-5 rounded-xl border border-teal-200 dark:border-teal-800 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-950/30 dark:to-emerald-950/20 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
@@ -784,11 +784,12 @@ function ProductsContent() {
                         AI Visual Search Results
                       </p>
                       <p className="text-xs text-teal-700 dark:text-teal-400 mt-0.5">
-                        {(visualSearchResults.exactMatches?.length ?? 0) + (visualSearchResults.similarMatches?.length ?? 0)} styles matched
+                        {(Array.isArray(visualSearchResults.exactMatches) ? visualSearchResults.exactMatches.length : 0) +
+                         (Array.isArray(visualSearchResults.similarMatches) ? visualSearchResults.similarMatches.length : 0)} styles matched
                         {visualSearchResults.wasFallback ? ' (similar items)' : ''} by Gemini Vision
                       </p>
                       {/* Attribute pills */}
-                      {visualSearchResults.extractedAttributes && (
+                      {visualSearchResults.extractedAttributes && typeof visualSearchResults.extractedAttributes === 'object' && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {Object.entries(visualSearchResults.extractedAttributes)
                             .filter(([k, v]) => v && k !== 'confidence')
@@ -815,28 +816,29 @@ function ProductsContent() {
                 </div>
 
                 {/* Visual search product sections */}
-                {(visualSearchResults.exactMatches?.length > 0 || visualSearchResults.similarMatches?.length > 0) ? (
+                {(Array.isArray(visualSearchResults.exactMatches) && visualSearchResults.exactMatches.length > 0) ||
+                 (Array.isArray(visualSearchResults.similarMatches) && visualSearchResults.similarMatches.length > 0) ? (
                   <div className="mt-4 space-y-5">
-                    {visualSearchResults.exactMatches?.length > 0 && (
+                    {Array.isArray(visualSearchResults.exactMatches) && visualSearchResults.exactMatches.length > 0 && (
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-teal-700 dark:text-teal-400 mb-2.5">
                           Exact Matches ({visualSearchResults.exactMatches.length})
                         </p>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
                           {visualSearchResults.exactMatches.slice(0, 10).map((product: any) => (
-                            <ProductCard key={product.id} product={product} viewMode="grid" />
+                            <ProductCard key={product.id || product.name} product={product} viewMode="grid" />
                           ))}
                         </div>
                       </div>
                     )}
-                    {visualSearchResults.similarMatches?.length > 0 && (
+                    {Array.isArray(visualSearchResults.similarMatches) && visualSearchResults.similarMatches.length > 0 && (
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-500 mb-2.5">
                           Similar Styles ({visualSearchResults.similarMatches.length})
                         </p>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
                           {visualSearchResults.similarMatches.slice(0, 10).map((product: any) => (
-                            <ProductCard key={product.id} product={product} viewMode="grid" />
+                            <ProductCard key={product.id || product.name} product={product} viewMode="grid" />
                           ))}
                         </div>
                       </div>
@@ -845,8 +847,8 @@ function ProductsContent() {
                 ) : (
                   <div className="mt-4 py-6 text-center">
                     <Camera className="w-8 h-8 text-teal-300 mx-auto mb-2" />
-                    <p className="text-sm text-teal-700 dark:text-teal-400 font-semibold">No exact matches found</p>
-                    <p className="text-xs text-teal-600/70 dark:text-teal-500 mt-0.5">Browse all products below or try a different image</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-400 font-semibold">No matching products found</p>
+                    <p className="text-xs text-teal-600/70 dark:text-teal-500 mt-0.5">Browse all catalog products below or try uploading a clearer item image</p>
                   </div>
                 )}
               </div>
