@@ -12,6 +12,7 @@ import {
   ShoppingBag, HelpCircle, ArrowLeft, User, QrCode, Building, ChevronRight
 } from 'lucide-react';
 import { useCart, useClearCart } from '@/hooks';
+import { useLocationStore } from '@/store';
 import { toast } from '@/components/ui/toast';
 
 import { API_BASE } from '@/constants';
@@ -34,15 +35,15 @@ export default function CheckoutPage() {
   const [giftWrap, setGiftWrap] = useState(false);
   const [giftMessage, setGiftMessage] = useState('');
 
-  // Form State - Contact & Shipping Details
+  const { pincode: locPincode, city: locCity, state: locState } = useLocationStore();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [streetAddress, setStreetAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [stateProvince, setStateProvince] = useState('');
-  const [zipPostal, setZipPostal] = useState('');
+  const [city, setCity] = useState(locCity || 'Pune');
+  const [stateProvince, setStateProvince] = useState(locState || 'Maharashtra');
+  const [zipPostal, setZipPostal] = useState(locPincode || '411001');
   const [country, setCountry] = useState('India');
 
   const countryOptions = [

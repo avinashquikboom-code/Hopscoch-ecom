@@ -10,7 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { MobileSearchOverlay } from '@/components/common/MobileSearchOverlay';
 import { VisualSearchModal } from '@/components/common/VisualSearchModal';
-import { useAuthStore, useCartStore, useThemeStore } from '@/store';
+import { LocationModal } from '@/components/common/LocationModal';
+import { useAuthStore, useCartStore, useThemeStore, useLocationStore } from '@/store';
+import { useAddresses } from '@/hooks/use-addresses';
 import { resolveAvatarUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -40,6 +42,7 @@ export function Header() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   
   // Language & Currency states
   const [language, setLanguage] = useState<'EN' | 'HI'>('EN');
@@ -49,6 +52,8 @@ export function Header() {
   const { user, isAuthenticated, openLoginModal } = useAuthStore();
   const { cart } = useCartStore();
   const { theme, setTheme } = useThemeStore();
+  const { pincode, city, formattedLocation, isAutoDetected, setLocation, detectLocation } = useLocationStore();
+  const { data: addresses = [] } = useAddresses();
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -56,7 +61,29 @@ export function Header() {
 
   useEffect(() => {
     setMounted(true);
+    // Auto detect location for guest if never set
+    if (!isAutoDetected && pincode === '411001') {
+      detectLocation();
+    }
   }, []);
+
+  // Sync location from user default address when signed in
+  useEffect(() => {
+    if (isAuthenticated && Array.isArray(addresses) && addresses.length > 0) {
+      const defaultAddr = addresses.find((a: any) => a.isDefault) || addresses[0];
+      const pin = defaultAddr.pincode || defaultAddr.zipCode;
+      const c = defaultAddr.city;
+      const s = defaultAddr.state;
+      if (pin && c) {
+        setLocation({
+          pincode: pin,
+          city: c,
+          state: s,
+          formattedLocation: `${c}, ${pin}`,
+        });
+      }
+    }
+  }, [isAuthenticated, addresses]);
 
   // Load search history from LocalStorage
   useEffect(() => {
@@ -140,10 +167,13 @@ export function Header() {
         <div className="container mx-auto flex items-center justify-between gap-4">
           
           {/* Left Side: Delivery address pin */}
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600 dark:text-gray-400">
-            <MapPin className="w-3.5 h-3.5 text-gray-500 dark:text-gray-500" />
-            <span>Deliver to: <span className="text-gray-800 dark:text-gray-200">411036</span></span>
-            <span className="text-[#0d9488] hover:underline cursor-pointer ml-1">Select location &gt;</span>
+          <div 
+            onClick={() => setIsLocationModalOpen(true)}
+            className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600 dark:text-gray-400 cursor-pointer group"
+          >
+            <MapPin className="w-3.5 h-3.5 text-[#0d9488]" />
+            <span>Deliver to: <span className="text-gray-800 dark:text-gray-200 font-extrabold">{city ? `${city} (${pincode})` : pincode}</span></span>
+            <span className="text-[#0d9488] group-hover:underline ml-1">Change &gt;</span>
           </div>
 
           {/* Right Side: Language, Currency, Supercoins & Theme toggle */}
@@ -617,6 +647,12 @@ export function Header() {
       <MobileSearchOverlay
         isOpen={isMobileSearchOpen}
         onClose={() => setIsMobileSearchOpen(false)}
+      />
+
+      {/* Location Selector Modal */}
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
       />
 
     </div>

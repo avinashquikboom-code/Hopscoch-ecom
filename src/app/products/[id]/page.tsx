@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Heart, Share2, Star, ShieldCheck, ChevronRight, Tag, MapPin, Truck, HelpCircle, X, Check, MessageSquare, Download } from 'lucide-react';
 import { useAddToCart, useAddToWishlist, useRemoveFromWishlist } from '@/hooks';
-import { useWishlistStore, useAuthStore } from '@/store';
+import { useWishlistStore, useAuthStore, useLocationStore } from '@/store';
 import { toast } from '@/components/ui/toast';
 import { getColorCode } from '@/services/product.service';
 
@@ -47,11 +47,23 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const mockProducts = productsData?.data || [];
   
   // ── All hooks must be declared unconditionally before any early returns ──
+  const { pincode: defaultPincode, city: defaultCity } = useLocationStore();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  const [pincode, setPincode] = useState('');
-  const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
+  const [pincode, setPincode] = useState(defaultPincode || '411001');
+  const [pincodeStatus, setPincodeStatus] = useState<string | null>(
+    `Delivery available to ${defaultCity ? `${defaultCity} (${defaultPincode || '411001'})` : defaultPincode || '411001'} | Free shipping`
+  );
+
+  useEffect(() => {
+    if (defaultPincode) {
+      setPincode(defaultPincode);
+      setPincodeStatus(
+        `Delivery available to ${defaultCity ? `${defaultCity} (${defaultPincode})` : defaultPincode} | Free shipping`
+      );
+    }
+  }, [defaultPincode, defaultCity]);
   const [flyStyle, setFlyStyle] = useState<React.CSSProperties | null>(null);
   const [isPlayingCatwalk, setIsPlayingCatwalk] = useState(false);
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);

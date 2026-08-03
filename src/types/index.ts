@@ -15,13 +15,16 @@ export interface Address {
   userId: string;
   fullName: string;
   phone: string;
-  addressLine1: string;
+  addressLine1?: string;
   addressLine2?: string;
+  line1?: string;
+  line2?: string;
   streetAddress?: string;
   city: string;
   state: string;
-  postalCode: string;
+  postalCode?: string;
   zipCode?: string;
+  pincode?: string;
   country: string;
   isDefault: boolean;
   type?: 'home' | 'work' | 'other';
