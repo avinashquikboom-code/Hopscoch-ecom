@@ -3,10 +3,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useOrders } from '@/hooks/use-orders';
+import { orderService } from '@/services';
 import {
   Package, Truck, CheckCircle, Clock, XCircle, RotateCcw,
   ShoppingBag, ChevronRight, Loader2, Search, ArrowLeft, Filter,
-  ExternalLink, Calendar, CreditCard, ShieldCheck
+  ExternalLink, Calendar, CreditCard, ShieldCheck, Download
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
@@ -308,7 +309,19 @@ export default function OrdersPage() {
                       <span className="text-xs text-slate-400">({itemCount} item{itemCount !== 1 ? 's' : ''})</span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          orderService.downloadInvoice(rawId);
+                        }}
+                        className="inline-flex items-center gap-1 px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/70 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold transition-all"
+                        title="Download Tax Invoice"
+                      >
+                        <Download className="w-3.5 h-3.5 text-teal-600" />
+                        Invoice
+                      </button>
+
                       <Link
                         href={`/orders/${rawId}`}
                         className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold transition-all shadow-md shadow-teal-600/20"

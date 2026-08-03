@@ -8,7 +8,7 @@ import {
   Camera, Check, Eye, EyeOff, ChevronRight, Shield, Bell,
   Package, Star, CreditCard, Phone, Mail, Edit3, Save, X,
   Home, Briefcase, Plus, Trash2, Pencil, RefreshCw, Upload, AlertCircle,
-  Loader2, CheckCircle2, Sparkles
+  Loader2, CheckCircle2, Sparkles, Download
 } from 'lucide-react';
 import { useAuthStore } from '@/store';
 import {
@@ -25,6 +25,7 @@ import {
   useSetDefaultAddress
 } from '@/hooks/use-addresses';
 import { useOrders } from '@/hooks/use-orders';
+import { orderService } from '@/services';
 import { useWishlist } from '@/hooks/use-wishlist';
 import { toast } from '@/components/ui/toast';
 import { resolveAvatarUrl, resolveImageUrl } from '@/lib/utils';
@@ -578,12 +579,21 @@ export default function ProfilePage() {
 
                             <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-700/60">
                               <p className="text-base font-bold text-slate-900 dark:text-white">₹{Number(order.total || 0).toLocaleString('en-IN')}</p>
-                              <Link
-                                href={`/orders/${order.id}`}
-                                className="inline-flex items-center gap-1 text-xs font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400"
-                              >
-                                View Details <ChevronRight className="w-3.5 h-3.5" />
-                              </Link>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  onClick={() => orderService.downloadInvoice(order.id)}
+                                  className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-teal-600 dark:text-slate-300 transition-colors"
+                                  title="Download Invoice"
+                                >
+                                  <Download className="w-3.5 h-3.5 text-teal-600" /> Invoice
+                                </button>
+                                <Link
+                                  href={`/orders/${order.id}`}
+                                  className="inline-flex items-center gap-1 text-xs font-semibold text-teal-600 hover:text-teal-700 dark:text-teal-400"
+                                >
+                                  View Details <ChevronRight className="w-3.5 h-3.5" />
+                                </Link>
+                              </div>
                             </div>
                           </div>
                         );

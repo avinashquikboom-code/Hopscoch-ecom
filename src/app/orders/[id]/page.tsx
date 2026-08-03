@@ -10,6 +10,7 @@ import {
   Copy, Check, FileText, AlertTriangle, Upload, X
 } from 'lucide-react';
 import { useOrder, useCancelOrder, useReturnOrder } from '@/hooks/use-orders';
+import { orderService } from '@/services';
 import { toast } from '@/components/ui/toast';
 import { resolveImageUrl } from '@/lib/utils';
 
@@ -347,6 +348,15 @@ export default function OrderDetailPage() {
           </div>
 
         </div>
+
+        {/* ── DOWNLOAD TAX INVOICE BUTTON ─────────────────────────────────── */}
+        <button
+          onClick={() => orderService.downloadInvoice(cleanId)}
+          className="w-full flex items-center justify-center gap-2 h-12 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50/40 dark:hover:bg-teal-950/20 transition-all shadow-xs"
+        >
+          <Download className="w-4 h-4 text-teal-600" />
+          Download / Print Tax Invoice
+        </button>
 
       </div>
 

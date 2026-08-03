@@ -189,4 +189,18 @@ export const orderService = {
     if (!res.ok) throw { response: { data: json } };
     return normalizeOrder(json.data ?? json);
   },
+
+  /** Get invoice URL for printing / downloading */
+  getInvoiceUrl(id: string): string {
+    const numericId = id.replace(/\D/g, '') || id;
+    return `${API_BASE}/api/orders/${numericId}/invoice`;
+  },
+
+  /** Trigger download / print window for order invoice */
+  downloadInvoice(id: string): void {
+    if (typeof window !== 'undefined') {
+      const url = this.getInvoiceUrl(id);
+      window.open(url, '_blank');
+    }
+  },
 };
