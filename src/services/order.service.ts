@@ -193,7 +193,7 @@ export const orderService = {
   /** Get invoice URL for printing / downloading */
   getInvoiceUrl(id: string): string {
     const numericId = id.replace(/\D/g, '') || id;
-    return `${API_BASE}/api/orders/${numericId}/invoice`;
+    return `${API_BASE}/api/v1/web/orders/${numericId}/invoice`;
   },
 
   /** Trigger download / print window for order invoice */

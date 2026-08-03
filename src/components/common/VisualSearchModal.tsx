@@ -86,7 +86,7 @@ export function VisualSearchModal({ isOpen, onClose, onResultsReady }: Props) {
       const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/api/v1/mobile/search/visual`, {
+      const res = await fetch(`${API_BASE}/api/v1/web/search/visual`, {
         method: 'POST',
         headers,
         body: formData,

@@ -126,7 +126,7 @@ export default function CheckoutPage() {
 
       setIsLoadingAddresses(true);
       try {
-        const res = await fetchWithAuth(`${API_BASE}/api/addresses`);
+        const res = await fetchWithAuth(`${API_BASE}/api/v1/web/addresses`);
         if (res.ok) {
           const json = await res.json();
           const list = json.data ?? json ?? [];
@@ -200,7 +200,7 @@ export default function CheckoutPage() {
     // Save address for future use if selectedAddressId === 'new' and save checkbox is true
     if (selectedAddressId === 'new' && saveAddressForFuture && firstName && streetAddress && city) {
       try {
-        await fetch(`${API_BASE}/api/addresses`, {
+        await fetch(`${API_BASE}/api/v1/web/addresses`, {
           method: 'POST',
           headers: authHeaders(),
           body: JSON.stringify({

@@ -106,7 +106,7 @@ export default function Home() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/banners`);
+        const res = await fetch(`${API_BASE}/api/v1/web/banners`);
         if (res.ok) {
           const json = await res.json();
           const raw = json.data ?? json ?? [];
