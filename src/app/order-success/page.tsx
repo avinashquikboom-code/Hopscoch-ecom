@@ -26,7 +26,8 @@ import { Suspense } from 'react';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get('orderId') || `AUR-${Math.floor(80000 + Math.random() * 10000)}`;
+  const rawId = searchParams.get('orderId') || searchParams.get('orderNumber') || '';
+  const orderId = rawId ? rawId.replace('#', '') : '';
   const total = searchParams.get('total') || '0';
 
   const [confettiPieces] = useState(() =>

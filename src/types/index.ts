@@ -17,12 +17,14 @@ export interface Address {
   phone: string;
   addressLine1: string;
   addressLine2?: string;
+  streetAddress?: string;
   city: string;
   state: string;
   postalCode: string;
+  zipCode?: string;
   country: string;
   isDefault: boolean;
-  type: 'home' | 'work' | 'other';
+  type?: 'home' | 'work' | 'other';
 }
 
 // Product Types

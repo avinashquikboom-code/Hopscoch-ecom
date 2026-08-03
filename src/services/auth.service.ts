@@ -176,7 +176,47 @@ export const authService = {
   },
 
   async updateProfile(data: Partial<User>): Promise<User> {
-    await delay(500);
+    const token = getStoredToken();
+    if (token && token !== 'undefined' && token !== 'null') {
+      try {
+        const res = await fetch(`${API_BASE}/api/users/me`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phone: data.phone,
+            avatarUrl: data.avatar || (data as any).avatarUrl,
+          }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const updated = json?.data ?? json;
+          const stored = typeof window !== 'undefined'
+            ? localStorage.getItem(STORAGE_KEYS.USER_DATA)
+            : null;
+          let user: User = buildUser('user@fciseller.com');
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              if (parsed?.state?.user) user = parsed.state.user;
+            } catch {/* ignore */}
+          }
+          return {
+            ...user,
+            ...updated,
+            firstName: updated.firstName ?? data.firstName ?? user.firstName,
+            lastName: updated.lastName ?? data.lastName ?? user.lastName,
+            phone: updated.phone ?? data.phone ?? user.phone,
+          };
+        }
+      } catch (e) {
+        console.warn('Backend profile update failed, falling back to local update:', e);
+      }
+    }
     const stored = typeof window !== 'undefined'
       ? localStorage.getItem(STORAGE_KEYS.USER_DATA)
       : null;

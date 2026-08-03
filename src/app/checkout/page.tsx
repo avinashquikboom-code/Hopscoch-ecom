@@ -259,7 +259,7 @@ export default function CheckoutPage() {
             sessionStorage.removeItem('cart_gift_wrap');
             setIsProcessing(false);
             toast.success(`Order ${createdOrder.orderNumber} placed successfully!`);
-            router.push(`/order-success?orderNumber=${createdOrder.orderNumber}`);
+            router.push(`/order-success?orderId=${createdOrder.id}&orderNumber=${createdOrder.orderNumber}&total=${createdOrder.totalAmount || total}`);
           },
         });
         return;
@@ -302,7 +302,7 @@ export default function CheckoutPage() {
                   onSuccess: () => {
                     sessionStorage.removeItem('cart_gift_wrap');
                     toast.success(`Payment verified! Order ${createdOrder.orderNumber} confirmed.`);
-                    router.push(`/order-success?orderNumber=${createdOrder.orderNumber}`);
+                    router.push(`/order-success?orderId=${createdOrder.id}&orderNumber=${createdOrder.orderNumber}&total=${createdOrder.totalAmount || total}`);
                   },
                 });
               },
