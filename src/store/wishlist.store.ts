@@ -80,8 +80,11 @@ export const useWishlistStore = create<WishlistState>()(
 
       isInWishlist: (productId: string) => {
         const { wishlist } = get();
-        if (!wishlist) return false;
-        return wishlist.items.some((item) => item.productId === productId);
+        if (!wishlist || !Array.isArray(wishlist.items)) return false;
+        const targetId = String(productId);
+        return wishlist.items.some(
+          (item) => String(item.productId) === targetId || String(item.product?.id) === targetId
+        );
       },
     }),
     {

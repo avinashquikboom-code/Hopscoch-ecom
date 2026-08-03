@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Product } from '@/types';
 import { Heart, Star, ShoppingBag, Eye, Zap, BadgeCheck } from 'lucide-react';
-import { useAddToCart, useAddToWishlist } from '@/hooks';
+import { useAddToCart, useAddToWishlist, useRemoveFromWishlist } from '@/hooks';
 import { useWishlistStore, useAuthStore } from '@/store';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -23,6 +23,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
   const router = useRouter();
   const addToCart = useAddToCart();
   const addToWishlist = useAddToWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
   const isInWishlist = useWishlistStore((state) => state.isInWishlist(product.id));
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const openLoginModal = useAuthStore((state) => state.openLoginModal);
@@ -57,12 +58,23 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
   const handleAddToWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isAuthenticated) {
+      toast.info('Please sign in to save items to your wishlist', {
+        action: {
+          label: 'Sign In',
+          onClick: () => openLoginModal(),
+        },
+      });
       openLoginModal();
       return;
     }
     setWishlistPulse(true);
     setTimeout(() => setWishlistPulse(false), 600);
-    addToWishlist.mutate(product.id);
+
+    if (isInWishlist) {
+      removeFromWishlist.mutate(product.id);
+    } else {
+      addToWishlist.mutate(product.id);
+    }
   };
 
   const handleQuickAddSize = (e: React.MouseEvent, size: string) => {

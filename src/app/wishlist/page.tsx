@@ -4,13 +4,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useWishlistStore } from '@/store';
-import { useAddToCart, useRemoveFromWishlist } from '@/hooks';
-import { Heart, Trash2, ShoppingCart, Share2, ArrowRight } from 'lucide-react';
+import { useWishlist, useAddToCart, useRemoveFromWishlist } from '@/hooks';
+import { Heart, Trash2, ShoppingCart, Share2, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/toast';
 
 export default function WishlistPage() {
+  const { isLoading } = useWishlist();
   const items = useWishlistStore((state) => state.wishlist?.items || []);
-  const wishlistItems = items.map(item => item.product);
+  const wishlistItems = items.map(item => item.product).filter(Boolean);
 
   const addToCartMutation = useAddToCart();
   const removeFromWishlistMutation = useRemoveFromWishlist();

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Heart, Share2, Star, ShieldCheck, ChevronRight, Tag, MapPin, Truck, HelpCircle, X, Check, MessageSquare, Download } from 'lucide-react';
 import { useAddToCart, useAddToWishlist, useRemoveFromWishlist } from '@/hooks';
-import { useWishlistStore } from '@/store';
+import { useWishlistStore, useAuthStore } from '@/store';
 import { toast } from '@/components/ui/toast';
 import { getColorCode } from '@/services/product.service';
 
@@ -62,6 +62,8 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const removeFromWishlistMutation = useRemoveFromWishlist();
   // Safe: product?.id — returns undefined when product is null (during loading/error)
   const isInWishlist = useWishlistStore((state) => state.isInWishlist(product?.id ?? ''));
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const openLoginModal = useAuthStore((state) => state.openLoginModal);
 
   useEffect(() => {
     if (product) {
@@ -164,12 +166,20 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   };
 
   const handleWishlistToggle = () => {
+    if (!isAuthenticated) {
+      toast.info('Please sign in to save items to your wishlist', {
+        action: {
+          label: 'Sign In',
+          onClick: () => openLoginModal(),
+        },
+      });
+      openLoginModal();
+      return;
+    }
     if (isInWishlist) {
       removeFromWishlistMutation.mutate(product.id);
-      toast.success('Removed from Wishlist');
     } else {
       addToWishlistMutation.mutate(product.id);
-      toast.success('Added to Wishlist');
     }
   };
 
