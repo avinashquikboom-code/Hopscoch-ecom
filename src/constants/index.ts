@@ -44,8 +44,8 @@ export const API_ENDPOINTS = {
   
   // User
   USER_PROFILE: '/user/profile',
-  USER_ADDRESSES: '/user/addresses',
-  USER_ADDRESS: (id: string) => `/user/addresses/${id}`,
+  USER_ADDRESSES: '/addresses',
+  USER_ADDRESS: (id: string) => `/addresses/${id}`,
   CHANGE_PASSWORD: '/user/change-password',
   
   // Coupons

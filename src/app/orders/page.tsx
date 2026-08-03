@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useOrders } from '@/hooks/use-orders';
 import {
@@ -77,6 +77,20 @@ export default function OrdersPage() {
       return matchCategory && matchSearch;
     });
   }, [rawOrders, activeTab, searchQuery]);
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-slate-50/80 dark:bg-slate-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

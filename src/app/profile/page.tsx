@@ -120,27 +120,41 @@ export default function ProfilePage() {
     whatsappUpdates: true,
   });
 
-  if (!isAuthenticated && typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token');
-    if (!token || token === 'undefined' || token === 'null') {
-      return (
-        <div className="min-h-[80vh] bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center px-4 py-12">
-          <div className="w-20 h-20 bg-teal-50 dark:bg-teal-950/50 rounded-full flex items-center justify-center mb-4 border border-teal-200 dark:border-teal-800">
-            <User className="w-10 h-10 text-teal-600 dark:text-teal-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Access Your Account</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm text-center mb-6">
-            Please log in to manage your profile details, track orders, and view saved addresses.
-          </p>
-          <Link
-            href="/login"
-            className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-teal-600/20"
-          >
-            Sign In / Register
-          </Link>
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-slate-50/80 dark:bg-slate-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
+      </div>
+    );
+  }
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const isAuth = isAuthenticated || !!(token && token !== 'undefined' && token !== 'null' && token.trim() !== '');
+
+  if (!isAuth) {
+    return (
+      <div className="min-h-[80vh] bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center px-4 py-12">
+        <div className="w-20 h-20 bg-teal-50 dark:bg-teal-950/50 rounded-full flex items-center justify-center mb-4 border border-teal-200 dark:border-teal-800">
+          <User className="w-10 h-10 text-teal-600 dark:text-teal-400" />
         </div>
-      );
-    }
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Access Your Account</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm text-center mb-6">
+          Please log in to manage your profile details, track orders, and view saved addresses.
+        </p>
+        <Link
+          href="/login"
+          className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-sm font-semibold transition-all shadow-md shadow-teal-600/20"
+        >
+          Sign In / Register
+        </Link>
+      </div>
+    );
   }
 
   const avatarUrl = resolveAvatarUrl(storeUser?.avatar || storeUser?.avatarUrl);

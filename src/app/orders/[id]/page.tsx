@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
@@ -64,7 +64,13 @@ export default function OrderDetailPage() {
   const [returnModalOpen, setReturnModalOpen] = useState(false);
   const [returnReason, setReturnReason] = useState('Size too small / wrong fit');
 
-  if (isLoading) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted || isLoading) {
     return (
       <div className="min-h-screen bg-slate-50/80 dark:bg-slate-950 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
