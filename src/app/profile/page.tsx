@@ -65,7 +65,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');
 
   // Real backend queries
-  const { data: addressesData, isLoading: isLoadingAddresses } = useAddresses();
+  const { data: addressesData, isLoading: isLoadingAddresses, isError: isErrorAddresses, refetch: refetchAddresses } = useAddresses();
   const { data: ordersData, isLoading: isLoadingOrders } = useOrders(1, 10);
   const { data: wishlistData } = useWishlist();
 
@@ -159,7 +159,8 @@ export default function ProfilePage() {
   }
 
   const avatarUrl = resolveAvatarUrl(storeUser?.avatar || storeUser?.avatarUrl);
-  const addresses: Address[] = (addressesData as any) || [];
+  const rawAddr = (addressesData as any)?.data ?? addressesData;
+  const addresses: Address[] = Array.isArray(rawAddr) ? rawAddr : [];
   const orders = ordersData?.data || [];
   const wishlistCount = Array.isArray(wishlistData) ? wishlistData.length : (wishlistData as any)?.items?.length || 0;
 
@@ -623,13 +624,33 @@ export default function ProfilePage() {
                     <div className="flex items-center justify-center py-12">
                       <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
                     </div>
+                  ) : isErrorAddresses ? (
+                    <div className="text-center py-12 space-y-3">
+                      <div className="w-16 h-16 bg-rose-50 dark:bg-rose-950/40 rounded-full flex items-center justify-center mx-auto border border-rose-200 dark:border-rose-800">
+                        <AlertCircle className="w-8 h-8 text-rose-500" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Unable to load addresses</p>
+                      <p className="text-xs text-slate-500 max-w-xs mx-auto">An error occurred while fetching your saved addresses.</p>
+                      <button
+                        onClick={() => refetchAddresses()}
+                        className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm"
+                      >
+                        Try Again
+                      </button>
+                    </div>
                   ) : addresses.length === 0 ? (
                     <div className="text-center py-12 space-y-3">
                       <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto">
                         <MapPin className="w-8 h-8 text-slate-400" />
                       </div>
-                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No saved addresses</p>
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No saved addresses yet</p>
                       <p className="text-xs text-slate-500 max-w-xs mx-auto">Add an address to speed up your future checkouts.</p>
+                      <button
+                        onClick={handleOpenAddAddress}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm"
+                      >
+                        <Plus className="w-4 h-4" /> Add Address
+                      </button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

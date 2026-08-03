@@ -4,15 +4,19 @@ import { Address, User } from '@/types';
 
 export const userService = {
   async getAddresses(): Promise<Address[]> {
-    return apiClient.get<Address[]>(API_ENDPOINTS.USER_ADDRESSES);
+    const res: any = await apiClient.get(API_ENDPOINTS.USER_ADDRESSES);
+    const list = res?.data ?? res ?? [];
+    return Array.isArray(list) ? list : [];
   },
 
   async addAddress(address: Omit<Address, 'id' | 'userId'>): Promise<Address> {
-    return apiClient.post<Address>(API_ENDPOINTS.USER_ADDRESSES, address);
+    const res: any = await apiClient.post(API_ENDPOINTS.USER_ADDRESSES, address);
+    return res?.data ?? res;
   },
 
   async updateAddress(id: string, address: Partial<Address>): Promise<Address> {
-    return apiClient.put<Address>(API_ENDPOINTS.USER_ADDRESS(id), address);
+    const res: any = await apiClient.put(API_ENDPOINTS.USER_ADDRESS(id), address);
+    return res?.data ?? res;
   },
 
   async deleteAddress(id: string): Promise<void> {
@@ -20,6 +24,7 @@ export const userService = {
   },
 
   async setDefaultAddress(id: string): Promise<Address> {
-    return apiClient.patch<Address>(API_ENDPOINTS.USER_ADDRESS(id), { isDefault: true });
+    const res: any = await apiClient.patch(API_ENDPOINTS.USER_ADDRESS(id), { isDefault: true });
+    return res?.data ?? res;
   },
 };
