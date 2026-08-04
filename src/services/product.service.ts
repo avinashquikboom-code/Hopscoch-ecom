@@ -356,20 +356,69 @@ export const productService = {
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Review>> {
-    await delay(200);
-    const reviews = MOCK_REVIEWS.map((r) => ({ ...r, productId }));
-    return { data: reviews, total: reviews.length, page, limit, totalPages: 1 } as any;
+    try {
+      const res = await fetch(`${API_BASE}/api/web/products/${productId}/reviews?page=${page}&limit=${limit}`);
+      if (res.ok) {
+        const json = await res.json();
+        const rawReviews = json.data?.reviews || json.data || json.reviews || [];
+        const total = json.data?.pagination?.total || json.pagination?.total || rawReviews.length;
+        const totalPages = json.data?.pagination?.totalPages || json.pagination?.totalPages || 1;
+
+        const reviews: Review[] = rawReviews.map((r: any) => ({
+          id: String(r.id),
+          userId: String(r.userId || r.user?.id || ''),
+          productId: String(r.productId),
+          rating: Number(r.rating || 5),
+          title: r.title || '',
+          comment: r.comment || '',
+          isVerifiedPurchase: r.isVerifiedPurchase ?? true,
+          createdAt: r.createdAt || new Date().toISOString(),
+          helpfulCount: r.helpfulCount || 0,
+          user: {
+            firstName: r.user?.firstName || r.userName || 'Customer',
+            lastName: r.user?.lastName || '',
+          },
+        }));
+
+        return { data: reviews, total, page, limit, totalPages } as any;
+      }
+    } catch (e) {
+      console.error('Failed to fetch reviews:', e);
+    }
+    return { data: [], total: 0, page: 1, limit, totalPages: 1 } as any;
   },
 
-  async addReview(_productId: string, review: any): Promise<Review> {
-    await delay(400);
+  async addReview(productId: string, review: { rating: number; title?: string; comment?: string; orderId?: number }): Promise<Review> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const res = await fetch(`${API_BASE}/api/web/products/${productId}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(review),
+    });
+
+    const json = await res.json();
+    if (!res.ok) {
+      throw new Error(json.message || 'Failed to submit review');
+    }
+
+    const r = json.data || json.review || json;
     return {
-      id: 'r_new_' + Date.now(),
-      userId: 'local',
-      ...review,
-      createdAt: new Date().toISOString(),
+      id: String(r.id),
+      userId: String(r.userId || ''),
+      productId: String(r.productId),
+      rating: Number(r.rating || review.rating),
+      title: r.title || review.title || '',
+      comment: r.comment || review.comment || '',
+      isVerifiedPurchase: r.isVerifiedPurchase ?? true,
+      createdAt: r.createdAt || new Date().toISOString(),
       helpfulCount: 0,
-      user: { firstName: 'You', lastName: '' },
+      user: {
+        firstName: r.user?.firstName || 'You',
+        lastName: r.user?.lastName || '',
+      },
     } as any;
   },
 
