@@ -116,7 +116,7 @@ export const orderService = {
     limit = 10
   ): Promise<PaginatedResponse<Order>> {
     const res = await fetchWithAuth(
-      `${API_BASE}/api/orders?page=${page}&limit=${limit}`
+      `${API_BASE}/api/v1/web/orders?page=${page}&limit=${limit}`
     );
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
@@ -138,7 +138,7 @@ export const orderService = {
   async getOrderById(id: string): Promise<Order> {
     const numericId = id.replace(/\D/g, '') || id;
     const res = await fetchWithAuth(
-      `${API_BASE}/api/orders/${numericId}`
+      `${API_BASE}/api/v1/web/orders/${numericId}`
     );
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
@@ -148,7 +148,7 @@ export const orderService = {
   /** Create a new order from the cart — accepts { addressId } or legacy CheckoutFormData */
   async createOrder(data: any): Promise<Order> {
     const addressId = data.addressId ?? data.address?.id ?? '1';
-    const res = await fetchWithAuth(`${API_BASE}/api/orders`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/orders`, {
       method: 'POST',
       body: JSON.stringify({ addressId: String(addressId) }),
     });
@@ -160,7 +160,7 @@ export const orderService = {
   /** Cancel an order */
   async cancelOrder(id: string, reason?: string): Promise<Order> {
     const numericId = id.replace(/\D/g, '') || id;
-    const res = await fetchWithAuth(`${API_BASE}/api/orders/${numericId}/cancel`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/orders/${numericId}/cancel`, {
       method: 'POST',
       body: JSON.stringify({ reason: reason || 'Cancelled by user' }),
     });
@@ -172,7 +172,7 @@ export const orderService = {
   /** Return request */
   async returnOrder(id: string, reason: string): Promise<Order> {
     const numericId = id.replace(/\D/g, '') || id;
-    const res = await fetchWithAuth(`${API_BASE}/api/orders/${numericId}/return`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/orders/${numericId}/return`, {
       method: 'PATCH',
       body: JSON.stringify({ reason }),
     });
@@ -184,7 +184,7 @@ export const orderService = {
   /** Track order */
   async trackOrder(id: string): Promise<any> {
     const numericId = id.replace(/\D/g, '') || id;
-    const res = await fetchWithAuth(`${API_BASE}/api/orders/${numericId}`);
+    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/orders/${numericId}`);
     const json = await res.json();
     if (!res.ok) throw { response: { data: json } };
     return normalizeOrder(json.data ?? json);

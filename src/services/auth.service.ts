@@ -178,7 +178,7 @@ export const authService = {
 
   async updateProfile(data: Partial<User>): Promise<User> {
     try {
-      const res = await fetchWithAuth(`${API_BASE}/api/users/me`, {
+      const res = await fetchWithAuth(`${API_BASE}/api/v1/web/users/me`, {
         method: 'PATCH',
         body: JSON.stringify({
           firstName: data.firstName,
@@ -234,7 +234,7 @@ export const authService = {
     const formData = new FormData();
     formData.append('avatar', file);
 
-    const res = await fetchWithAuth(`${API_BASE}/api/users/me`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/users/me`, {
       method: 'PATCH',
       body: formData,
     });

@@ -199,7 +199,7 @@ export const productService = {
       }
 
       const queryString = params.toString();
-      const url = `${API_BASE}/api/products${queryString ? `?${queryString}` : ''}`;
+      const url = `${API_BASE}/api/v1/web/products${queryString ? `?${queryString}` : ''}`;
       const res = await fetch(url);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch products');
@@ -233,7 +233,7 @@ export const productService = {
 
   async getProductById(id: string): Promise<Product> {
     try {
-      const res = await fetch(`${API_BASE}/api/products/${id}`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products/${id}`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Product not found');
       if (json.data) {
@@ -248,7 +248,7 @@ export const productService = {
 
   async getFeaturedProducts(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/products`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch featured products');
       const raw = extractRawProducts(json);
@@ -262,7 +262,7 @@ export const productService = {
 
   async getTrendingProducts(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/products`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch trending products');
       const raw = extractRawProducts(json);
@@ -276,7 +276,7 @@ export const productService = {
 
   async getNewArrivals(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/products`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch new arrivals');
       const raw = extractRawProducts(json);
@@ -290,7 +290,7 @@ export const productService = {
 
   async getBestSellers(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/products`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch best sellers');
       const raw = extractRawProducts(json);
@@ -304,7 +304,7 @@ export const productService = {
 
   async searchProducts(query: string): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/products`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Search failed');
       const raw = extractRawProducts(json);
@@ -321,7 +321,7 @@ export const productService = {
 
   async getCategories(): Promise<Category[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/categories`);
+      const res = await fetch(`${API_BASE}/api/v1/web/categories`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch categories');
       const raw = json.data ?? json ?? [];

@@ -7,7 +7,7 @@ export interface GiftWrapConfig {
 }
 
 async function fetchGiftWrapConfig(): Promise<GiftWrapConfig> {
-  const res = await fetch(`${API_BASE}/api/config/gift-wrap`);
+  const res = await fetch(`${API_BASE}/api/v1/web/config/gift-wrap`);
   const json = await res.json();
   if (!res.ok) {
     // Backend unreachable — fall back to sane defaults so the page still renders

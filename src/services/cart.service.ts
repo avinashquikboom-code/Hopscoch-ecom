@@ -137,7 +137,7 @@ export const cartService = {
         if (item.variant?.id) {
           body.variantId = Number(item.variant.id);
         }
-        await fetchWithAuth(`${API_BASE}/api/cart`, {
+        await fetchWithAuth(`${API_BASE}/api/v1/web/cart`, {
           method: 'POST',
           body: JSON.stringify(body),
         });
@@ -157,7 +157,7 @@ export const cartService = {
     await this.mergeGuestCart();
 
     try {
-      const res = await fetchWithAuth(`${API_BASE}/api/cart`);
+      const res = await fetchWithAuth(`${API_BASE}/api/v1/web/cart`);
       if (!res.ok) return getGuestCart();
       const json = await res.json();
       return mapBackendCart(json.data ?? json);
@@ -174,7 +174,7 @@ export const cartService = {
       try {
         const body: any = { productId: Number(productId), quantity };
         if (variantId) body.variantId = Number(variantId);
-        const res = await fetchWithAuth(`${API_BASE}/api/cart`, {
+        const res = await fetchWithAuth(`${API_BASE}/api/v1/web/cart`, {
           method: 'POST',
           body: JSON.stringify(body),
         });
@@ -235,7 +235,7 @@ export const cartService = {
 
     if (token) {
       try {
-        const res = await fetchWithAuth(`${API_BASE}/api/cart/${itemId}`, {
+        const res = await fetchWithAuth(`${API_BASE}/api/v1/web/cart/${itemId}`, {
           method: 'PATCH',
           body: JSON.stringify({ quantity }),
         });
@@ -256,7 +256,7 @@ export const cartService = {
 
     if (token) {
       try {
-        const res = await fetchWithAuth(`${API_BASE}/api/cart/${itemId}`, {
+        const res = await fetchWithAuth(`${API_BASE}/api/v1/web/cart/${itemId}`, {
           method: 'DELETE',
         });
         if (res.ok) return this.getCart();
@@ -276,7 +276,7 @@ export const cartService = {
 
     if (token) {
       try {
-        await fetchWithAuth(`${API_BASE}/api/cart`, { method: 'DELETE' });
+        await fetchWithAuth(`${API_BASE}/api/v1/web/cart`, { method: 'DELETE' });
       } catch { /* ignore */ }
     }
 
