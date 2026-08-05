@@ -1,6 +1,6 @@
 import { API_BASE } from '@/constants';
 import { Order, PaginatedResponse } from '@/types';
-import { fetchWithAuth } from '@/lib/api-client';
+import { fetchWithAuth, getValidToken } from '@/lib/api-client';
 import { resolveImageUrl } from '@/lib/utils';
 
 // ── Convert status string to wizard step index ──────────────────────────────
@@ -115,6 +115,9 @@ export const orderService = {
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Order>> {
+    if (!getValidToken()) {
+      return { data: [], total: 0, page, limit, totalPages: 0 } as any;
+    }
     const res = await fetchWithAuth(
       `${API_BASE}/api/v1/web/orders?page=${page}&limit=${limit}`
     );

@@ -3,10 +3,14 @@ import { userService } from '@/services';
 import { Address } from '@/types';
 import { toast } from '@/components/ui/toast';
 
+import { useAuthStore } from '@/store';
+
 export function useAddresses() {
+  const isAuth = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
     queryKey: ['addresses'],
     queryFn: () => userService.getAddresses(),
+    enabled: isAuth,
   });
 }
 

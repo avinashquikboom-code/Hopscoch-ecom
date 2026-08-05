@@ -1,9 +1,10 @@
 import { API_BASE, API_ENDPOINTS } from '@/constants';
-import { fetchWithAuth } from '@/lib/api-client';
+import { fetchWithAuth, getValidToken } from '@/lib/api-client';
 import { Address } from '@/types';
 
 export const userService = {
   async getAddresses(): Promise<Address[]> {
+    if (!getValidToken()) return [];
     try {
       let res = await fetchWithAuth(`${API_BASE}/api${API_ENDPOINTS.USER_ADDRESSES}`);
       if (!res.ok) {

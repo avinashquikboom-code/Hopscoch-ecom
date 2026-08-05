@@ -1,5 +1,5 @@
 import { API_BASE } from '@/constants';
-import { fetchWithAuth } from '@/lib/api-client';
+import { fetchWithAuth, getValidToken } from '@/lib/api-client';
 import { Wishlist, WishlistItem } from '@/types';
 import { useWishlistStore } from '@/store';
 import { resolveImageUrl } from '@/lib/utils';
@@ -40,6 +40,12 @@ function normalizeWishlistItem(raw: any): WishlistItem {
 
 export const wishlistService = {
   async getWishlist(): Promise<Wishlist> {
+    const token = getValidToken();
+    if (!token) {
+      const current = useWishlistStore.getState().wishlist;
+      return current || { id: 'guest', userId: '', items: [], updatedAt: new Date().toISOString() };
+    }
+
     try {
       let res = await fetchWithAuth(`${API_BASE}/api/v1/web/wishlist`);
       if (!res.ok) {

@@ -50,7 +50,17 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: () => authService.logout(),
+    onMutate: () => {
+      logout();
+      queryClient.clear();
+    },
     onSuccess: () => {
+      logout();
+      queryClient.clear();
+      toast.success('Logout successful');
+      router.push('/login');
+    },
+    onError: () => {
       logout();
       queryClient.clear();
       toast.success('Logout successful');

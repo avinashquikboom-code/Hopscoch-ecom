@@ -97,7 +97,13 @@ export const toast = Object.assign(toastFn, {
       return;
     }
     if (status === 401) {
-      toast.error("Session expired.");
+      // Do not show "Session expired." for background GET fetches or unauthenticated users
+      const hasToken = typeof window !== 'undefined' && Boolean(
+        localStorage.getItem("auth_token") || localStorage.getItem("user_data")
+      );
+      if (m !== "GET" && hasToken) {
+        toast.error("Session expired.");
+      }
       return;
     }
     if (status === 403) {

@@ -2,16 +2,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { wishlistService } from '@/services';
 import { Wishlist } from '@/types';
-import { useWishlistStore } from '@/store';
+import { useWishlistStore, useAuthStore } from '@/store';
 import { toast } from '@/components/ui/toast';
 
 export function useWishlist() {
   const queryClient = useQueryClient();
   const setWishlist = useWishlistStore((state) => state.setWishlist);
+  const isAuth = useAuthStore((state) => state.isAuthenticated);
 
   const query = useQuery({
     queryKey: ['wishlist'],
     queryFn: () => wishlistService.getWishlist(),
+    enabled: isAuth,
   });
 
   useEffect(() => {
