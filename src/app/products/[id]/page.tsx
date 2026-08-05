@@ -191,26 +191,8 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               {/* IMAGE CARD */}
               <div className="bg-white border border-[#efefef]">
 
-                {/* Thumb + Main row */}
-                <div className="flex">
-
-                  {/* Vertical thumbs */}
-                  <div className="hidden sm:block w-[72px] border-r border-[#f0f0f0] p-2 space-y-2">
-                    {product.images.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setSelectedImage(i)}
-                        className={`block w-[52px] h-[60px] border overflow-hidden cursor-pointer transition-all mx-auto ${
-                          selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0] hover:border-[#0d9488]/50'
-                        }`}
-                      >
-                        <img src={img} alt="" className="w-full h-full object-cover object-top" />
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Main image */}
-                  <div className="flex-1 relative">
+                {/* Main image */}
+                <div className="relative">
                     {/* Wishlist + Share — top right overlay */}
                     <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
                       <button
@@ -278,7 +260,6 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                         </button>
                       ))}
                     </div>
-                  </div>
                 </div>
 
                 {/* Colour image strip (variant selector with image thumbnails) */}
