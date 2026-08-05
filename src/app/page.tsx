@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { ProductCard } from '@/components/product/ProductCard';
 import { motion, AnimatePresence } from 'framer-motion';
+import { resolveImageUrl } from '@/lib/utils';
 
 const Instagram = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -382,10 +383,10 @@ export default function Home() {
                 <Clock className="w-4 h-4 text-[#0d9488]" />
                 <span className="tracking-wider">ENDS IN</span>
                 <span className="bg-neutral-850 px-1.5 py-0.5 rounded text-white">{formatNumber(timeLeft.hours)}</span>
-                <span>:</span>
+                <span className="text-[#0d9488] font-bold">:</span>
                 <span className="bg-neutral-850 px-1.5 py-0.5 rounded text-white">{formatNumber(timeLeft.minutes)}</span>
-                <span>:</span>
-                <span className="bg-neutral-850 px-1.5 py-0.5 rounded text-[#0d9488] animate-pulse">{formatNumber(timeLeft.seconds)}</span>
+                <span className="text-[#0d9488] font-bold">:</span>
+                <span className="bg-neutral-850 px-1.5 py-0.5 rounded text-white">{formatNumber(timeLeft.seconds)}</span>
               </div>
             </div>
             <Link href="/products?sort=popular" className="text-xs font-extrabold text-[#0d9488] hover:underline flex items-center gap-1.5 group font-mono tracking-wider">
