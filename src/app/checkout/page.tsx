@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Lock, Check, X, Shield, ArrowRight, Info, CreditCard, 
-  ShoppingBag, HelpCircle, ArrowLeft, User, QrCode, Building, ChevronRight
+  ShoppingBag, HelpCircle, ArrowLeft, User, QrCode, Building, ChevronRight, Trash2
 } from 'lucide-react';
 import { useCart, useClearCart } from '@/hooks';
 import { useLocationStore } from '@/store';
@@ -155,6 +155,26 @@ export default function CheckoutPage() {
 
     fetchAddresses();
   }, []);
+
+  const handleDeleteAddress = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Are you sure you want to delete this address?')) return;
+    try {
+      const res = await fetchWithAuth(`${API_BASE}/api/v1/web/addresses/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        toast.success('Address deleted');
+        setSavedAddresses((prev) => prev.filter((a) => a.id !== id));
+        if (selectedAddressId === id) {
+          setSelectedAddressId('new');
+          setShowAddressForm(true);
+        }
+      }
+    } catch {
+      toast.error('Failed to delete address');
+    }
+  };
 
   // Restore gift-wrap selection persisted from cart page
   useEffect(() => {
@@ -477,6 +497,14 @@ export default function CheckoutPage() {
                                     📞 {addr.phone}
                                   </p>
                                 </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => handleDeleteAddress(addr.id, e)}
+                                  title="Delete Address"
+                                  className="p-1 text-gray-400 hover:text-rose-600 rounded transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               </div>
                             </div>
                           );
@@ -680,14 +708,8 @@ export default function CheckoutPage() {
                             <span>Razorpay Secure Payment Gateway</span>
                           </div>
                           <p className="text-gray-600 leading-relaxed">
-                            Upon clicking <strong>Proceed to Payment</strong>, Razorpay's encrypted checkout window will open. You can complete your transaction using:
+                            Upon clicking <strong>Proceed to Payment</strong>, Razorpay's encrypted checkout window will open.
                           </p>
-                          <div className="grid grid-cols-2 gap-2 text-xxs font-bold text-gray-700 pt-1">
-                            <div className="bg-white p-2 border border-gray-200 rounded text-center">💳 Credit & Debit Cards</div>
-                            <div className="bg-white p-2 border border-gray-200 rounded text-center">📱 UPI (Google Pay, PhonePe, Paytm)</div>
-                            <div className="bg-white p-2 border border-gray-200 rounded text-center">🏦 Net Banking (All Indian Banks)</div>
-                            <div className="bg-white p-2 border border-gray-200 rounded text-center">👛 Wallets & EMI Options</div>
-                          </div>
                         </div>
                       </div>
                     )}

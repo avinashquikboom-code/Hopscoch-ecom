@@ -686,21 +686,23 @@ export default function ProfilePage() {
                               <Pencil className="w-3.5 h-3.5" /> Edit
                             </button>
                             {!addr.isDefault && (
-                              <>
-                                <button
-                                  onClick={() => setDefaultAddressMutation.mutate(addr.id)}
-                                  className="text-teal-600 hover:text-teal-700 font-semibold"
-                                >
-                                  Make Default
-                                </button>
-                                <button
-                                  onClick={() => deleteAddressMutation.mutate(addr.id)}
-                                  className="text-rose-500 hover:text-rose-700 font-semibold flex items-center gap-1 ml-auto"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" /> Delete
-                                </button>
-                              </>
+                              <button
+                                onClick={() => setDefaultAddressMutation.mutate(addr.id)}
+                                className="text-teal-600 hover:text-teal-700 font-semibold"
+                              >
+                                Make Default
+                              </button>
                             )}
+                            <button
+                              onClick={() => {
+                                if (confirm('Are you sure you want to delete this address?')) {
+                                  deleteAddressMutation.mutate(addr.id);
+                                }
+                              }}
+                              className="text-rose-500 hover:text-rose-700 font-semibold flex items-center gap-1 ml-auto"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> Delete
+                            </button>
                           </div>
                         </div>
                       ))}

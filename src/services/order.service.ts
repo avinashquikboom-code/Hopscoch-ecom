@@ -192,13 +192,13 @@ export const orderService = {
 
   /** Get invoice URL for printing / downloading */
   getInvoiceUrl(id: string): string {
-    const numericId = id.replace(/\D/g, '') || id;
-    return `${API_BASE}/api/v1/web/orders/${numericId}/invoice`;
+    const cleanId = encodeURIComponent(String(id || '').trim());
+    return `${API_BASE}/api/v1/web/orders/${cleanId}/invoice`;
   },
 
   /** Trigger download / print window for order invoice */
   downloadInvoice(id: string): void {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && id) {
       const url = this.getInvoiceUrl(id);
       window.open(url, '_blank');
     }

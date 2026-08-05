@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Package, MapPin, ArrowRight, ShoppingBag, Share2, Download, ChevronRight } from 'lucide-react';
+import { orderService } from '@/services';
 
 // Confetti particle component
 function ConfettiParticle({ delay, x, color }: { delay: number; x: number; color: string }) {
@@ -155,7 +156,10 @@ function OrderSuccessContent() {
               <Share2 className="w-3.5 h-3.5" /> Share
             </button>
             <span className="text-[#E2E8F0]">|</span>
-            <button className="flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#0F766E] transition-colors">
+            <button
+              onClick={() => orderService.downloadInvoice(orderId || rawId)}
+              className="flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#0F766E] transition-colors"
+            >
               <Download className="w-3.5 h-3.5" /> Download Invoice
             </button>
             <span className="text-[#E2E8F0]">|</span>
