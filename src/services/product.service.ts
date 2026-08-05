@@ -1,6 +1,7 @@
 import { Product, Category, Review, ProductFilters, PaginatedResponse } from '@/types';
 import { PAGINATION, API_BASE } from '@/constants';
 import { resolveImageUrl } from '@/lib/utils';
+import { fetchWithAuth } from '@/lib/api-client';
 
 function delay(ms = 300) {
   return new Promise((res) => setTimeout(res, ms));
@@ -389,13 +390,8 @@ export const productService = {
   },
 
   async addReview(productId: string, review: { rating: number; title?: string; comment?: string; orderId?: number }): Promise<Review> {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const res = await fetch(`${API_BASE}/api/v1/web/products/${productId}/reviews`, {
+    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/products/${productId}/reviews`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
       body: JSON.stringify(review),
     });
 
