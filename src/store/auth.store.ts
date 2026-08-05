@@ -36,6 +36,14 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: true,
           isLoading: false,
         });
+        if (typeof window !== 'undefined' && authResponse.token) {
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, authResponse.token);
+          localStorage.setItem('auth_token', authResponse.token);
+          if ((authResponse as any).refreshToken) {
+            localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, (authResponse as any).refreshToken);
+            localStorage.setItem('refresh_token', (authResponse as any).refreshToken);
+          }
+        }
       },
 
       setUser: (user: User) => {
@@ -52,6 +60,8 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== 'undefined') {
           localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
         }
       },
 

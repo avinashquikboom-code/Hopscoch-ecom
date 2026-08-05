@@ -1,11 +1,26 @@
 import { API_BASE, STORAGE_KEYS } from '@/constants';
+import { useAuthStore } from '@/store/auth.store';
 
 /**
  * Reads a valid auth token from localStorage, filtering out undefined/null/mock strings.
+ * Falls back to Zustand's user_data key if needed.
  */
 export function getValidToken(): string | null {
   if (typeof window === 'undefined') return null;
-  const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) || localStorage.getItem('auth_token');
+  let token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) || localStorage.getItem('auth_token');
+
+  if (!token) {
+    try {
+      const userDataStr = localStorage.getItem(STORAGE_KEYS.USER_DATA) || localStorage.getItem('user_data');
+      if (userDataStr) {
+        const parsed = JSON.parse(userDataStr);
+        token = parsed?.state?.token || parsed?.token || null;
+      }
+    } catch {
+      // Ignore JSON parse errors
+    }
+  }
+
   if (!token || token === 'undefined' || token === 'null' || token.trim() === '' || token.startsWith('mock_token_')) {
     return null;
   }
@@ -14,10 +29,24 @@ export function getValidToken(): string | null {
 
 /**
  * Reads a valid refresh token from localStorage.
+ * Falls back to Zustand's user_data key if needed.
  */
 export function getValidRefreshToken(): string | null {
   if (typeof window === 'undefined') return null;
-  const token = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN) || localStorage.getItem('refresh_token');
+  let token = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN) || localStorage.getItem('refresh_token');
+
+  if (!token) {
+    try {
+      const userDataStr = localStorage.getItem(STORAGE_KEYS.USER_DATA) || localStorage.getItem('user_data');
+      if (userDataStr) {
+        const parsed = JSON.parse(userDataStr);
+        token = parsed?.state?.refreshToken || parsed?.state?.refresh_token || parsed?.refreshToken || null;
+      }
+    } catch {
+      // Ignore JSON parse errors
+    }
+  }
+
   if (!token || token === 'undefined' || token === 'null' || token.trim() === '' || token.startsWith('mock_token_')) {
     return null;
   }
@@ -52,17 +81,28 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}): Pro
         const refreshRes = await fetch(`${API_BASE}/api/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken }),
+          body: JSON.stringify({ refreshToken, deviceType: 'web' }),
         });
 
         if (refreshRes.ok) {
           const refreshJson = await refreshRes.json();
           const data = refreshJson.data ?? refreshJson;
           const newToken = data.accessToken || data.token;
+          const newRefreshToken = data.refreshToken;
+
           if (newToken) {
             localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, newToken);
             localStorage.setItem('auth_token', newToken);
-            
+
+            if (newRefreshToken) {
+              localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
+              localStorage.setItem('refresh_token', newRefreshToken);
+            }
+
+            try {
+              useAuthStore.setState({ token: newToken });
+            } catch {}
+
             // Retry original request with newly acquired access token
             const retryHeaders = {
               ...headers,

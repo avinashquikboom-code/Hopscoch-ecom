@@ -6,11 +6,7 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle, Clock, Truck, Package, MapPin, Copy, Check, ExternalLink } from 'lucide-react';
 
 import { API_BASE } from '@/constants';
-
-function authHeaders(): HeadersInit {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-  return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
-}
+import { fetchWithAuth } from '@/lib/api-client';
 
 export default function TrackOrderPage() {
   const params = useParams();
@@ -24,9 +20,8 @@ export default function TrackOrderPage() {
     status: 'PROCESSING',
     trackingUrl: null,
     steps: [
-      { id: 0, label: 'Order Placed', time: '', detail: 'Order placed successfully', done: true },
-      { id: 1, label: 'Order Confirmed', time: '', detail: 'Confirming your order', done: true },
-      { id: 2, label: 'Packed & Dispatched', time: '', detail: 'Packing your order', done: false },
+      { id: 1, label: 'Order Placed', time: '', detail: 'Received & verified', done: true },
+      { id: 2, label: 'Packed', time: '', detail: 'Quality check completed', done: false },
       { id: 3, label: 'In Transit', time: '', detail: 'Courier in transit', done: false },
       { id: 4, label: 'Out for Delivery', time: '', detail: 'Delivery agent will be assigned', done: false },
       { id: 5, label: 'Delivered', time: '', detail: 'Estimated delivery', done: false },
@@ -37,7 +32,7 @@ export default function TrackOrderPage() {
     async function getTracking() {
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/api/v1/web/shipping/track/${cleanId}`, { headers: authHeaders() });
+        const res = await fetchWithAuth(`${API_BASE}/api/v1/web/shipping/track/${cleanId}`);
         const json = await res.json();
         
         if (res.ok && json.data) {

@@ -221,9 +221,8 @@ export default function CheckoutPage() {
     // Save address for future use if selectedAddressId === 'new' and save checkbox is true
     if (selectedAddressId === 'new' && saveAddressForFuture && firstName && streetAddress && city) {
       try {
-        await fetch(`${API_BASE}/api/v1/web/addresses`, {
+        await fetchWithAuth(`${API_BASE}/api/v1/web/addresses`, {
           method: 'POST',
-          headers: authHeaders(),
           body: JSON.stringify({
             fullName: `${firstName} ${lastName}`.trim(),
             phone,
@@ -261,9 +260,8 @@ export default function CheckoutPage() {
     };
 
     try {
-      const orderRes = await fetch(`${API_BASE}/api/v1/web/orders`, {
+      const orderRes = await fetchWithAuth(`${API_BASE}/api/v1/web/orders`, {
         method: 'POST',
-        headers: authHeaders(),
         body: JSON.stringify(payload),
       });
 
@@ -288,14 +286,13 @@ export default function CheckoutPage() {
 
       // Online / Razorpay Flow
       try {
-        const configRes = await fetch(`${API_BASE}/api/v1/web/payments/config`, { headers: authHeaders() });
+        const configRes = await fetchWithAuth(`${API_BASE}/api/v1/web/payments/config`);
         const configJson = await configRes.json();
         
         if (configRes.ok && configJson.data?.keyId) {
           const keyId = configJson.data.keyId;
-          const rzpOrderRes = await fetch(`${API_BASE}/api/v1/web/payments/order`, {
+          const rzpOrderRes = await fetchWithAuth(`${API_BASE}/api/v1/web/payments/order`, {
             method: 'POST',
-            headers: authHeaders(),
             body: JSON.stringify({ orderId: createdOrder.id }),
           });
 
@@ -310,9 +307,8 @@ export default function CheckoutPage() {
               description: `Order ${createdOrder.orderNumber}`,
               order_id: razorpayOrderId,
               handler: async function (response: any) {
-                await fetch(`${API_BASE}/api/v1/web/payments/verify`, {
+                await fetchWithAuth(`${API_BASE}/api/v1/web/payments/verify`, {
                   method: 'POST',
-                  headers: authHeaders(),
                   body: JSON.stringify({
                     razorpayOrderId: response.razorpay_order_id,
                     razorpayPaymentId: response.razorpay_payment_id,

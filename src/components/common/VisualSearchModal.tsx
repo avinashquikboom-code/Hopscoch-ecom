@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Camera, X, Upload, Sparkles, Loader2, ImageIcon, AlertCircle, CheckCircle2, Search } from 'lucide-react';
 import { API_BASE } from '@/constants';
+import { fetchWithAuth } from '@/lib/api-client';
 
 interface VisualSearchResult {
   extractedAttributes: {
@@ -83,12 +84,8 @@ export function VisualSearchModal({ isOpen, onClose, onResultsReady }: Props) {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/api/v1/web/search/visual`, {
+      const res = await fetchWithAuth(`${API_BASE}/api/v1/web/search/visual`, {
         method: 'POST',
-        headers,
         body: formData,
       });
       const json = await res.json();
