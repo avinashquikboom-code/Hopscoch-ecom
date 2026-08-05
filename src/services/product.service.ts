@@ -200,7 +200,10 @@ export const productService = {
 
       const queryString = params.toString();
       const url = `${API_BASE}/api/v1/web/products${queryString ? `?${queryString}` : ''}`;
-      const res = await fetch(url);
+      let res = await fetch(url);
+      if (!res.ok) {
+        res = await fetch(`${API_BASE}/api/products${queryString ? `?${queryString}` : ''}`);
+      }
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch products');
 
@@ -233,7 +236,10 @@ export const productService = {
 
   async getProductById(id: string): Promise<Product> {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/web/products/${id}`);
+      let res = await fetch(`${API_BASE}/api/v1/web/products/${id}`);
+      if (!res.ok) {
+        res = await fetch(`${API_BASE}/api/products/${id}`);
+      }
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Product not found');
       if (json.data) {
@@ -321,7 +327,10 @@ export const productService = {
 
   async getCategories(): Promise<Category[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/web/categories`);
+      let res = await fetch(`${API_BASE}/api/v1/web/categories`);
+      if (!res.ok) {
+        res = await fetch(`${API_BASE}/api/categories`);
+      }
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch categories');
       const raw = json.data ?? json ?? [];
