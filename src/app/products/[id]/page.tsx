@@ -1,6 +1,6 @@
 'use client';
 
-import { useProducts, useProduct } from '@/hooks/use-products';
+import { useProducts, useProduct, useProductReviews, useAddReview } from '@/hooks/use-products';
 import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,27 +10,12 @@ import {
   Heart, Share2, Star, ChevronRight, Tag, MapPin, Truck,
   HelpCircle, X, Check, ShieldCheck, RotateCcw,
   ChevronDown, ChevronUp, Package, Clock, CreditCard,
-  BadgeCheck, MessageSquare, ThumbsUp, Download, ZoomIn,
+  BadgeCheck, MessageSquare, ThumbsUp, Download, ZoomIn, Loader2, AlertCircle
 } from 'lucide-react';
 import { useAddToCart, useAddToWishlist, useRemoveFromWishlist } from '@/hooks';
 import { useWishlistStore, useAuthStore, useLocationStore } from '@/store';
 import { toast } from '@/components/ui/toast';
 import { getColorCode } from '@/services/product.service';
-
-/* ── Static mock reviews (no review API call on PDP) ── */
-const MOCK_REVIEWS = [
-  { id: 'r1', user: 'Priya S.', rating: 5, title: 'Excellent quality!', comment: 'Absolutely premium quality! Worth every rupee. Material is luxurious and the fit is perfect.', date: '12 Jun, 2026', certified: true, helpful: 24 },
-  { id: 'r2', user: 'Rahul M.', rating: 4, title: 'Great product, fast delivery', comment: 'Great fit and finish. Delivery was fast too. The colour is exactly as shown in the pictures.', date: '2 May, 2026', certified: true, helpful: 10 },
-  { id: 'r3', user: 'Ananya K.', rating: 5, title: 'Exceeded expectations!', comment: 'Loved the packaging and quality exceeded expectations! Will buy again.', date: '20 Apr, 2026', certified: false, helpful: 18 },
-];
-
-const RATING_DIST = [
-  { label: '5', pct: 75, color: '#26a541' },
-  { label: '4', pct: 15, color: '#26a541' },
-  { label: '3', pct: 5,  color: '#ff9f00' },
-  { label: '2', pct: 3,  color: '#ff6161' },
-  { label: '1', pct: 2,  color: '#ff6161' },
-];
 
 export default function ProductDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -38,7 +23,12 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
   const { data: product, isLoading, isError } = useProduct(id);
   const { data: productsData } = useProducts();
+  const { data: reviewsData, isLoading: isReviewsLoading } = useProductReviews(id, 1, 50);
+  const addReviewMutation = useAddReview();
+
   const relatedProducts = productsData?.data || [];
+  const reviewsList = reviewsData?.data || [];
+  const totalReviewsCount = reviewsData?.total || reviewsList.length;
 
   const { pincode: defaultPincode, city: defaultCity } = useLocationStore();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -55,6 +45,14 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const [zoom, setZoom]                   = useState(false);
   const [zoomXY, setZoomXY]              = useState({ x: 50, y: 50 });
 
+  // ── Review submission modal state ──
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewRating, setReviewRating]           = useState(5);
+  const [reviewHoverRating, setReviewHoverRating] = useState(0);
+  const [reviewTitle, setReviewTitle]             = useState('');
+  const [reviewComment, setReviewComment]         = useState('');
+  const [submitError, setSubmitError]             = useState<string | null>(null);
+
   const addToCart    = useAddToCart();
   const addWishlist  = useAddToWishlist();
   const removeWishlist = useRemoveFromWishlist();
@@ -68,6 +66,14 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       setSelectedColor(product.colors?.[0] || '');
     }
   }, [product]);
+
+  // ── Dynamic Rating Distribution ──
+  const ratingDist = [5, 4, 3, 2, 1].map((stars) => {
+    const count = reviewsList.filter((r) => Math.round(r.rating) === stars).length;
+    const pct = totalReviewsCount > 0 ? Math.round((count / totalReviewsCount) * 100) : 0;
+    const color = stars >= 4 ? '#26a541' : stars === 3 ? '#ff9f00' : '#ff6161';
+    return { label: String(stars), count, pct, color };
+  });
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) return (
@@ -99,7 +105,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       v.color?.toLowerCase() === selectedColor.toLowerCase()
     );
 
-  // ── Handlers (logic unchanged) ───────────────────────────────────────────
+  // ── Handlers ───────────────────────────────────────────────────────────
   const doAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     setFlyStyle({
       position: 'fixed', zIndex: 9999, pointerEvents: 'none',
@@ -145,6 +151,46 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     toast.success('Image saved!');
   };
 
+  const handleOpenRateModal = () => {
+    if (!isAuth) {
+      toast.info('Please sign in to rate this product');
+      openLogin();
+      return;
+    }
+    setSubmitError(null);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError(null);
+
+    addReviewMutation.mutate(
+      {
+        productId: product.id,
+        review: {
+          rating: reviewRating,
+          title: reviewTitle.trim() || undefined,
+          comment: reviewComment.trim() || undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success('Review submitted successfully!');
+          setIsReviewModalOpen(false);
+          setReviewTitle('');
+          setReviewComment('');
+          setReviewRating(5);
+        },
+        onError: (err: any) => {
+          const errMsg = err.message || 'Failed to submit review';
+          setSubmitError(errMsg);
+          toast.error(errMsg);
+        },
+      }
+    );
+  };
+
   const specEntries = Object.entries({
     'Brand':             product.brand || 'FCISeller',
     'Material':          'Premium Cotton Blend',
@@ -182,9 +228,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
         {/* TOP PRODUCT ROW */}
         <div className="flex flex-col lg:flex-row gap-3">
 
-          {/* ╔══════════════════════════════════════════╗
-              ║  LEFT — IMAGE GALLERY (Flipkart exact)  ║
-              ╚══════════════════════════════════════════╝ */}
+          {/* LEFT — IMAGE GALLERY */}
           <div className="w-full lg:w-[40%] xl:w-[38%] flex-shrink-0">
             <div className="lg:sticky lg:top-[68px] space-y-2">
 
@@ -193,73 +237,73 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
                 {/* Main image */}
                 <div className="relative">
-                    {/* Wishlist + Share — top right overlay */}
-                    <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
-                      <button
-                        onClick={doWishlist}
-                        className={`w-9 h-9 bg-white shadow border flex items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                          isInWishlist ? 'text-red-500 border-red-200' : 'text-[#878787] border-[#e0e0e0] hover:text-red-400'
-                        }`}
-                      >
-                        <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
-                      </button>
-                      <button
-                        onClick={() => setShareOpen(!shareOpen)}
-                        className="w-9 h-9 bg-white shadow border border-[#e0e0e0] text-[#878787] flex items-center justify-center cursor-pointer hover:text-[#0d9488] transition-all hover:scale-105"
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                  {/* Wishlist + Share — top right overlay */}
+                  <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
+                    <button
+                      onClick={doWishlist}
+                      className={`w-9 h-9 bg-white shadow border flex items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                        isInWishlist ? 'text-red-500 border-red-200' : 'text-[#878787] border-[#e0e0e0] hover:text-red-400'
+                      }`}
+                    >
+                      <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                    </button>
+                    <button
+                      onClick={() => setShareOpen(!shareOpen)}
+                      className="w-9 h-9 bg-white shadow border border-[#e0e0e0] text-[#878787] flex items-center justify-center cursor-pointer hover:text-[#0d9488] transition-all hover:scale-105"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
+                  </div>
 
-                    {/* Share dropdown */}
-                    {shareOpen && (
-                      <div className="absolute top-3 right-14 z-30 bg-white border border-[#e0e0e0] shadow-lg p-3 w-52 animate-in fade-in slide-in-from-top-1 duration-150">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-[11px] font-bold text-[#212121] uppercase">Share</span>
-                          <button onClick={() => setShareOpen(false)} className="text-[#878787] cursor-pointer border-none bg-transparent"><X className="w-3.5 h-3.5" /></button>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(product.name + ' ' + window.location.href)}`)} className="flex items-center gap-1 px-2 py-1 bg-[#25d366] text-white text-[11px] font-bold cursor-pointer border-none">WhatsApp</button>
-                          <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied!'); setShareOpen(false); }} className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-[#212121] text-[11px] font-bold cursor-pointer border-none">Copy Link</button>
-                          <button onClick={doDownload} className="flex items-center gap-1 px-2 py-1 bg-teal-50 text-[#0d9488] text-[11px] font-bold cursor-pointer border border-teal-200"><Download className="w-3 h-3" /> Save</button>
-                        </div>
+                  {/* Share dropdown */}
+                  {shareOpen && (
+                    <div className="absolute top-3 right-14 z-30 bg-white border border-[#e0e0e0] shadow-lg p-3 w-52 animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-[11px] font-bold text-[#212121] uppercase">Share</span>
+                        <button onClick={() => setShareOpen(false)} className="text-[#878787] cursor-pointer border-none bg-transparent"><X className="w-3.5 h-3.5" /></button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(product.name + ' ' + window.location.href)}`)} className="flex items-center gap-1 px-2 py-1 bg-[#25d366] text-white text-[11px] font-bold cursor-pointer border-none">WhatsApp</button>
+                        <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied!'); setShareOpen(false); }} className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-[#212121] text-[11px] font-bold cursor-pointer border-none">Copy Link</button>
+                        <button onClick={doDownload} className="flex items-center gap-1 px-2 py-1 bg-teal-50 text-[#0d9488] text-[11px] font-bold cursor-pointer border border-teal-200"><Download className="w-3 h-3" /> Save</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Main image with zoom */}
+                  <div
+                    className="relative overflow-hidden cursor-zoom-in"
+                    style={{ aspectRatio: '5/6' }}
+                    onMouseMove={doMouseMove}
+                    onMouseLeave={() => setZoom(false)}
+                  >
+                    <img
+                      src={product.images[selectedImage]}
+                      alt={product.name}
+                      className="w-full h-full object-cover object-top"
+                      style={zoom ? { transform: 'scale(2)', transformOrigin: `${zoomXY.x}% ${zoomXY.y}%`, transition: 'transform 0.1s' } : { transition: 'transform 0.3s' }}
+                    />
+                    {discount > 0 && (
+                      <div className="absolute top-0 left-0 bg-[#26a541] text-white text-[11px] font-bold px-2 py-0.5">
+                        {discount}% OFF
                       </div>
                     )}
+                    {!zoom && (
+                      <div className="absolute bottom-2 left-2 bg-black/40 text-white text-[10px] px-2 py-0.5 flex items-center gap-1 rounded-sm backdrop-blur-sm">
+                        <ZoomIn className="w-2.5 h-2.5" /> Hover to zoom
+                      </div>
+                    )}
+                  </div>
 
-                    {/* Main image with zoom */}
-                    <div
-                      className="relative overflow-hidden cursor-zoom-in"
-                      style={{ aspectRatio: '5/6' }}
-                      onMouseMove={doMouseMove}
-                      onMouseLeave={() => setZoom(false)}
-                    >
-                      <img
-                        src={product.images[selectedImage]}
-                        alt={product.name}
-                        className="w-full h-full object-cover object-top"
-                        style={zoom ? { transform: 'scale(2)', transformOrigin: `${zoomXY.x}% ${zoomXY.y}%`, transition: 'transform 0.1s' } : { transition: 'transform 0.3s' }}
-                      />
-                      {discount > 0 && (
-                        <div className="absolute top-0 left-0 bg-[#26a541] text-white text-[11px] font-bold px-2 py-0.5">
-                          {discount}% OFF
-                        </div>
-                      )}
-                      {!zoom && (
-                        <div className="absolute bottom-2 left-2 bg-black/40 text-white text-[10px] px-2 py-0.5 flex items-center gap-1 rounded-sm backdrop-blur-sm">
-                          <ZoomIn className="w-2.5 h-2.5" /> Hover to zoom
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Mobile thumbnails */}
-                    <div className="sm:hidden flex gap-2 p-2 overflow-x-auto border-t border-[#f0f0f0]">
-                      {product.images.map((img, i) => (
-                        <button key={i} onClick={() => setSelectedImage(i)}
-                          className={`flex-shrink-0 w-11 h-[52px] border overflow-hidden cursor-pointer ${selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0]'}`}>
-                          <img src={img} alt="" className="w-full h-full object-cover object-top" />
-                        </button>
-                      ))}
-                    </div>
+                  {/* Mobile thumbnails */}
+                  <div className="sm:hidden flex gap-2 p-2 overflow-x-auto border-t border-[#f0f0f0]">
+                    {product.images.map((img, i) => (
+                      <button key={i} onClick={() => setSelectedImage(i)}
+                        className={`flex-shrink-0 w-11 h-[52px] border overflow-hidden cursor-pointer ${selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0]'}`}>
+                        <img src={img} alt="" className="w-full h-full object-cover object-top" />
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Colour image strip (variant selector with image thumbnails) */}
@@ -294,7 +338,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                   </div>
                 )}
 
-                {/* ── ADD TO CART + BUY NOW ── */}
+                {/* ADD TO CART + BUY NOW */}
                 <div className="border-t border-[#f0f0f0] grid grid-cols-2">
                   <button
                     onClick={doAddToCart}
@@ -321,7 +365,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] text-[#0d9488] font-semibold cursor-pointer hover:underline">{product.brand || 'FCISeller'} Official</span>
                   <span className="flex items-center gap-0.5 bg-[#26a541] text-white text-[11px] font-bold px-1.5 py-0.5">
-                    4.7 <Star className="w-2.5 h-2.5 fill-current ml-0.5" />
+                    {(product.rating || 0).toFixed(1)} <Star className="w-2.5 h-2.5 fill-current ml-0.5" />
                   </span>
                 </div>
                 <div className="grid grid-cols-3 mt-3 pt-3 border-t border-[#f0f0f0] gap-2">
@@ -341,12 +385,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          {/* ╔══════════════════════════════════════════╗
-              ║  RIGHT — PRODUCT INFO                   ║
-              ╚══════════════════════════════════════════╝ */}
+          {/* RIGHT — PRODUCT INFO */}
           <div className="flex-1 min-w-0 space-y-3">
 
-            {/* ── TITLE + RATING CARD ── */}
+            {/* TITLE + RATING CARD */}
             <div className="bg-white border border-[#efefef] px-4 sm:px-5 pt-4 pb-0">
 
               {/* Brand */}
@@ -361,10 +403,10 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               <div className="flex items-center gap-3 flex-wrap pb-3 border-b border-[#f0f0f0]">
                 <div className="flex items-center gap-1.5">
                   <span className="flex items-center gap-1 bg-[#26a541] text-white text-[12px] font-bold px-2 py-0.5">
-                    {product.rating.toFixed(1)} <Star className="w-3 h-3 fill-current" />
+                    {(product.rating || 0).toFixed(1)} <Star className="w-3 h-3 fill-current" />
                   </span>
                   <span className="text-[12px] text-[#878787]">
-                    {product.reviewCount.toLocaleString()} Ratings &amp; {Math.max(product.reviewCount - 12, 8)} Reviews
+                    {(product.reviewCount || 0).toLocaleString()} Ratings &amp; {totalReviewsCount.toLocaleString()} Reviews
                   </span>
                 </div>
                 <span className="flex items-center gap-1 border border-[#0d9488]/50 text-[#0d9488] text-[10px] font-bold px-1.5 py-0.5 italic">
@@ -372,7 +414,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </span>
               </div>
 
-              {/* ── PRICE ── */}
+              {/* PRICE */}
               <div className="py-3 border-b border-[#f0f0f0]">
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span style={{ fontSize: 28, fontWeight: 700, color: '#212121' }}>₹{product.price.toLocaleString()}</span>
@@ -391,7 +433,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </p>
               </div>
 
-              {/* ── OFFERS ── */}
+              {/* OFFERS */}
               <div className="py-3 border-b border-[#f0f0f0]">
                 <p className="text-[13px] font-bold text-[#212121] mb-2">Available Offers</p>
                 <div className="space-y-2">
@@ -409,7 +451,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              {/* ── SIZE SELECTOR ── */}
+              {/* SIZE SELECTOR */}
               {product.sizes && product.sizes.length > 0 && (
                 <div className="py-3 border-b border-[#f0f0f0]">
                   <div className="flex items-center justify-between mb-2.5">
@@ -442,7 +484,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </div>
               )}
 
-              {/* ── DELIVERY CHECKER ── */}
+              {/* DELIVERY CHECKER */}
               <div className="py-3 border-b border-[#f0f0f0]">
                 <div className="flex items-center gap-1.5 mb-2">
                   <MapPin className="w-3.5 h-3.5 text-[#212121]" />
@@ -465,7 +507,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 )}
               </div>
 
-              {/* ── DESCRIPTION ── */}
+              {/* DESCRIPTION */}
               <div className="py-3">
                 <p className="text-[13px] font-bold text-[#212121] mb-1.5">Description</p>
                 <div className={`relative overflow-hidden transition-all ${descOpen ? '' : 'max-h-[72px]'}`}>
@@ -479,7 +521,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
             </div>
 
-            {/* ── SPECIFICATIONS ── */}
+            {/* SPECIFICATIONS */}
             <div className="bg-white border border-[#efefef] px-4 sm:px-5 py-4">
               <p className="text-[15px] font-bold text-[#212121] mb-3">Specifications</p>
               <div className="divide-y divide-[#f0f0f0]">
@@ -497,28 +539,31 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               )}
             </div>
 
-            {/* ── RATINGS & REVIEWS ── */}
+            {/* DYNAMIC RATINGS & REVIEWS SECTION */}
             <div className="bg-white border border-[#efefef] px-4 sm:px-5 py-4">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-[15px] font-bold text-[#212121]">Ratings &amp; Reviews</p>
-                <button className="text-[12px] text-[#0d9488] font-bold border border-[#0d9488] px-3 py-1.5 hover:bg-[#0d9488]/5 cursor-pointer transition-colors">
+                <button
+                  onClick={handleOpenRateModal}
+                  className="text-[12px] text-[#0d9488] font-bold border border-[#0d9488] px-3 py-1.5 hover:bg-[#0d9488]/5 cursor-pointer transition-colors"
+                >
                   Rate Product
                 </button>
               </div>
 
-              {/* Summary */}
+              {/* Dynamic Summary */}
               <div className="flex items-center gap-8 mb-5">
                 <div className="text-center flex-shrink-0">
-                  <p className="text-[42px] font-bold text-[#212121] leading-none">{product.rating.toFixed(1)}</p>
+                  <p className="text-[42px] font-bold text-[#212121] leading-none">{(product.rating || 0).toFixed(1)}</p>
                   <div className="flex gap-0.5 justify-center my-1.5">
-                    {[1,2,3,4,5].map(s => (
-                      <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(product.rating) ? 'fill-[#26a541] text-[#26a541]' : 'fill-[#e0e0e0] text-[#e0e0e0]'}`} />
+                    {[1, 2, 3, 4, 5].map(s => (
+                      <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(product.rating || 0) ? 'fill-[#26a541] text-[#26a541]' : 'fill-[#e0e0e0] text-[#e0e0e0]'}`} />
                     ))}
                   </div>
-                  <p className="text-[11px] text-[#878787]">{product.reviewCount.toLocaleString()} ratings</p>
+                  <p className="text-[11px] text-[#878787]">{(product.reviewCount || totalReviewsCount).toLocaleString()} ratings &amp; reviews</p>
                 </div>
                 <div className="flex-1 space-y-1.5">
-                  {RATING_DIST.map(({ label, pct, color }) => (
+                  {ratingDist.map(({ label, pct, color }) => (
                     <div key={label} className="flex items-center gap-2">
                       <span className="text-[11px] text-[#878787] w-3 text-right flex-shrink-0">{label}</span>
                       <Star className="w-3 h-3 fill-[#878787] text-[#878787] flex-shrink-0" />
@@ -531,46 +576,69 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                 </div>
               </div>
 
-              {/* Review list */}
-              <div className="divide-y divide-[#f0f0f0]">
-                {(showAllReviews ? MOCK_REVIEWS : MOCK_REVIEWS.slice(0, 2)).map((r) => (
-                  <div key={r.id} className="py-4">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className={`flex items-center gap-0.5 text-white text-[11px] font-bold px-1.5 py-0.5 ${r.rating >= 4 ? 'bg-[#26a541]' : r.rating === 3 ? 'bg-[#ff9f00]' : 'bg-[#ff6161]'}`}>
-                        {r.rating} <Star className="w-2.5 h-2.5 fill-current" />
-                      </span>
-                      <span className="text-[13px] font-bold text-[#212121]">{r.title}</span>
-                    </div>
-                    <p className="text-[13px] text-[#212121] mb-2 leading-relaxed">{r.comment}</p>
-                    <div className="flex items-center gap-3 text-[11px] text-[#878787]">
-                      <span className="font-semibold text-[#212121]">{r.user}</span>
-                      {r.certified && (
-                        <span className="flex items-center gap-0.5 text-[#26a541] font-semibold">
-                          <Check className="w-3 h-3" /> Certified Buyer
-                        </span>
-                      )}
-                      <span>{r.date}</span>
-                    </div>
-                    <div className="flex gap-4 mt-2">
-                      <button className="text-[11px] text-[#878787] flex items-center gap-1 cursor-pointer border-none bg-transparent hover:text-[#212121]">
-                        <ThumbsUp className="w-3 h-3" /> {r.helpful} Helpful
-                      </button>
-                      <button className="text-[11px] text-[#878787] flex items-center gap-1 cursor-pointer border-none bg-transparent hover:text-[#212121]">
-                        <MessageSquare className="w-3 h-3" /> Comment
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {/* Dynamic Review List */}
+              {isReviewsLoading ? (
+                <div className="py-8 text-center text-[#878787] text-xs flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#0d9488]" /> Loading reviews...
+                </div>
+              ) : reviewsList.length === 0 ? (
+                <div className="py-8 text-center border-t border-[#f0f0f0]">
+                  <p className="text-[13px] text-[#212121] font-semibold mb-1">No reviews yet</p>
+                  <p className="text-[12px] text-[#878787] mb-3">Be the first to rate and review this product!</p>
+                  <button
+                    onClick={handleOpenRateModal}
+                    className="text-[12px] bg-[#0d9488] text-white font-bold px-4 py-2 hover:bg-[#0b7a70] transition-colors"
+                  >
+                    Write a Review
+                  </button>
+                </div>
+              ) : (
+                <div className="divide-y divide-[#f0f0f0]">
+                  {(showAllReviews ? reviewsList : reviewsList.slice(0, 3)).map((r) => {
+                    const userName = r.user?.firstName
+                      ? `${r.user.firstName} ${r.user.lastName || ''}`.trim()
+                      : 'Customer';
+                    const dateStr = new Date(r.createdAt).toLocaleDateString('en-IN', {
+                      day: 'numeric', month: 'short', year: 'numeric'
+                    });
 
-              {MOCK_REVIEWS.length > 2 && (
+                    return (
+                      <div key={r.id} className="py-4">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className={`flex items-center gap-0.5 text-white text-[11px] font-bold px-1.5 py-0.5 ${r.rating >= 4 ? 'bg-[#26a541]' : r.rating === 3 ? 'bg-[#ff9f00]' : 'bg-[#ff6161]'}`}>
+                            {r.rating} <Star className="w-2.5 h-2.5 fill-current" />
+                          </span>
+                          {r.title && <span className="text-[13px] font-bold text-[#212121]">{r.title}</span>}
+                        </div>
+                        {r.comment && <p className="text-[13px] text-[#212121] mb-2 leading-relaxed">{r.comment}</p>}
+                        <div className="flex items-center gap-3 text-[11px] text-[#878787]">
+                          <span className="font-semibold text-[#212121]">{userName}</span>
+                          {r.isVerifiedPurchase && (
+                            <span className="flex items-center gap-0.5 text-[#26a541] font-semibold">
+                              <Check className="w-3 h-3" /> Certified Buyer
+                            </span>
+                          )}
+                          <span>{dateStr}</span>
+                        </div>
+                        <div className="flex gap-4 mt-2">
+                          <button className="text-[11px] text-[#878787] flex items-center gap-1 cursor-pointer border-none bg-transparent hover:text-[#212121]">
+                            <ThumbsUp className="w-3 h-3" /> {r.helpfulCount || 0} Helpful
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {reviewsList.length > 3 && (
                 <button onClick={() => setShowAllReviews(!showAllReviews)} className="w-full mt-3 py-2.5 border border-[#0d9488] text-[#0d9488] font-bold text-[13px] hover:bg-[#0d9488]/5 cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-                  {showAllReviews ? <><ChevronUp className="w-4 h-4" /> Show less</> : <>View all {MOCK_REVIEWS.length} reviews <ChevronDown className="w-4 h-4" /></>}
+                  {showAllReviews ? <><ChevronUp className="w-4 h-4" /> Show less</> : <>View all {reviewsList.length} reviews <ChevronDown className="w-4 h-4" /></>}
                 </button>
               )}
             </div>
 
-            {/* ── Q&A ── */}
+            {/* Q&A */}
             <div className="bg-white border border-[#efefef] px-4 sm:px-5 py-4">
               <p className="text-[15px] font-bold text-[#212121] mb-3 flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-[#878787]" /> Questions &amp; Answers
@@ -593,7 +661,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
 
-            {/* ── PAYMENT ── */}
+            {/* PAYMENT */}
             <div className="bg-white border border-[#efefef] px-4 sm:px-5 py-4">
               <p className="text-[15px] font-bold text-[#212121] mb-3 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-[#878787]" /> Payment &amp; EMI Options
@@ -610,7 +678,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
 
-        {/* ═══════════ RELATED PRODUCTS ═══════════ */}
+        {/* RELATED PRODUCTS */}
         {[
           { title: 'Frequently Bought Together', data: relatedProducts.slice(2, 6) },
           { title: 'Similar Products',           data: relatedProducts.slice(1, 5) },
@@ -629,6 +697,113 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
           </div>
         ))}
       </div>
+
+      {/* ═══════════ RATE PRODUCT / REVIEW SUBMISSION MODAL ═══════════ */}
+      {isReviewModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setIsReviewModalOpen(false)}>
+          <div className="bg-white w-full max-w-md shadow-2xl rounded-sm animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0]">
+              <p className="text-[15px] font-bold text-[#212121]">Write a Review</p>
+              <button onClick={() => setIsReviewModalOpen(false)} className="p-1 hover:bg-gray-100 cursor-pointer border-none">
+                <X className="w-5 h-5 text-[#878787]" />
+              </button>
+            </div>
+
+            <form onSubmit={handleReviewSubmit} className="p-5 space-y-4">
+              {/* Product Info */}
+              <div className="flex items-center gap-3 pb-3 border-b border-[#f0f0f0]">
+                <img src={product.images[0]} alt={product.name} className="w-12 h-14 object-cover object-top border border-[#e0e0e0]" />
+                <div>
+                  <p className="text-[11px] text-[#878787] uppercase font-bold">{product.brand || 'FCISeller'}</p>
+                  <p className="text-[13px] font-semibold text-[#212121] line-clamp-1">{product.name}</p>
+                </div>
+              </div>
+
+              {/* Star Rating Picker */}
+              <div>
+                <label className="block text-[12px] font-bold text-[#212121] mb-1.5">Rating</label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const active = (reviewHoverRating || reviewRating) >= star;
+                    return (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setReviewRating(star)}
+                        onMouseEnter={() => setReviewHoverRating(star)}
+                        onMouseLeave={() => setReviewHoverRating(0)}
+                        className="p-1 cursor-pointer border-none bg-transparent transition-transform hover:scale-110"
+                      >
+                        <Star className={`w-7 h-7 ${active ? 'fill-[#26a541] text-[#26a541]' : 'fill-[#e0e0e0] text-[#e0e0e0]'}`} />
+                      </button>
+                    );
+                  })}
+                  <span className="text-[13px] font-bold text-[#26a541] ml-2">
+                    {reviewHoverRating || reviewRating} / 5 Stars
+                  </span>
+                </div>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-[12px] font-bold text-[#212121] mb-1">Review Title</label>
+                <input
+                  type="text"
+                  value={reviewTitle}
+                  onChange={(e) => setReviewTitle(e.target.value)}
+                  placeholder="e.g. Excellent quality & perfect fit"
+                  className="w-full border border-[#c2c2c2] px-3 py-2 text-[13px] focus:outline-none focus:border-[#0d9488]"
+                />
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label className="block text-[12px] font-bold text-[#212121] mb-1">Review Details</label>
+                <textarea
+                  rows={4}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share details about the quality, material, sizing, or overall experience..."
+                  className="w-full border border-[#c2c2c2] px-3 py-2 text-[13px] focus:outline-none focus:border-[#0d9488] resize-none"
+                />
+              </div>
+
+              {/* Error Message Alert */}
+              {submitError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-sm text-[12px] flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className="flex-1 text-[13px] h-10 border-[#c2c2c2] text-[#212121]"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={addReviewMutation.isPending}
+                  className="flex-1 bg-[#0d9488] hover:bg-[#0b7a70] text-white font-bold text-[13px] h-10"
+                >
+                  {addReviewMutation.isPending ? (
+                    <span className="flex items-center gap-1">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Submitting...
+                    </span>
+                  ) : (
+                    'Submit Review'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════ SIZE CHART MODAL ═══════════ */}
       {sizeChart && (

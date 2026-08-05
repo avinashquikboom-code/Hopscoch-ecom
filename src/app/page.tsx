@@ -185,7 +185,7 @@ export default function Home() {
       {/* 1. Category Bar (Modern Floating Glass Track) */}
       <section className="mx-4 sm:mx-6 md:mx-12 my-6 rounded-2xl backdrop-blur-md bg-white/45 dark:bg-gray-950/40 border border-white/40 dark:border-white/5 py-4 px-6 shadow-md transition-all duration-300 relative z-10">
         <div className="container mx-auto">
-          <div className="flex items-center justify-between gap-4 overflow-x-auto scrollbar-hide py-1">
+          <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto scrollbar-hide py-1">
             {mockCategories.map((category) => (
               <Link
                 key={category.id}
