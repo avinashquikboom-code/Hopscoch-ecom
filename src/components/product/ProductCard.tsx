@@ -185,7 +185,7 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
           )}
 
           {/* Quick Add — slides up on hover */}
-          <div className={`absolute inset-x-0 bottom-0 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-md border-t border-gray-100 dark:border-neutral-900 py-3.5 px-3.5 flex flex-col gap-2.5 transition-transform duration-300 ease-out transform translate-y-full group-hover:translate-y-0 z-20`}>
+          <div className={`absolute inset-x-0 bottom-0 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-md border-t border-gray-100 dark:border-neutral-900 rounded-b-2xl py-3.5 px-3.5 flex flex-col gap-2.5 transition-transform duration-300 ease-out transform translate-y-full group-hover:translate-y-0 z-20`}>
             <div className="flex items-center justify-between text-[9px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-wider">
               <span>Quick Add</span>
               <span className="text-[#0d9488] flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> View Details</span>

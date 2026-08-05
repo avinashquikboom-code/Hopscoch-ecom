@@ -11,8 +11,9 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { MobileSearchOverlay } from '@/components/common/MobileSearchOverlay';
 import { VisualSearchModal } from '@/components/common/VisualSearchModal';
 import { LocationModal } from '@/components/common/LocationModal';
-import { useAuthStore, useCartStore, useThemeStore, useLocationStore } from '@/store';
+import { useAuthStore, useCartStore, useThemeStore, useLocationStore, useWishlistStore } from '@/store';
 import { useAddresses } from '@/hooks/use-addresses';
+import { useWishlist } from '@/hooks/use-wishlist';
 import { resolveAvatarUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -54,6 +55,9 @@ export function Header() {
   const { theme, setTheme } = useThemeStore();
   const { pincode, city, formattedLocation, isAutoDetected, setLocation, detectLocation } = useLocationStore();
   const { data: addresses = [] } = useAddresses();
+  useWishlist();
+  const wishlist = useWishlistStore((s) => s.wishlist);
+  const wishlistItemsCount = wishlist?.items?.length || 0;
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
@@ -459,8 +463,15 @@ export function Header() {
               whileHover={{ scale: 1.05, translateY: -1 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Link href="/wishlist" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
-                <Heart className="h-5 w-5" />
+              <Link href="/wishlist" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
+                <div className="relative">
+                  <Heart className="h-5 w-5" />
+                  {mounted && wishlistItemsCount > 0 && (
+                    <Badge className="absolute -top-1.5 -right-2 h-4 min-w-4 flex items-center justify-center p-0.5 bg-rose-500 text-white text-[8px] font-black rounded-full border border-white shadow-sm">
+                      {wishlistItemsCount}
+                    </Badge>
+                  )}
+                </div>
                 <span className="text-[10px] font-bold tracking-tight">Wishlist</span>
               </Link>
             </motion.div>
