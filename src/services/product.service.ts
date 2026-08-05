@@ -357,7 +357,7 @@ export const productService = {
     limit = 10
   ): Promise<PaginatedResponse<Review>> {
     try {
-      const res = await fetch(`${API_BASE}/api/web/products/${productId}/reviews?page=${page}&limit=${limit}`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products/${productId}/reviews?page=${page}&limit=${limit}`);
       if (res.ok) {
         const json = await res.json();
         const rawReviews = json.data?.reviews || json.data || json.reviews || [];
@@ -390,7 +390,7 @@ export const productService = {
 
   async addReview(productId: string, review: { rating: number; title?: string; comment?: string; orderId?: number }): Promise<Review> {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const res = await fetch(`${API_BASE}/api/web/products/${productId}/reviews`, {
+    const res = await fetch(`${API_BASE}/api/v1/web/products/${productId}/reviews`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
