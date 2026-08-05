@@ -114,16 +114,24 @@ export const authService = {
 
   async logout(): Promise<void> {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-      if (token) {
+      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) || localStorage.getItem('auth_token');
+      const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN) || localStorage.getItem('refresh_token');
+      if (token || refreshToken) {
         fetch(`${API_BASE}/api/auth/logout`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ refreshToken: refreshToken || '' }),
         }).catch(() => {});
       }
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
       localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user_data');
     }
   },
 

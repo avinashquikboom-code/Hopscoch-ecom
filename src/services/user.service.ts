@@ -1,30 +1,79 @@
-import { apiClient } from '@/lib/axios';
-import { API_ENDPOINTS } from '@/constants';
-import { Address, User } from '@/types';
+import { API_BASE, API_ENDPOINTS } from '@/constants';
+import { fetchWithAuth } from '@/lib/api-client';
+import { Address } from '@/types';
 
 export const userService = {
   async getAddresses(): Promise<Address[]> {
-    const res: any = await apiClient.get(API_ENDPOINTS.USER_ADDRESSES);
-    const list = res?.data ?? res ?? [];
-    return Array.isArray(list) ? list : [];
+    try {
+      let res = await fetchWithAuth(`${API_BASE}/api${API_ENDPOINTS.USER_ADDRESSES}`);
+      if (!res.ok) {
+        res = await fetchWithAuth(`${API_BASE}/api/addresses`);
+      }
+      if (!res.ok) return [];
+      const json = await res.json();
+      const list = json?.data ?? json ?? [];
+      return Array.isArray(list) ? list : [];
+    } catch {
+      return [];
+    }
   },
 
   async addAddress(address: Omit<Address, 'id' | 'userId'>): Promise<Address> {
-    const res: any = await apiClient.post(API_ENDPOINTS.USER_ADDRESSES, address);
-    return res?.data ?? res;
+    let res = await fetchWithAuth(`${API_BASE}/api${API_ENDPOINTS.USER_ADDRESSES}`, {
+      method: 'POST',
+      body: JSON.stringify(address),
+    });
+    if (!res.ok) {
+      res = await fetchWithAuth(`${API_BASE}/api/addresses`, {
+        method: 'POST',
+        body: JSON.stringify(address),
+      });
+    }
+    const json = await res.json();
+    if (!res.ok) throw { response: { data: json } };
+    return json?.data ?? json;
   },
 
   async updateAddress(id: string, address: Partial<Address>): Promise<Address> {
-    const res: any = await apiClient.put(API_ENDPOINTS.USER_ADDRESS(id), address);
-    return res?.data ?? res;
+    let res = await fetchWithAuth(`${API_BASE}/api${API_ENDPOINTS.USER_ADDRESS(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(address),
+    });
+    if (!res.ok) {
+      res = await fetchWithAuth(`${API_BASE}/api/addresses/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(address),
+      });
+    }
+    const json = await res.json();
+    if (!res.ok) throw { response: { data: json } };
+    return json?.data ?? json;
   },
 
   async deleteAddress(id: string): Promise<void> {
-    return apiClient.delete<void>(API_ENDPOINTS.USER_ADDRESS(id));
+    let res = await fetchWithAuth(`${API_BASE}/api${API_ENDPOINTS.USER_ADDRESS(id)}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      res = await fetchWithAuth(`${API_BASE}/api/addresses/${id}`, {
+        method: 'DELETE',
+      });
+    }
   },
 
   async setDefaultAddress(id: string): Promise<Address> {
-    const res: any = await apiClient.patch(API_ENDPOINTS.USER_ADDRESS(id), { isDefault: true });
-    return res?.data ?? res;
+    let res = await fetchWithAuth(`${API_BASE}/api${API_ENDPOINTS.USER_ADDRESS(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isDefault: true }),
+    });
+    if (!res.ok) {
+      res = await fetchWithAuth(`${API_BASE}/api/addresses/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ isDefault: true }),
+      });
+    }
+    const json = await res.json();
+    if (!res.ok) throw { response: { data: json } };
+    return json?.data ?? json;
   },
 };

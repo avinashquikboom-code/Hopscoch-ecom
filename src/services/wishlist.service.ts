@@ -41,7 +41,10 @@ function normalizeWishlistItem(raw: any): WishlistItem {
 export const wishlistService = {
   async getWishlist(): Promise<Wishlist> {
     try {
-      const res = await fetchWithAuth(`${API_BASE}/api/v1/web/wishlist`);
+      let res = await fetchWithAuth(`${API_BASE}/api/v1/web/wishlist`);
+      if (!res.ok) {
+        res = await fetchWithAuth(`${API_BASE}/api/wishlist`);
+      }
       if (!res.ok) {
         throw new Error('Failed to fetch wishlist');
       }
@@ -64,9 +67,14 @@ export const wishlistService = {
 
   async addToWishlist(productId: string): Promise<Wishlist> {
     const numericId = productId.replace(/\D/g, '') || productId;
-    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/wishlist/${numericId}`, {
+    let res = await fetchWithAuth(`${API_BASE}/api/v1/web/wishlist/${numericId}`, {
       method: 'POST',
     });
+    if (!res.ok && res.status !== 409) {
+      res = await fetchWithAuth(`${API_BASE}/api/wishlist/${numericId}`, {
+        method: 'POST',
+      });
+    }
     const json = await res.json();
     if (!res.ok && res.status !== 409) {
       throw new Error(json.message || 'Failed to add to wishlist');
@@ -76,9 +84,14 @@ export const wishlistService = {
 
   async removeFromWishlist(productId: string): Promise<Wishlist> {
     const numericId = productId.replace(/\D/g, '') || productId;
-    const res = await fetchWithAuth(`${API_BASE}/api/v1/web/wishlist/${numericId}`, {
+    let res = await fetchWithAuth(`${API_BASE}/api/v1/web/wishlist/${numericId}`, {
       method: 'DELETE',
     });
+    if (!res.ok) {
+      res = await fetchWithAuth(`${API_BASE}/api/wishlist/${numericId}`, {
+        method: 'DELETE',
+      });
+    }
     const json = await res.json();
     if (!res.ok) {
       throw new Error(json.message || 'Failed to remove from wishlist');
