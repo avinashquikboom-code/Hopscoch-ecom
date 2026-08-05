@@ -229,7 +229,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                     {/* Main image with zoom */}
                     <div
                       className="relative overflow-hidden cursor-zoom-in"
-                      style={{ aspectRatio: '3/4' }}
+                      style={{ aspectRatio: '4/3' }}
                       onMouseMove={doMouseMove}
                       onMouseLeave={() => setZoom(false)}
                     >
