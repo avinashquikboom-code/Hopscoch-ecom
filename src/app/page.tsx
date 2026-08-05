@@ -102,6 +102,7 @@ export default function Home() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [banners, setBanners] = useState<any[]>([]);
   const [isBannersLoading, setIsBannersLoading] = useState(true);
+  const [failedBannerImages, setFailedBannerImages] = useState<Record<string | number, boolean>>({});
 
   // Fetch active banners from backend
   useEffect(() => {
@@ -241,17 +242,24 @@ export default function Home() {
                   className="w-full h-full relative"
                 >
                   <Image
-                    src={banners[activeSlide].imageUrl}
-                    alt={banners[activeSlide].title}
+                    src={
+                      failedBannerImages[banners[activeSlide].id] || !banners[activeSlide].imageUrl
+                        ? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&auto=format&fit=crop&q=80'
+                        : resolveImageUrl(banners[activeSlide].imageUrl)
+                    }
+                    alt={banners[activeSlide].title || 'Banner'}
                     fill
                     priority
                     sizes="100vw"
-                    className="object-cover object-center brightness-[0.45] select-none"
+                    className="object-cover object-center brightness-90 select-none transition-all duration-300"
+                    onError={() => {
+                      setFailedBannerImages(prev => ({ ...prev, [banners[activeSlide].id]: true }));
+                    }}
                   />
                 </motion.div>
               </div>
               
-              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/35 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
               
               {/* Text overlay content */}
               <div className="absolute left-8 sm:left-20 max-w-xs sm:max-w-2xl text-white z-10 flex flex-col gap-2 sm:gap-3.5">
@@ -585,10 +593,10 @@ export default function Home() {
                 alt={banner.title}
                 fill
                 sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-500 brightness-50"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-500 brightness-90"
               />
               {/* Gradient colour tint */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${banner.color} opacity-60`} />
+              <div className={`absolute inset-0 bg-gradient-to-br ${banner.color} opacity-40`} />
               {/* Content */}
               <div className="absolute inset-0 p-4 flex flex-col justify-between text-white">
                 <span className="text-[9px] font-black bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-2.5 py-0.5 w-fit tracking-widest uppercase">
