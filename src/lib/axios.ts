@@ -3,6 +3,8 @@ import { API_BASE_URL, STORAGE_KEYS } from '@/constants';
 import { toast } from '@/components/ui/toast';
 
 class ApiClient {
+
+  
   private client: AxiosInstance;
 
   constructor() {
