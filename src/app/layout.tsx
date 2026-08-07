@@ -4,7 +4,6 @@ import "./globals.css";
 import { ReactQueryProvider } from "@/lib/react-query";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { ToastProvider } from "@/components/ui/toast";
 import { LoginModal, ThemeProvider } from "@/components/common";
 
@@ -30,14 +29,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} light`} suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-background text-foreground font-sans pb-16 lg:pb-0">
+      <body className="min-h-screen flex flex-col bg-background text-foreground font-sans pb-0">
         <ReactQueryProvider>
           <ToastProvider>
             <ThemeProvider>
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />
-              <MobileBottomNav />
               <LoginModal />
             </ThemeProvider>
           </ToastProvider>

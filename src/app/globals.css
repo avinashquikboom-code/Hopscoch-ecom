@@ -191,12 +191,18 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-border;
+  }
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
   }
   html {
     @apply font-sans scroll-smooth;
@@ -205,6 +211,10 @@
     @apply font-sans;
     color: var(--aura-text-heading);
     letter-spacing: -0.01em;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
   }
 }
 

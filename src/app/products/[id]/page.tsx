@@ -842,6 +842,8 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
         </div>
       )}
 
+
+
       {/* Fly-to-cart */}
       {flyStyle && (
         <div style={flyStyle}>

@@ -50,7 +50,7 @@ export function Header() {
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
   const [mounted, setMounted] = useState(false);
 
-  const { user, isAuthenticated, openLoginModal } = useAuthStore();
+  const { user, isAuthenticated, openLoginModal, logout } = useAuthStore();
   const { cart } = useCartStore();
   const { theme, setTheme } = useThemeStore();
   const { pincode, city, formattedLocation, isAutoDetected, setLocation, detectLocation } = useLocationStore();
@@ -548,9 +548,9 @@ export function Header() {
 
       {/* 3. MOBILE DRAWER NAVIGATION */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="left" className="w-[280px] p-0 overflow-y-auto bg-card border-r border-border/30">
+        <SheetContent side="left" className="w-[300px] p-0 overflow-y-auto bg-card border-r border-border/30">
           <div 
-            className="bg-[#0d9488] p-4 text-white flex items-center gap-2 cursor-pointer"
+            className="bg-[#0d9488] p-4 text-white flex items-center justify-between cursor-pointer"
             onClick={() => {
               if (!isAuthenticated) {
                 setIsMobileMenuOpen(false);
@@ -558,56 +558,69 @@ export function Header() {
               }
             }}
           >
-            <User className="h-5 w-5" />
-            <span className="font-bold text-sm">
-              {isAuthenticated && user ? `Hello, ${user.firstName}` : 'Login & Signup'}
-            </span>
+            <div className="flex items-center gap-2.5">
+              <User className="h-6 w-6" />
+              <div className="flex flex-col">
+                <span className="font-bold text-sm leading-tight">
+                  {isAuthenticated && user ? `Hello, ${user.firstName}` : 'Login & Signup'}
+                </span>
+                <span className="text-[10px] text-teal-100 font-medium">
+                  {isAuthenticated ? 'Manage account & orders' : 'Access your wishlist & cart'}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="py-4 space-y-4">
-            <div className="px-4 border-b border-border/40 pb-2">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Categories</span>
-              <nav className="flex flex-col gap-3.5 mt-2">
-                <Link 
-                  href="/products?category=Women" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-sm font-semibold text-foreground/80 hover:text-[#0d9488] transition-colors uppercase"
-                >
-                  Women
-                </Link>
-                <Link 
-                  href="/products?category=Men" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-sm font-semibold text-foreground/80 hover:text-[#0d9488] transition-colors uppercase"
-                >
-                  Men
-                </Link>
-                <Link 
-                  href="/products?category=Kids" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-sm font-semibold text-foreground/80 hover:text-[#0d9488] transition-colors uppercase"
-                >
-                  Kids
-                </Link>
-                <Link 
-                  href="/products?category=Collections" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-sm font-semibold text-foreground/80 hover:text-[#0d9488] transition-colors uppercase"
-                >
-                  Collections
-                </Link>
+            {/* Main Navigation Links */}
+            <div className="px-4 border-b border-border/40 pb-3">
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Navigation</span>
+              <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
+                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Home</Link>
+                <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Shop All Products</Link>
+                <Link href="/categories" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Categories</Link>
+                <Link href="/products?category=Collections" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Collections</Link>
+                <Link href="/products?sort=popular" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Featured Brands</Link>
               </nav>
             </div>
 
+            {/* User Quick Access */}
+            <div className="px-4 border-b border-border/40 pb-3">
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Quick Access</span>
+              <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
+                <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between hover:text-[#0d9488] transition-colors">
+                  <span>Wishlist</span>
+                  {wishlistItemsCount > 0 && <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold">{wishlistItemsCount}</span>}
+                </Link>
+                <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between hover:text-[#0d9488] transition-colors">
+                  <span>Cart &amp; Checkout</span>
+                  {cartItemsCount > 0 && <span className="px-2 py-0.5 rounded-full bg-[#0d9488] text-white text-[10px] font-bold">{cartItemsCount}</span>}
+                </Link>
+                <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">My Orders</Link>
+                <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Profile &amp; Settings</Link>
+              </nav>
+            </div>
+
+            {/* Info & Support */}
+            <div className="px-4 border-b border-border/40 pb-3">
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Company &amp; Support</span>
+              <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
+                <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">About Us</Link>
+                <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Contact Us</Link>
+                <Link href="/faq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Support &amp; FAQ</Link>
+              </nav>
+            </div>
+
+            {/* Regional Preferences */}
             <div className="px-4 border-b border-border/40 pb-4">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-2.5">Preferences</span>
-              <div className="space-y-3 text-xs font-semibold text-gray-700">
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2.5">Preferences</span>
+              <div className="space-y-3 text-xs font-semibold text-gray-700 dark:text-gray-300">
                 <div className="flex items-center justify-between">
                   <span>Language</span>
                   <select 
                     value={language} 
                     onChange={(e) => setLanguage(e.target.value as any)}
-                    className="bg-transparent border border-gray-200 rounded px-2 py-1 outline-none font-bold"
+                    className="bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none font-bold"
                   >
                     <option value="EN">English</option>
                     <option value="HI">हिन्दी</option>
@@ -622,7 +635,7 @@ export function Header() {
                   <select 
                     value={currency} 
                     onChange={(e) => setCurrency(e.target.value as any)}
-                    className="bg-transparent border border-gray-200 rounded px-2 py-1 outline-none font-bold"
+                    className="bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none font-bold"
                   >
                     <option value="INR">INR (₹)</option>
                     <option value="USD">USD ($)</option>
@@ -641,15 +654,20 @@ export function Header() {
               </div>
             </div>
 
-            <div className="px-4">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Account</span>
-              <div className="flex flex-col gap-3.5 mt-2 text-sm font-semibold text-foreground/80">
-                <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
-                <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
-                <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)}>My Wishlist</Link>
-                <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)}>My Cart</Link>
+            {/* Logout button if authenticated */}
+            {isAuthenticated && (
+              <div className="px-4 pt-1 pb-4">
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left font-extrabold text-xs text-rose-600 hover:text-rose-700 uppercase tracking-wider py-2 cursor-pointer border-none bg-transparent"
+                >
+                  Logout Account
+                </button>
               </div>
-            </div>
+            )}
           </div>
         </SheetContent>
       </Sheet>
