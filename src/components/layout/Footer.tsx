@@ -7,13 +7,11 @@ import {
   Mail, 
   Phone, 
   MapPin, 
-  Clock, 
   ChevronDown, 
   ChevronUp, 
   ShieldCheck, 
   Truck, 
   RotateCcw,
-  Sparkles,
   Award
 } from 'lucide-react';
 
@@ -38,7 +36,7 @@ export function Footer() {
     <footer className="w-full bg-[#080d1a] text-gray-300 border-t border-gray-800/80 font-sans relative z-10 transition-colors">
       
       {/* 1. VALUE PROPOSITION & TRUST PILLARS BAR */}
-      <div className="bg-gradient-to-r from-gray-900 via-slate-900 to-gray-900 border-b border-gray-800/80 py-8 px-4 sm:px-6 md:px-12">
+      <div className="bg-gradient-to-r from-gray-950 via-slate-900 to-gray-950 border-b border-gray-800/80 py-8 px-4 sm:px-6 md:px-12">
         <div className="container mx-auto max-w-7xl grid grid-cols-2 md:grid-cols-4 gap-6">
           
           <div className="flex items-center gap-3.5 group">
@@ -235,11 +233,11 @@ export function Footer() {
               </div>
 
               <div className="pt-2 border-t border-gray-800/80 space-y-2 text-[11px]">
-                <div className="flex items-center gap-2 text-gray-300">
+                <div className="flex items-center gap-2 text-gray-300 font-semibold">
                   <Phone className="w-3.5 h-3.5 text-teal-400 shrink-0" />
                   <a href="tel:+9118001234567" className="hover:text-teal-400 transition-colors">+91 1800-123-4567</a>
                 </div>
-                <div className="flex items-center gap-2 text-gray-300">
+                <div className="flex items-center gap-2 text-gray-300 font-semibold">
                   <Mail className="w-3.5 h-3.5 text-teal-400 shrink-0" />
                   <a href="mailto:support@fciseller.com" className="hover:text-teal-400 transition-colors">support@fciseller.com</a>
                 </div>
@@ -265,7 +263,7 @@ export function Footer() {
               {['Visa', 'Mastercard', 'RuPay', 'UPI', 'Razorpay', 'Google Pay', 'PhonePe', 'Paytm'].map((pay) => (
                 <span 
                   key={pay}
-                  className="px-3 py-1 rounded-lg bg-gray-900 border border-gray-800 text-[11px] font-bold text-gray-300 hover:text-white transition-all select-none"
+                  className="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-gray-800 text-[11px] font-bold text-gray-300 hover:text-white hover:border-teal-500/40 transition-all select-none"
                 >
                   {pay}
                 </span>
@@ -282,7 +280,7 @@ export function Footer() {
               {['Shiprocket', 'Blue Dart', 'Delhivery', 'DTDC', 'Ekart'].map((partner) => (
                 <span 
                   key={partner}
-                  className="px-3 py-1 rounded-lg bg-gray-900 border border-gray-800 text-[11px] font-bold text-gray-300 hover:text-white transition-all select-none"
+                  className="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-gray-800 text-[11px] font-bold text-gray-300 hover:text-white hover:border-teal-500/40 transition-all select-none"
                 >
                   {partner}
                 </span>
