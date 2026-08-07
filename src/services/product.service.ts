@@ -169,12 +169,14 @@ function extractRawProducts(json: any): any[] {
 export const productService = {
   async getProducts(
     filters?: ProductFilters,
-    pagination: { page: number; limit: number } = { page: PAGINATION.DEFAULT_PAGE, limit: PAGINATION.DEFAULT_LIMIT }
+    pagination?: Partial<{ page: number; limit: number }>
   ): Promise<PaginatedResponse<Product>> {
     try {
+      const page = pagination?.page ?? PAGINATION.DEFAULT_PAGE;
+      const limit = pagination?.limit ?? PAGINATION.DEFAULT_LIMIT;
       const params = new URLSearchParams();
-      params.append('page', String(pagination.page));
-      params.append('limit', String(pagination.limit));
+      params.append('page', String(page));
+      params.append('limit', String(limit));
 
       if (filters) {
         if (filters.category && filters.category !== 'all') {
@@ -219,13 +221,13 @@ export const productService = {
       });
 
       const total = json.data?.pagination?.total ?? json.pagination?.total ?? filtered.length;
-      const totalPages = json.data?.pagination?.totalPages ?? json.pagination?.totalPages ?? Math.ceil(filtered.length / pagination.limit);
+      const totalPages = json.data?.pagination?.totalPages ?? json.pagination?.totalPages ?? Math.ceil(filtered.length / limit);
 
       return {
         data: filtered,
         total: total,
-        page: pagination.page,
-        limit: pagination.limit,
+        page: page,
+        limit: limit,
         totalPages: totalPages,
       };
     } catch (e) {
@@ -254,12 +256,14 @@ export const productService = {
 
   async getFeaturedProducts(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/web/products`);
+      let res = await fetch(`${API_BASE}/api/v1/web/products/featured`);
+      if (!res.ok) res = await fetch(`${API_BASE}/api/products/featured`);
+      if (!res.ok) res = await fetch(`${API_BASE}/api/v1/web/products?isFeatured=true`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch featured products');
       const raw = extractRawProducts(json);
       const mapped = raw.map(mapBackendProductToFrontend);
-      return mapped.filter((p) => p.isFeatured || p.rating >= 4.5).slice(0, 10);
+      return mapped.length > 0 ? mapped : (await this.getProducts(undefined, { page: 1, limit: 10 })).data;
     } catch (e) {
       console.error('Backend featured fetch failed:', e);
       return [];
@@ -268,12 +272,14 @@ export const productService = {
 
   async getTrendingProducts(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/web/products`);
+      let res = await fetch(`${API_BASE}/api/v1/web/products/trending`);
+      if (!res.ok) res = await fetch(`${API_BASE}/api/products/trending`);
+      if (!res.ok) res = await fetch(`${API_BASE}/api/v1/web/products?isTrending=true`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch trending products');
       const raw = extractRawProducts(json);
       const mapped = raw.map(mapBackendProductToFrontend);
-      return [...mapped].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0)).slice(0, 10);
+      return mapped.length > 0 ? mapped : (await this.getProducts(undefined, { page: 1, limit: 10 })).data;
     } catch (e) {
       console.error('Backend trending fetch failed:', e);
       return [];
@@ -282,12 +288,14 @@ export const productService = {
 
   async getNewArrivals(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/web/products`);
+      let res = await fetch(`${API_BASE}/api/v1/web/products/new`);
+      if (!res.ok) res = await fetch(`${API_BASE}/api/products/new`);
+      if (!res.ok) res = await fetch(`${API_BASE}/api/v1/web/products?isNewArrival=true`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch new arrivals');
       const raw = extractRawProducts(json);
       const mapped = raw.map(mapBackendProductToFrontend);
-      return [...mapped].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 10);
+      return mapped.length > 0 ? mapped : (await this.getProducts(undefined, { page: 1, limit: 10 })).data;
     } catch (e) {
       console.error('Backend new arrivals fetch failed:', e);
       return [];
@@ -296,7 +304,7 @@ export const productService = {
 
   async getBestSellers(): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/web/products`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products?sortBy=popular`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch best sellers');
       const raw = extractRawProducts(json);
@@ -310,14 +318,20 @@ export const productService = {
 
   async searchProducts(query: string): Promise<Product[]> {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/web/products`);
+      const res = await fetch(`${API_BASE}/api/v1/web/products?search=${encodeURIComponent(query)}`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Search failed');
       const raw = extractRawProducts(json);
       const mapped = raw.map(mapBackendProductToFrontend);
       const q = query.toLowerCase();
       return mapped.filter(
-        (p) => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q) ||
+          (p as any).category?.toLowerCase().includes(q) ||
+          (p as any).subcategory?.toLowerCase().includes(q) ||
+          p.brand?.toLowerCase().includes(q) ||
+          p.tags?.some((t) => t.toLowerCase().includes(q))
       );
     } catch (e) {
       console.error('Backend search fetch failed:', e);
