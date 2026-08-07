@@ -240,7 +240,8 @@ export function Header() {
           
           {/* Left Side: Hamburger Menu & Logo */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Mobile Hamburger menu */}
+            {/* Mobile Hamburger menu — Disabled per user request */}
+            {/*
             <Button
               variant="ghost"
               size="icon"
@@ -250,6 +251,7 @@ export function Header() {
             >
               <Menu className="h-6 w-6 text-gray-800 dark:text-gray-200" />
             </Button>
+            */}
 
             {/* FCISeller Logo */}
             <Link href="/" className="flex items-center gap-2 select-none shrink-0">
@@ -405,7 +407,8 @@ export function Header() {
         }}
       />
 
-      {/* 3. MOBILE DRAWER NAVIGATION */}
+      {/* 3. MOBILE DRAWER NAVIGATION — Disabled per user request */}
+      {/*
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-[300px] p-0 overflow-y-auto bg-card border-r border-border/30">
           <div 
@@ -431,7 +434,6 @@ export function Header() {
           </div>
 
           <div className="py-4 space-y-4">
-            {/* Main Navigation Links */}
             <div className="px-4 border-b border-border/40 pb-3">
               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Navigation</span>
               <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
@@ -443,7 +445,6 @@ export function Header() {
               </nav>
             </div>
 
-            {/* User Quick Access */}
             <div className="px-4 border-b border-border/40 pb-3">
               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Quick Access</span>
               <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
@@ -460,7 +461,6 @@ export function Header() {
               </nav>
             </div>
 
-            {/* Info & Support */}
             <div className="px-4 border-b border-border/40 pb-3">
               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Company &amp; Support</span>
               <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
@@ -470,7 +470,6 @@ export function Header() {
               </nav>
             </div>
 
-            {/* Regional Preferences */}
             <div className="px-4 border-b border-border/40 pb-4">
               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2.5">Preferences</span>
               <div className="space-y-3 text-xs font-semibold text-gray-700 dark:text-gray-300">
@@ -513,7 +512,6 @@ export function Header() {
               </div>
             </div>
 
-            {/* Logout button if authenticated */}
             {isAuthenticated && (
               <div className="px-4 pt-1 pb-4">
                 <button
@@ -530,6 +528,7 @@ export function Header() {
           </div>
         </SheetContent>
       </Sheet>
+      */}
 
       {/* Mobile Search Overlay */}
       <MobileSearchOverlay
