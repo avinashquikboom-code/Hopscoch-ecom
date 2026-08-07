@@ -33,49 +33,49 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full bg-[#FAFAFA] text-[#4B5563] border-t border-[#E5E7EB] font-sans relative z-10 transition-colors">
+    <footer className="w-full bg-[#FAFAFA] dark:bg-[#080d1a] text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-800/80 font-sans relative z-10 transition-colors">
       
       {/* 1. VALUE PROPOSITION & TRUST PILLARS BAR */}
-      <div className="bg-white border-b border-[#E5E7EB] py-8 px-4 sm:px-6 md:px-12">
+      <div className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800/80 py-8 px-4 sm:px-6 md:px-12">
         <div className="container mx-auto max-w-7xl grid grid-cols-2 md:grid-cols-4 gap-6">
           
-          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] p-3.5 rounded-2xl border border-[#E5E7EB]/70 shadow-xs hover:shadow-md transition-all">
-            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 border border-[#0d9488]/20 flex items-center justify-center text-[#0d9488] shrink-0 group-hover:scale-110 transition-transform">
+          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] dark:bg-slate-900/80 p-3.5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 dark:bg-teal-500/10 border border-[#0d9488]/20 dark:border-teal-500/20 flex items-center justify-center text-[#0d9488] dark:text-teal-400 shrink-0 group-hover:scale-110 transition-transform">
               <Truck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-black text-[#111827] uppercase tracking-wider">Express Shipping</h4>
-              <p className="text-[11px] text-[#6B7280] mt-0.5">Fast delivery &amp; real-time tracking</p>
+              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">Express Shipping</h4>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Fast delivery &amp; real-time tracking</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] p-3.5 rounded-2xl border border-[#E5E7EB]/70 shadow-xs hover:shadow-md transition-all">
-            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 border border-[#0d9488]/20 flex items-center justify-center text-[#0d9488] shrink-0 group-hover:scale-110 transition-transform">
+          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] dark:bg-slate-900/80 p-3.5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 dark:bg-teal-500/10 border border-[#0d9488]/20 dark:border-teal-500/20 flex items-center justify-center text-[#0d9488] dark:text-teal-400 shrink-0 group-hover:scale-110 transition-transform">
               <RotateCcw className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-black text-[#111827] uppercase tracking-wider">Easy 7-Day Returns</h4>
-              <p className="text-[11px] text-[#6B7280] mt-0.5">Hassle-free instant exchanges</p>
+              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">Easy 7-Day Returns</h4>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">Hassle-free instant exchanges</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] p-3.5 rounded-2xl border border-[#E5E7EB]/70 shadow-xs hover:shadow-md transition-all">
-            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 border border-[#0d9488]/20 flex items-center justify-center text-[#0d9488] shrink-0 group-hover:scale-110 transition-transform">
+          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] dark:bg-slate-900/80 p-3.5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 dark:bg-teal-500/10 border border-[#0d9488]/20 dark:border-teal-500/20 flex items-center justify-center text-[#0d9488] dark:text-teal-400 shrink-0 group-hover:scale-110 transition-transform">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-black text-[#111827] uppercase tracking-wider">100% Secure Checkout</h4>
-              <p className="text-[11px] text-[#6B7280] mt-0.5">256-Bit SSL encrypted payments</p>
+              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">100% Secure Checkout</h4>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">256-Bit SSL encrypted payments</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] p-3.5 rounded-2xl border border-[#E5E7EB]/70 shadow-xs hover:shadow-md transition-all">
-            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 border border-[#0d9488]/20 flex items-center justify-center text-[#0d9488] shrink-0 group-hover:scale-110 transition-transform">
+          <div className="flex items-center gap-3.5 group bg-[#FAFAFA] dark:bg-slate-900/80 p-3.5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-[#0d9488]/10 dark:bg-teal-500/10 border border-[#0d9488]/20 dark:border-teal-500/20 flex items-center justify-center text-[#0d9488] dark:text-teal-400 shrink-0 group-hover:scale-110 transition-transform">
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-black text-[#111827] uppercase tracking-wider">Authentic Guarantee</h4>
-              <p className="text-[11px] text-[#6B7280] mt-0.5">100% genuine luxury products</p>
+              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">Authentic Guarantee</h4>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">100% genuine luxury products</p>
             </div>
           </div>
 
@@ -90,15 +90,15 @@ export function Footer() {
           <div className="lg:col-span-2 space-y-4 pr-0 md:pr-6">
             <Link href="/" className="flex items-center gap-2.5 select-none w-max">
               <img src="/logo.png" alt="FCI Seller Logo" className="h-8 max-h-[34px] w-auto object-contain" />
-              <span className="font-black text-base tracking-wider text-[#111827] uppercase leading-none">FCI SELLER</span>
+              <span className="font-black text-base tracking-wider text-gray-900 dark:text-white uppercase leading-none">FCI SELLER</span>
             </Link>
-            <p className="text-xs text-[#6B7280] leading-relaxed max-w-md">
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed max-w-md">
               India's premier luxury fashion destination bringing curated designer apparel, footwear, and high-fashion lifestyle accessories straight to your doorstep with guaranteed authenticity.
             </p>
 
             {/* Social Media Icons */}
             <div className="pt-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#0d9488] block mb-2.5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#0d9488] dark:text-teal-400 block mb-2.5">
                 Follow FCI SELLER
               </span>
               <div className="flex items-center gap-2.5">
@@ -155,7 +155,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.name}
-                    className="w-9 h-9 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center text-[#4B5563] hover:text-white hover:bg-[#0d9488] hover:border-[#0d9488] transition-all cursor-pointer shadow-xs active:scale-95"
+                    className="w-9 h-9 rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white hover:bg-[#0d9488] dark:hover:bg-[#0d9488] hover:border-[#0d9488] transition-all cursor-pointer shadow-xs active:scale-95"
                   >
                     {social.icon}
                   </Link>
@@ -165,84 +165,84 @@ export function Footer() {
           </div>
 
           {/* SHOP COLUMN */}
-          <div className="border-b border-[#E5E7EB] md:border-none pb-4 md:pb-0">
+          <div className="border-b border-gray-200 dark:border-gray-800 md:border-none pb-4 md:pb-0">
             <button
               onClick={() => toggleSection('shop')}
-              className="w-full flex items-center justify-between text-xs font-black uppercase tracking-widest text-[#1F2937] py-2 md:py-0 md:mb-4 cursor-pointer md:cursor-default"
+              className="w-full flex items-center justify-between text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white py-2 md:py-0 md:mb-4 cursor-pointer md:cursor-default"
             >
               <span>Shop &amp; Explore</span>
-              <span className="md:hidden text-[#0d9488]">
+              <span className="md:hidden text-[#0d9488] dark:text-teal-400">
                 {openSections.shop ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </span>
             </button>
-            <ul className={`space-y-2.5 text-xs text-[#4B5563] font-medium transition-all ${
+            <ul className={`space-y-2.5 text-xs text-gray-600 dark:text-gray-400 font-medium transition-all ${
               openSections.shop ? 'block pt-2' : 'hidden md:block'
             }`}>
-              <li><Link href="/products?category=Women" className="hover:text-[#0d9488] transition-colors">Women's Fashion</Link></li>
-              <li><Link href="/products?category=Men" className="hover:text-[#0d9488] transition-colors">Men's Apparel</Link></li>
-              <li><Link href="/products?category=Kids" className="hover:text-[#0d9488] transition-colors">Kids Wear</Link></li>
-              <li><Link href="/products?category=Accessories" className="hover:text-[#0d9488] transition-colors">Beauty &amp; Accessories</Link></li>
-              <li><Link href="/products?category=Footwear" className="hover:text-[#0d9488] transition-colors">Footwear Collection</Link></li>
-              <li><Link href="/products?category=Collections" className="hover:text-[#0d9488] transition-colors">Curated Collections</Link></li>
-              <li><Link href="/studio" className="hover:text-[#0d9488] transition-colors">Runway Studio Drops</Link></li>
+              <li><Link href="/products?category=Women" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Women's Fashion</Link></li>
+              <li><Link href="/products?category=Men" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Men's Apparel</Link></li>
+              <li><Link href="/products?category=Kids" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Kids Wear</Link></li>
+              <li><Link href="/products?category=Accessories" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Beauty &amp; Accessories</Link></li>
+              <li><Link href="/products?category=Footwear" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Footwear Collection</Link></li>
+              <li><Link href="/products?category=Collections" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Curated Collections</Link></li>
+              <li><Link href="/studio" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Runway Studio Drops</Link></li>
             </ul>
           </div>
 
           {/* CUSTOMER CARE COLUMN */}
-          <div className="border-b border-[#E5E7EB] md:border-none pb-4 md:pb-0">
+          <div className="border-b border-gray-200 dark:border-gray-800 md:border-none pb-4 md:pb-0">
             <button
               onClick={() => toggleSection('customerCare')}
-              className="w-full flex items-center justify-between text-xs font-black uppercase tracking-widest text-[#1F2937] py-2 md:py-0 md:mb-4 cursor-pointer md:cursor-default"
+              className="w-full flex items-center justify-between text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white py-2 md:py-0 md:mb-4 cursor-pointer md:cursor-default"
             >
               <span>Customer Support</span>
-              <span className="md:hidden text-[#0d9488]">
+              <span className="md:hidden text-[#0d9488] dark:text-teal-400">
                 {openSections.customerCare ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </span>
             </button>
-            <ul className={`space-y-2.5 text-xs text-[#4B5563] font-medium transition-all ${
+            <ul className={`space-y-2.5 text-xs text-gray-600 dark:text-gray-400 font-medium transition-all ${
               openSections.customerCare ? 'block pt-2' : 'hidden md:block'
             }`}>
-              <li><Link href="/orders" className="hover:text-[#0d9488] transition-colors">My Orders</Link></li>
-              <li><Link href="/wishlist" className="hover:text-[#0d9488] transition-colors">My Wishlist</Link></li>
-              <li><Link href="/orders" className="hover:text-[#0d9488] transition-colors">Track Order Package</Link></li>
-              <li><Link href="/orders" className="hover:text-[#0d9488] transition-colors">Returns &amp; Exchange</Link></li>
-              <li><Link href="/return-policy" className="hover:text-[#0d9488] transition-colors">Refund Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-[#0d9488] transition-colors">Shipping Terms</Link></li>
-              <li><Link href="/faq" className="hover:text-[#0d9488] transition-colors">Help &amp; FAQs</Link></li>
+              <li><Link href="/orders" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">My Orders</Link></li>
+              <li><Link href="/wishlist" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">My Wishlist</Link></li>
+              <li><Link href="/orders" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Track Order Package</Link></li>
+              <li><Link href="/orders" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Returns &amp; Exchange</Link></li>
+              <li><Link href="/return-policy" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Refund Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Shipping Terms</Link></li>
+              <li><Link href="/faq" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Help &amp; FAQs</Link></li>
             </ul>
           </div>
 
           {/* COMPANY & CONTACT COLUMN */}
-          <div className="border-b border-[#E5E7EB] md:border-none pb-4 md:pb-0">
+          <div className="border-b border-gray-200 dark:border-gray-800 md:border-none pb-4 md:pb-0">
             <button
               onClick={() => toggleSection('company')}
-              className="w-full flex items-center justify-between text-xs font-black uppercase tracking-widest text-[#1F2937] py-2 md:py-0 md:mb-4 cursor-pointer md:cursor-default"
+              className="w-full flex items-center justify-between text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white py-2 md:py-0 md:mb-4 cursor-pointer md:cursor-default"
             >
               <span>Company &amp; Contact</span>
-              <span className="md:hidden text-[#0d9488]">
+              <span className="md:hidden text-[#0d9488] dark:text-teal-400">
                 {openSections.company ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </span>
             </button>
-            <div className={`space-y-3 text-xs text-[#4B5563] transition-all ${
+            <div className={`space-y-3 text-xs text-gray-600 dark:text-gray-400 transition-all ${
               openSections.company ? 'block pt-2' : 'hidden md:block'
             }`}>
               <div className="space-y-2">
-                <p><Link href="/about" className="hover:text-[#0d9488] transition-colors">About FCI SELLER</Link></p>
-                <p><Link href="/privacy" className="hover:text-[#0d9488] transition-colors">Privacy Policy</Link></p>
-                <p><Link href="/terms" className="hover:text-[#0d9488] transition-colors">Terms of Service</Link></p>
+                <p><Link href="/about" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">About FCI SELLER</Link></p>
+                <p><Link href="/privacy" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Privacy Policy</Link></p>
+                <p><Link href="/terms" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Terms of Service</Link></p>
               </div>
 
-              <div className="pt-2 border-t border-[#E5E7EB] space-y-2 text-[11px]">
-                <div className="flex items-center gap-2 text-[#1F2937] font-semibold">
-                  <Phone className="w-3.5 h-3.5 text-[#0d9488] shrink-0" />
-                  <a href="tel:+9118001234567" className="hover:text-[#0d9488] transition-colors">+91 1800-123-4567</a>
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-800/80 space-y-2 text-[11px]">
+                <div className="flex items-center gap-2 text-gray-800 dark:text-gray-300 font-semibold">
+                  <Phone className="w-3.5 h-3.5 text-[#0d9488] dark:text-teal-400 shrink-0" />
+                  <a href="tel:+9118001234567" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">+91 1800-123-4567</a>
                 </div>
-                <div className="flex items-center gap-2 text-[#1F2937] font-semibold">
-                  <Mail className="w-3.5 h-3.5 text-[#0d9488] shrink-0" />
-                  <a href="mailto:support@fciseller.com" className="hover:text-[#0d9488] transition-colors">support@fciseller.com</a>
+                <div className="flex items-center gap-2 text-gray-800 dark:text-gray-300 font-semibold">
+                  <Mail className="w-3.5 h-3.5 text-[#0d9488] dark:text-teal-400 shrink-0" />
+                  <a href="mailto:support@fciseller.com" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">support@fciseller.com</a>
                 </div>
-                <div className="flex items-start gap-2 text-[#6B7280]">
-                  <MapPin className="w-3.5 h-3.5 text-[#0d9488] shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 text-gray-500 dark:text-gray-400">
+                  <MapPin className="w-3.5 h-3.5 text-[#0d9488] dark:text-teal-400 shrink-0 mt-0.5" />
                   <span>FCI Towers, Tech Park, Bangalore - 560103, KA, India</span>
                 </div>
               </div>
@@ -252,18 +252,18 @@ export function Footer() {
         </div>
 
         {/* ECOSYSTEM BADGES */}
-        <div className="border-t border-[#E5E7EB] mt-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="border-t border-gray-200 dark:border-gray-800/80 mt-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           
           {/* Payment Badges */}
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] block mb-2.5 text-center md:text-left">
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 block mb-2.5 text-center md:text-left">
               100% Secure Payment Gateways
             </span>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               {['Visa', 'Mastercard', 'RuPay', 'UPI', 'Razorpay', 'Google Pay', 'PhonePe', 'Paytm'].map((pay) => (
                 <span 
                   key={pay}
-                  className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] text-[11px] font-bold text-[#1F2937] shadow-xs hover:border-[#0d9488] hover:text-[#0d9488] transition-all select-none"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-700 dark:text-gray-300 shadow-xs hover:border-[#0d9488] dark:hover:border-teal-500/40 hover:text-[#0d9488] dark:hover:text-teal-400 transition-all select-none"
                 >
                   {pay}
                 </span>
@@ -273,14 +273,14 @@ export function Footer() {
 
           {/* Shipping Partners */}
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] block mb-2.5 text-center md:text-right">
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 block mb-2.5 text-center md:text-right">
               Express Delivery Partners
             </span>
             <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
               {['Shiprocket', 'Blue Dart', 'Delhivery', 'DTDC', 'Ekart'].map((partner) => (
                 <span 
                   key={partner}
-                  className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] text-[11px] font-bold text-[#1F2937] shadow-xs hover:border-[#0d9488] hover:text-[#0d9488] transition-all select-none"
+                  className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-700 dark:text-gray-300 shadow-xs hover:border-[#0d9488] dark:hover:border-teal-500/40 hover:text-[#0d9488] dark:hover:text-teal-400 transition-all select-none"
                 >
                   {partner}
                 </span>
@@ -291,16 +291,16 @@ export function Footer() {
         </div>
 
         {/* BOTTOM BAR */}
-        <div className="border-t border-[#E5E7EB] mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#9CA3AF]">
+        <div className="border-t border-gray-200 dark:border-gray-800/80 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
           <p className="text-center sm:text-left">
-            &copy; 2026 <span className="font-bold text-[#111827] uppercase">FCISELLER</span>. All Rights Reserved. Made with ❤️ in India.
+            &copy; 2026 <span className="font-bold text-gray-900 dark:text-white uppercase">FCISELLER</span>. All Rights Reserved. Made with ❤️ in India.
           </p>
-          <div className="flex items-center gap-4 text-[11px] font-semibold text-[#6B7280]">
-            <Link href="/privacy" className="hover:text-[#0d9488] transition-colors">Privacy Policy</Link>
-            <span className="text-[#D1D5DB]">•</span>
-            <Link href="/terms" className="hover:text-[#0d9488] transition-colors">Terms of Service</Link>
-            <span className="text-[#D1D5DB]">•</span>
-            <span className="text-[#0d9488] font-mono">v1.0.0</span>
+          <div className="flex items-center gap-4 text-[11px] font-semibold">
+            <Link href="/privacy" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Privacy Policy</Link>
+            <span className="text-gray-300 dark:text-gray-700">•</span>
+            <Link href="/terms" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Terms &amp; Conditions</Link>
+            <span className="text-gray-300 dark:text-gray-700">•</span>
+            <span className="text-[#0d9488] dark:text-teal-400 font-mono">v1.0.0</span>
           </div>
         </div>
 
