@@ -2,40 +2,61 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, TrendingUp, Clock } from 'lucide-react';
+import { Search, X, TrendingUp, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { searchKeywordService, SearchKeywordItem } from '@/services/search-keyword.service';
 
 interface MobileSearchOverlayProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const recentSearches = ['Summer dress', 'Sneakers', 'Handbag', 'Sunglasses'];
-const trendingSearches = ['New Collection 2026', 'Silk Edit', 'Essential Basics', 'Statement Prints'];
-
 export function MobileSearchOverlay({ isOpen, onClose }: MobileSearchOverlayProps) {
   const [query, setQuery] = useState('');
+  const [popularKeywords, setPopularKeywords] = useState<SearchKeywordItem[]>([]);
+  const [trendingKeywords, setTrendingKeywords] = useState<SearchKeywordItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isOpen) {
+      if (inputRef.current) inputRef.current.focus();
+      loadKeywords();
     }
   }, [isOpen]);
+
+  const loadKeywords = async () => {
+    setLoading(true);
+    try {
+      const [popular, trending] = await Promise.all([
+        searchKeywordService.getPopularKeywords(),
+        searchKeywordService.getTrendingKeywords(),
+      ]);
+      setPopularKeywords(popular);
+      setTrendingKeywords(trending);
+    } catch (error) {
+      // Handle error gracefully
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/products?search=${encodeURIComponent(query)}`);
+      const clean = query.trim();
+      searchKeywordService.trackSearchKeyword(clean);
+      router.push(`/products?search=${encodeURIComponent(clean)}`);
       onClose();
       setQuery('');
     }
   };
 
   const handleQuickSearch = (term: string) => {
+    if (!term) return;
+    searchKeywordService.trackSearchKeyword(term);
     router.push(`/products?search=${encodeURIComponent(term)}`);
     onClose();
   };
@@ -87,7 +108,7 @@ export function MobileSearchOverlay({ isOpen, onClose }: MobileSearchOverlayProp
           </form>
         </div>
 
-        {/* Suggestions */}
+        {/* Suggestions / Dynamic Keywords */}
         <div className="p-4 max-h-[60vh] overflow-y-auto">
           {query ? (
             <div className="space-y-2">
@@ -96,32 +117,39 @@ export function MobileSearchOverlay({ isOpen, onClose }: MobileSearchOverlayProp
                 <button
                   key={index}
                   onClick={() => handleQuickSearch(suggestion)}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted/50 transition-colors active:scale-95"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted/50 transition-colors active:scale-95 flex items-center gap-3"
                 >
-                  <div className="flex items-center gap-3">
-                    <Search className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{suggestion}</span>
-                  </div>
+                  <Search className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">{suggestion}</span>
                 </button>
               ))}
             </div>
           ) : (
-            <>
-              {/* Recent Searches */}
-              {recentSearches.length > 0 && (
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-semibold text-muted-foreground">Recent Searches</p>
-                    <button className="text-xs text-primary hover:underline">Clear all</button>
-                  </div>
+            <div className="space-y-6">
+              {/* Skeleton loading state */}
+              {loading && (
+                <div className="space-y-4 py-2">
+                  <div className="h-4 w-28 bg-muted animate-pulse rounded" />
                   <div className="flex flex-wrap gap-2">
-                    {recentSearches.map((search, index) => (
+                    <div className="h-8 w-24 bg-muted animate-pulse rounded-full" />
+                    <div className="h-8 w-32 bg-muted animate-pulse rounded-full" />
+                    <div className="h-8 w-20 bg-muted animate-pulse rounded-full" />
+                  </div>
+                </div>
+              )}
+
+              {/* Popular Searches */}
+              {!loading && popularKeywords.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Popular Searches</p>
+                  <div className="flex flex-wrap gap-2">
+                    {popularKeywords.map((item) => (
                       <button
-                        key={index}
-                        onClick={() => handleQuickSearch(search)}
-                        className="px-4 py-2 rounded-full bg-muted/50 text-sm hover:bg-muted transition-colors active:scale-95"
+                        key={item.id}
+                        onClick={() => handleQuickSearch(item.keyword)}
+                        className="px-4 py-2 rounded-full bg-muted/60 hover:bg-teal-500/10 hover:text-teal-600 border border-border text-sm font-semibold transition-all active:scale-95"
                       >
-                        {search}
+                        {item.keyword}
                       </button>
                     ))}
                   </div>
@@ -129,25 +157,27 @@ export function MobileSearchOverlay({ isOpen, onClose }: MobileSearchOverlayProp
               )}
 
               {/* Trending Searches */}
-              <div>
-                <p className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Trending
-                </p>
-                <div className="space-y-2">
-                  {trendingSearches.map((search, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuickSearch(search)}
-                      className="w-full text-left px-4 py-3 rounded-lg hover:bg-muted/50 transition-colors active:scale-95 flex items-center gap-3"
-                    >
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{search}</span>
-                    </button>
-                  ))}
+              {!loading && trendingKeywords.length > 0 && (
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+                    <TrendingUp className="h-4 w-4 text-amber-500" />
+                    <span>Trending Searches</span>
+                  </p>
+                  <div className="space-y-1.5">
+                    {trendingKeywords.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => handleQuickSearch(item.keyword)}
+                        className="w-full text-left px-3.5 py-2.5 rounded-xl hover:bg-muted/60 transition-colors active:scale-95 flex items-center gap-3"
+                      >
+                        <Sparkles className="h-4 w-4 text-amber-500 fill-amber-400" />
+                        <span className="text-sm font-semibold text-foreground">{item.keyword}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </>
+              )}
+            </div>
           )}
         </div>
       </div>

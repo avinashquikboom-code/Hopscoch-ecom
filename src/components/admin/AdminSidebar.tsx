@@ -14,7 +14,8 @@ import {
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
-  Package
+  Package,
+  Search
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -94,6 +95,14 @@ const navItems: NavItem[] = [
     title: 'Reports',
     href: '/admin/reports',
     icon: BarChart3,
+  },
+  {
+    title: 'Content Management',
+    href: '/admin/search-keywords',
+    icon: Search,
+    children: [
+      { title: 'Search Keywords', href: '/admin/search-keywords', icon: Search },
+    ],
   },
   {
     title: 'Notifications',

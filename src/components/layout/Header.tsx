@@ -17,20 +17,7 @@ import { useWishlist } from '@/hooks/use-wishlist';
 import { resolveAvatarUrl } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
-const POPULAR_SEARCHES = [
-  'Lehenga Choli',
-  'Anarkali Suit',
-  'Silk Saree',
-  'Couture Dress',
-  'Designer Kurti',
-];
-
-const TRENDING_SEARCHES = [
-  'Winter Jackets',
-  'Pashmina Shawl',
-  'Velvet Suits',
-  'Wedding Wear',
-];
+import { searchKeywordService, SearchKeywordItem } from '@/services/search-keyword.service';
 
 export function Header() {
   const router = useRouter();
@@ -45,6 +32,11 @@ export function Header() {
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   
+  // Dynamic Search Keywords from API
+  const [popularKeywords, setPopularKeywords] = useState<SearchKeywordItem[]>([]);
+  const [trendingKeywords, setTrendingKeywords] = useState<SearchKeywordItem[]>([]);
+  const [keywordsLoading, setKeywordsLoading] = useState(false);
+
   // Language & Currency states
   const [language, setLanguage] = useState<'EN' | 'HI'>('EN');
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
@@ -112,6 +104,25 @@ export function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Fetch popular & trending keywords from API when search box is focused
+  useEffect(() => {
+    if (searchFocused && popularKeywords.length === 0 && trendingKeywords.length === 0) {
+      setKeywordsLoading(true);
+      Promise.all([
+        searchKeywordService.getPopularKeywords(),
+        searchKeywordService.getTrendingKeywords(),
+      ])
+        .then(([popular, trending]) => {
+          setPopularKeywords(popular);
+          setTrendingKeywords(trending);
+        })
+        .catch(() => {})
+        .finally(() => {
+          setKeywordsLoading(false);
+        });
+    }
+  }, [searchFocused]);
+
   // Early return AFTER all hooks
   if (pathname === '/checkout') {
     return null;
@@ -122,6 +133,9 @@ export function Header() {
   const handleSearchSubmit = (queryStr: string) => {
     const trimmed = queryStr.trim();
     if (trimmed) {
+      // Track search analytics API
+      searchKeywordService.trackSearchKeyword(trimmed);
+
       // Save to history
       const updatedHistory = [trimmed, ...searchHistory.filter(h => h !== trimmed)].slice(0, 5);
       setSearchHistory(updatedHistory);
@@ -293,6 +307,118 @@ export function Header() {
                 <Camera className="h-4 w-4" />
               </button>
             </form>
+
+            {/* LIVE SEARCH DROPDOWN OVERLAY */}
+            {searchFocused && (
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-4 px-5 z-50 text-xs animate-in fade-in duration-150">
+                {/* Skeleton Loading State */}
+                {keywordsLoading && (
+                  <div className="space-y-3 py-1">
+                    <div className="h-3 w-24 bg-gray-200 dark:bg-gray-800 animate-pulse rounded" />
+                    <div className="flex flex-wrap gap-2">
+                      <div className="h-7 w-20 bg-gray-200 dark:bg-gray-800 animate-pulse rounded-full" />
+                      <div className="h-7 w-28 bg-gray-200 dark:bg-gray-800 animate-pulse rounded-full" />
+                      <div className="h-7 w-16 bg-gray-200 dark:bg-gray-800 animate-pulse rounded-full" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Auto Suggestions as user types */}
+                {suggestions.length > 0 && (
+                  <div className="mb-4">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Suggestions</span>
+                    <div className="space-y-1">
+                      {suggestions.map((s, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => handleSearchSubmit(s)}
+                          className="flex items-center gap-2 py-2 px-2.5 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 hover:text-[#0d9488] rounded-md cursor-pointer transition-colors font-medium text-gray-800 dark:text-gray-200"
+                        >
+                          <Search className="w-3.5 h-3.5 text-gray-400" />
+                          <span>{s}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recent Searches */}
+                {searchHistory.length > 0 && !searchQuery && (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Recent Searches</span>
+                      <button 
+                        onClick={clearHistory}
+                        className="text-[10px] font-bold text-[#0d9488] hover:underline cursor-pointer border-none bg-transparent"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {searchHistory.map((item, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => handleSearchSubmit(item)}
+                          className="flex items-center justify-between py-1.5 px-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer group transition-colors"
+                        >
+                          <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 font-medium">
+                            <History className="w-3.5 h-3.5 text-gray-400" />
+                            <span>{item}</span>
+                          </div>
+                          <button
+                            onClick={(e) => removeHistoryItem(e, item)}
+                            className="p-1 text-gray-400 hover:text-red-500 rounded transition-colors"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Dynamic Popular Searches (Hidden if empty array) */}
+                {!keywordsLoading && popularKeywords.length > 0 && !searchQuery && (
+                  <div className="mb-4">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Popular Searches</span>
+                    <div className="flex flex-wrap gap-2">
+                      {popularKeywords.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleSearchSubmit(item.keyword)}
+                          className="px-3 py-1.5 bg-gray-50 hover:bg-teal-50 dark:bg-gray-800 dark:hover:bg-teal-900/30 border border-gray-150 hover:border-[#0d9488] text-gray-800 dark:text-gray-200 hover:text-[#0d9488] rounded-full font-semibold transition-all cursor-pointer text-xs"
+                        >
+                          {item.keyword}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Dynamic Trending Searches (Hidden if empty array) */}
+                {!keywordsLoading && trendingKeywords.length > 0 && !searchQuery && (
+                  <div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-500 fill-amber-400" />
+                      <span>Trending Searches</span>
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {trendingKeywords.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleSearchSubmit(item.keyword)}
+                          className="px-3 py-1.5 bg-gray-50 hover:bg-teal-50 dark:bg-gray-800 dark:hover:bg-teal-900/30 border border-gray-150 hover:border-[#0d9488] text-gray-800 dark:text-gray-200 hover:text-[#0d9488] rounded-full font-semibold transition-all cursor-pointer flex items-center gap-1.5 text-xs"
+                        >
+                          <Sparkles className="w-3 h-3 text-amber-500 fill-amber-400" />
+                          <span>{item.keyword}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            )}
           </div>
 
           {/* Right Side Actions: Profile, Wishlist, Bag, Theme, Mobile Search */}
