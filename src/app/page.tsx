@@ -243,14 +243,16 @@ export default function Home() {
                   <Image
                     src={
                       failedBannerImages[banners[activeSlide].id] || !banners[activeSlide].imageUrl
-                        ? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&auto=format&fit=crop&q=80'
+                        ? 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&q=95&auto=format&fit=crop'
                         : resolveImageUrl(banners[activeSlide].imageUrl)
                     }
                     alt={banners[activeSlide].title || 'Banner'}
                     fill
                     priority
-                    sizes="100vw"
-                    className="object-cover object-center brightness-90 select-none transition-all duration-300"
+                    quality={100}
+                    unoptimized={true}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 100vw"
+                    className="object-cover object-center select-none transition-all duration-300"
                     onError={() => {
                       setFailedBannerImages(prev => ({ ...prev, [banners[activeSlide].id]: true }));
                     }}
@@ -258,10 +260,11 @@ export default function Home() {
                 </motion.div>
               </div>
               
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
+              {/* Max 10% localized subtle bottom gradient for crisp text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
               
-              {/* Text overlay content */}
-              <div className="absolute left-8 sm:left-20 max-w-xs sm:max-w-2xl text-white z-10 flex flex-col gap-2 sm:gap-3.5">
+              {/* Text overlay content with drop shadow contrast */}
+              <div className="absolute left-6 sm:left-16 max-w-xs sm:max-w-2xl text-white z-10 flex flex-col gap-2 sm:gap-3.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
                 <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -591,20 +594,22 @@ export default function Home() {
                 src={banner.img}
                 alt={banner.title}
                 fill
+                quality={95}
                 sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-500 brightness-90"
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-500 select-none"
               />
-              {/* Gradient colour tint */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${banner.color} opacity-40`} />
+              {/* Subtle 10% gradient colour tint */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${banner.color} opacity-10`} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               {/* Content */}
-              <div className="absolute inset-0 p-4 flex flex-col justify-between text-white">
-                <span className="text-[9px] font-black bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-2.5 py-0.5 w-fit tracking-widest uppercase">
+              <div className="absolute inset-0 p-4 flex flex-col justify-between text-white z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                <span className="text-[9px] font-black bg-black/40 backdrop-blur-md border border-white/30 rounded-full px-2.5 py-0.5 w-fit tracking-widest uppercase">
                   {banner.badge}
                 </span>
                 <div>
-                  <p className="text-sm font-black leading-tight">{banner.title}</p>
-                  <p className="text-[11px] font-medium opacity-80 mt-0.5">{banner.sub}</p>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold mt-2 opacity-90 group-hover:opacity-100 transition-opacity">
+                  <p className="text-sm font-black leading-tight text-white">{banner.title}</p>
+                  <p className="text-[11px] font-medium text-gray-100 mt-0.5">{banner.sub}</p>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold mt-2 text-white group-hover:underline">
                     Shop Now <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>

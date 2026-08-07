@@ -25,10 +25,10 @@ export function resolveAvatarUrl(url: string | null | undefined): string | null 
 
 /**
  * Resolves any image URL from the backend (rewriting production domains, relative paths,
- * JSON strings, arrays, and fallback placeholdering).
+ * JSON strings, arrays, and fallback placeholdering), ensuring maximum resolution and high DPI quality.
  */
 export function resolveImageUrl(url?: any): string {
-  const fallback = 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600';
+  const fallback = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&q=95&auto=format&fit=crop';
   if (!url) return fallback;
 
   // 1. Handle object or array inputs
@@ -67,6 +67,22 @@ export function resolveImageUrl(url?: any): string {
   if (resolved.includes('api.fciseller.com')) {
     resolved = resolved.replace(/https?:\/\/api\.fciseller\.com/g, API_BASE);
   }
+
+  // 4. Optimize Cloudinary URLs for High DPR / Ultra-High Quality Rendering
+  if (resolved.includes('res.cloudinary.com') || resolved.includes('cloudinary.com')) {
+    // If URL has upload/, inject high quality auto format parameters if missing
+    if (resolved.includes('/upload/') && !resolved.includes('/f_auto')) {
+      resolved = resolved.replace('/upload/', '/upload/f_auto,q_auto:best,dpr_auto/');
+    }
+  }
+
+  // 5. Optimize Unsplash fallback URLs for crisp 4K/Retina rendering
+  if (resolved.includes('images.unsplash.com')) {
+    if (resolved.includes('w=200') || resolved.includes('w=400') || resolved.includes('w=600')) {
+      resolved = resolved.replace(/w=\d+/, 'w=1920').replace(/q=\d+/, 'q=95');
+    }
+  }
+
   if (resolved.startsWith('http://') || resolved.startsWith('https://')) {
     return resolved;
   }
