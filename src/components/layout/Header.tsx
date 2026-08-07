@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Heart, User, Menu, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X, Sun, Moon, Camera } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User, Menu, ChevronDown, MapPin, Compass, Plane, ShoppingBasket, Coins, Globe, DollarSign, History, Sparkles, X, Sun, Moon, Camera, Grid, Package, LogOut, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -240,8 +240,7 @@ export function Header() {
           
           {/* Left Side: Hamburger Menu & Logo */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Mobile Hamburger menu — Disabled per user request */}
-            {/*
+            {/* Mobile Hamburger menu */}
             <Button
               variant="ghost"
               size="icon"
@@ -251,7 +250,6 @@ export function Header() {
             >
               <Menu className="h-6 w-6 text-gray-800 dark:text-gray-200" />
             </Button>
-            */}
 
             {/* FCISeller Logo */}
             <Link href="/" className="flex items-center gap-2 select-none shrink-0">
@@ -407,128 +405,251 @@ export function Header() {
         }}
       />
 
-      {/* 3. MOBILE DRAWER NAVIGATION — Disabled per user request */}
-      {/*
+      {/* 3. REDESIGNED LUXURY MOBILE SIDEBAR */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="left" className="w-[300px] p-0 overflow-y-auto bg-card border-r border-border/30">
-          <div 
-            className="bg-[#0d9488] p-4 text-white flex items-center justify-between cursor-pointer"
-            onClick={() => {
-              if (!isAuthenticated) {
-                setIsMobileMenuOpen(false);
-                openLoginModal();
-              }
-            }}
-          >
-            <div className="flex items-center gap-2.5">
-              <User className="h-6 w-6" />
-              <div className="flex flex-col">
-                <span className="font-bold text-sm leading-tight">
-                  {isAuthenticated && user ? `Hello, ${user.firstName}` : 'Login & Signup'}
-                </span>
-                <span className="text-[10px] text-teal-100 font-medium">
-                  {isAuthenticated ? 'Manage account & orders' : 'Access your wishlist & cart'}
-                </span>
+        <SheetContent side="left" className="w-[310px] sm:w-[340px] p-0 overflow-y-auto bg-slate-950 text-white border-r border-white/10 shadow-2xl">
+          
+          {/* Header Card: Aura Teal Gradient User / Brand Banner */}
+          <div className="bg-gradient-to-br from-[#0F766E] via-[#0d9488] to-[#042f2e] p-5 text-white relative overflow-hidden">
+            {/* Background ambient lighting */}
+            <div className="absolute top-[-20%] right-[-20%] w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
+            
+            <div className="flex items-center justify-between relative z-10">
+              <div 
+                className="flex items-center gap-3 cursor-pointer"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  if (!isAuthenticated) openLoginModal();
+                  else router.push('/profile');
+                }}
+              >
+                {/* User avatar or initials */}
+                {(() => {
+                  const avatarUrl = resolveAvatarUrl((user as any)?.avatar ?? (user as any)?.avatarUrl);
+                  return avatarUrl ? (
+                    <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-white/50 shadow-md">
+                      <img src={avatarUrl} alt={user?.firstName || 'User'} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-11 h-11 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-base font-extrabold shadow-md">
+                      {isAuthenticated && user ? user.firstName?.[0] : <User className="w-5 h-5" />}
+                    </div>
+                  );
+                })()}
+                
+                <div className="flex flex-col min-w-0">
+                  <span className="font-black text-sm tracking-tight truncate max-w-[170px]">
+                    {isAuthenticated && user ? `${user.firstName} ${user.lastName || ''}` : 'Welcome to FCI Seller'}
+                  </span>
+                  <span className="text-[11px] text-teal-100/80 font-medium truncate">
+                    {isAuthenticated ? user?.email || 'Logged in user' : 'Tap to sign in or register →'}
+                  </span>
+                </div>
               </div>
+
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1.5 rounded-full hover:bg-white/10 text-white/80 transition-colors border-none bg-transparent cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
-          <div className="py-4 space-y-4">
-            <div className="px-4 border-b border-border/40 pb-3">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Navigation</span>
-              <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
-                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Home</Link>
-                <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Shop All Products</Link>
-                <Link href="/categories" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Categories</Link>
-                <Link href="/products?category=Collections" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Collections</Link>
-                <Link href="/products?sort=popular" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Featured Brands</Link>
+          <div className="p-4 space-y-5">
+            {/* Quick Category Pills */}
+            <div>
+              <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest block mb-2.5">
+                Popular Departments
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: 'Women', href: '/products?category=Women', icon: '👗' },
+                  { label: 'Men', href: '/products?category=Men', icon: '👔' },
+                  { label: 'Kids', href: '/products?category=Kids', icon: '🧸' },
+                  { label: 'Beauty', href: '/products?category=Accessories', icon: '💄' },
+                  { label: 'Collections', href: '/products?category=Collections', icon: '⚡' },
+                  { label: 'Footwear', href: '/products?category=Footwear', icon: '👟' },
+                ].map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-2 bg-white/5 hover:bg-teal-500/15 border border-white/10 hover:border-teal-500/40 rounded-xl p-2.5 transition-all text-xs font-bold text-gray-200"
+                  >
+                    <span className="text-base select-none">{item.icon}</span>
+                    <span className="truncate">{item.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Navigation Menu */}
+            <div className="border-t border-white/10 pt-4">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2.5">
+                Explore &amp; Shop
+              </span>
+              <nav className="space-y-1">
+                {[
+                  { label: 'Home', href: '/', icon: Compass },
+                  { label: 'Shop All Products', href: '/products', icon: ShoppingBag },
+                  { label: 'All Categories', href: '/categories', icon: Grid },
+                  { label: 'Studio & Runway Drops', href: '/studio', icon: Sparkles, badge: 'NEW' },
+                  { label: 'Curated Collections', href: '/products?category=Collections', icon: ShoppingBasket },
+                ].map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className="w-4 h-4 text-teal-500" />
+                        <span>{link.label}</span>
+                      </div>
+                      {link.badge ? (
+                        <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[9px] font-black tracking-wider animate-pulse">
+                          {link.badge}
+                        </span>
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                      )}
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
 
-            <div className="px-4 border-b border-border/40 pb-3">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Quick Access</span>
-              <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
-                <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between hover:text-[#0d9488] transition-colors">
-                  <span>Wishlist</span>
-                  {wishlistItemsCount > 0 && <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold">{wishlistItemsCount}</span>}
+            {/* User Account Access */}
+            <div className="border-t border-white/10 pt-4">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2.5">
+                My Account
+              </span>
+              <nav className="space-y-1">
+                <Link
+                  href="/wishlist"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <Heart className="w-4 h-4 text-rose-500" />
+                    <span>My Wishlist</span>
+                  </div>
+                  {wishlistItemsCount > 0 ? (
+                    <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold">
+                      {wishlistItemsCount}
+                    </span>
+                  ) : (
+                    <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                  )}
                 </Link>
-                <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between hover:text-[#0d9488] transition-colors">
-                  <span>Cart &amp; Checkout</span>
-                  {cartItemsCount > 0 && <span className="px-2 py-0.5 rounded-full bg-[#0d9488] text-white text-[10px] font-bold">{cartItemsCount}</span>}
+
+                <Link
+                  href="/cart"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <ShoppingBag className="w-4 h-4 text-teal-500" />
+                    <span>Shopping Bag</span>
+                  </div>
+                  {cartItemsCount > 0 ? (
+                    <span className="px-2 py-0.5 rounded-full bg-teal-500 text-white text-[10px] font-bold">
+                      {cartItemsCount}
+                    </span>
+                  ) : (
+                    <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                  )}
                 </Link>
-                <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">My Orders</Link>
-                <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Profile &amp; Settings</Link>
+
+                <Link
+                  href="/orders"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <Package className="w-4 h-4 text-amber-500" />
+                    <span>Track Orders</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                </Link>
+
+                <Link
+                  href="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <User className="w-4 h-4 text-blue-400" />
+                    <span>Profile &amp; Addresses</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                </Link>
               </nav>
             </div>
 
-            <div className="px-4 border-b border-border/40 pb-3">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">Company &amp; Support</span>
-              <nav className="flex flex-col gap-3 font-semibold text-sm text-foreground">
-                <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">About Us</Link>
-                <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Contact Us</Link>
-                <Link href="/faq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#0d9488] transition-colors">Support &amp; FAQ</Link>
-              </nav>
-            </div>
-
-            <div className="px-4 border-b border-border/40 pb-4">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2.5">Preferences</span>
-              <div className="space-y-3 text-xs font-semibold text-gray-700 dark:text-gray-300">
-                <div className="flex items-center justify-between">
-                  <span>Language</span>
+            {/* Regional Preferences */}
+            <div className="border-t border-white/10 pt-4">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2.5">
+                Regional &amp; Currency
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 flex flex-col gap-1">
+                  <span className="text-[10px] text-gray-400">Language</span>
                   <select 
                     value={language} 
                     onChange={(e) => setLanguage(e.target.value as any)}
-                    className="bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none font-bold"
+                    className="bg-transparent border-none outline-none font-bold text-white cursor-pointer p-0 text-xs"
                   >
-                    <option value="EN">English</option>
-                    <option value="HI">हिन्दी</option>
-                    <option value="AR">العربية</option>
-                    <option value="MS">Bahasa Melayu</option>
-                    <option value="NL">Nederlands</option>
-                    <option value="FR">Français</option>
+                    <option value="EN" className="bg-gray-900 text-white">English</option>
+                    <option value="HI" className="bg-gray-900 text-white">हिन्दी</option>
+                    <option value="AR" className="bg-gray-900 text-white">العربية</option>
+                    <option value="MS" className="bg-gray-900 text-white">Bahasa Melayu</option>
+                    <option value="NL" className="bg-gray-900 text-white">Nederlands</option>
+                    <option value="FR" className="bg-gray-900 text-white">Français</option>
                   </select>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span>Currency</span>
+
+                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 flex flex-col gap-1">
+                  <span className="text-[10px] text-gray-400">Currency</span>
                   <select 
                     value={currency} 
                     onChange={(e) => setCurrency(e.target.value as any)}
-                    className="bg-transparent border border-gray-200 dark:border-gray-700 rounded px-2 py-1 outline-none font-bold"
+                    className="bg-transparent border-none outline-none font-bold text-white cursor-pointer p-0 text-xs"
                   >
-                    <option value="INR">INR (₹)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="AED">AED (Dubai)</option>
-                    <option value="BHD">BHD (Bahrain)</option>
-                    <option value="MYR">MYR (Malaysia)</option>
-                    <option value="MUR">MUR (Mauritius)</option>
-                    <option value="FJD">FJD (Fiji)</option>
-                    <option value="GYD">GYD (Guyana)</option>
-                    <option value="SRD">SRD (Suriname)</option>
-                    <option value="TTD">TTD (T&amp;T)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="EUR">EUR (€)</option>
+                    <option value="INR" className="bg-gray-900 text-white">INR (₹)</option>
+                    <option value="USD" className="bg-gray-900 text-white">USD ($)</option>
+                    <option value="AED" className="bg-gray-900 text-white">AED (Dubai)</option>
+                    <option value="BHD" className="bg-gray-900 text-white">BHD (Bahrain)</option>
+                    <option value="MYR" className="bg-gray-900 text-white">MYR (Malaysia)</option>
+                    <option value="GBP" className="bg-gray-900 text-white">GBP (£)</option>
+                    <option value="EUR" className="bg-gray-900 text-white">EUR (€)</option>
                   </select>
                 </div>
               </div>
             </div>
 
+            {/* Logout button */}
             {isAuthenticated && (
-              <div className="px-4 pt-1 pb-4">
+              <div className="border-t border-white/10 pt-4 pb-2">
                 <button
                   onClick={() => {
                     logout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full text-left font-extrabold text-xs text-rose-600 hover:text-rose-700 uppercase tracking-wider py-2 cursor-pointer border-none bg-transparent"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 rounded-xl font-bold text-xs text-rose-400 uppercase tracking-wider cursor-pointer transition-colors"
                 >
-                  Logout Account
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout Account</span>
                 </button>
               </div>
             )}
           </div>
         </SheetContent>
       </Sheet>
-      */}
 
       {/* Mobile Search Overlay */}
       <MobileSearchOverlay
