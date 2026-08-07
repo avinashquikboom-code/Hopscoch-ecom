@@ -234,38 +234,28 @@ export function Header() {
         </div>
       </div>
 
-      {/* 2. MAIN HEADER BAR (Myntra-style Logo, Navigation Links, Search Bar & Action Buttons) */}
-      <div className="w-full bg-white dark:bg-gray-950 py-3 px-4 sm:px-6 md:px-12 border-b border-gray-100 dark:border-gray-800">
-        <div className="container mx-auto flex items-center justify-between gap-4 md:gap-8">
+      {/* 2. MAIN HEADER BAR (Responsive 56-64px height, vertically centered logo, equal icon spacing) */}
+      <div className="w-full bg-white dark:bg-gray-950 h-14 sm:h-16 px-4 md:px-12 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between flex-nowrap">
+        <div className="container mx-auto flex items-center justify-between gap-2 sm:gap-4 md:gap-8 h-full">
           
-          {/* Left Side: Logo & Mobile Hamburger Menu */}
-          <div className="flex items-center gap-2">
-            {/* Desktop FCISeller Logo */}
-            <Link href="/" className="hidden md:flex items-center gap-2.5 select-none shrink-0">
-              <img src="/logo.png" alt="FCI Seller Logo" className="w-9 h-9 object-contain shrink-0" />
-              <div className="flex flex-col justify-center leading-none">
-                <span className="font-black text-sm tracking-wider text-[#282c3f] dark:text-white uppercase">FCI SELLER</span>
-              </div>
-            </Link>
+          {/* Left Side: Hamburger Menu & Logo */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Mobile Hamburger menu */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 text-gray-800 dark:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 lg:hidden p-0 flex items-center justify-center cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <Menu className="h-6 w-6 text-gray-800 dark:text-gray-200" />
+            </Button>
 
-            {/* Mobile Hamburger menu & logo */}
-            <div className="flex items-center gap-2 md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-gray-800 rounded-full hover:bg-gray-100"
-                onClick={() => setIsMobileMenuOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              
-              <Link href="/" className="flex items-center gap-1.5 select-none shrink-0">
-                <img src="/logo.png" alt="FCI Seller Logo" className="w-7 h-7 object-contain shrink-0" />
-                <div className="flex flex-col justify-center leading-none">
-                  <span className="font-black text-xs tracking-wider text-[#282c3f] dark:text-white uppercase">FCI SELLER</span>
-                </div>
-              </Link>
-            </div>
+            {/* FCISeller Logo */}
+            <Link href="/" className="flex items-center gap-2 select-none shrink-0">
+              <img src="/logo.png" alt="FCI Seller Logo" className="h-8 max-h-[34px] w-auto object-contain shrink-0" />
+              <span className="font-black text-xs sm:text-sm tracking-wider text-[#282c3f] dark:text-white uppercase leading-none">FCI SELLER</span>
+            </Link>
           </div>
 
           {/* Desktop Navigation Links */}
@@ -273,7 +263,6 @@ export function Header() {
             <Link href="/products?category=Men" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Men</Link>
             <Link href="/products?category=Women" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Women</Link>
             <Link href="/products?category=Kids" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Kids</Link>
-
             <Link href="/products?category=Accessories" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Beauty</Link>
             <Link href="/products?category=Collections" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Genz</Link>
             <Link href="/studio" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5 flex items-center gap-0.5">
@@ -282,11 +271,11 @@ export function Header() {
             </Link>
           </nav>
 
-          {/* Search Input Box */}
+          {/* Search Input Box (Desktop / Tablet) */}
           <div ref={searchRef} className="flex-1 max-w-lg relative hidden md:block">
             <form onSubmit={handleSearchForm} className="relative w-full">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
+              <Input
                 type="search"
                 placeholder="Search for products, brands and more"
                 className="w-full pl-10 pr-10 py-2.5 h-10 rounded-md bg-[#f5f5f6] dark:bg-gray-800 border border-transparent dark:border-gray-700 focus:bg-white dark:focus:bg-gray-900 focus:border-gray-200 focus:ring-0 text-gray-800 dark:text-gray-100 text-sm placeholder:text-gray-500 dark:placeholder:text-gray-500 font-normal outline-none transition-all"
@@ -294,7 +283,6 @@ export function Header() {
                 onFocus={() => setSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              {/* Camera / AI Image Search trigger */}
               <button
                 type="button"
                 onClick={() => { setSearchFocused(false); setIsVisualSearchOpen(true); }}
@@ -305,130 +293,28 @@ export function Header() {
                 <Camera className="h-4 w-4" />
               </button>
             </form>
-
-            {/* LIVE SEARCH DROPDOWN OVERLAY */}
-            {searchFocused && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-gray-900 border border-gray-200/90 dark:border-gray-700 rounded-lg shadow-xl py-4.5 px-5 z-40 text-xs text-gray-700 dark:text-gray-300 animate-in fade-in slide-in-from-top-1 duration-150">
-                
-                {/* 1. Dynamic Auto suggestions as user types */}
-                {suggestions.length > 0 && (
-                  <div className="mb-4">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Suggestions</span>
-                    <div className="space-y-1">
-                      {suggestions.map((s, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => handleSearchSubmit(s)}
-                          className="flex items-center gap-2 py-2 px-2.5 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 hover:text-[#0d9488] rounded-md cursor-pointer transition-colors font-medium text-gray-800 dark:text-gray-200"
-                        >
-                          <Search className="w-3.5 h-3.5 text-gray-400" />
-                          <span>{s}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Recent Searches (History) */}
-                {searchHistory.length > 0 && !searchQuery && (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Recent Searches</span>
-                      <button 
-                        onClick={clearHistory}
-                        className="text-[10px] font-bold text-[#0d9488] hover:underline cursor-pointer border-none bg-transparent"
-                      >
-                        Clear All
-                      </button>
-                    </div>
-                    <div className="space-y-1">
-                      {searchHistory.map((item, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => handleSearchSubmit(item)}
-                          className="flex items-center justify-between py-1.5 px-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md cursor-pointer group transition-colors"
-                        >
-                          <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 font-medium">
-                            <History className="w-3.5 h-3.5 text-gray-400" />
-                            <span>{item}</span>
-                          </div>
-                          <button
-                            onClick={(e) => removeHistoryItem(e, item)}
-                            className="p-1 text-gray-400 hover:text-red-500 rounded transition-colors"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. Popular Searches */}
-                {!searchQuery && (
-                  <div className="mb-4">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Popular Searches</span>
-                    <div className="flex flex-wrap gap-2">
-                      {POPULAR_SEARCHES.map((item) => (
-                        <button
-                          key={item}
-                          onClick={() => handleSearchSubmit(item)}
-                          className="px-3 py-1.5 bg-gray-50 hover:bg-teal-50 border border-gray-150 hover:border-[#0d9488] text-gray-800 hover:text-[#0d9488] rounded-full font-semibold transition-all cursor-pointer"
-                        >
-                          {item}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. Trending Searches */}
-                {!searchQuery && (
-                  <div>
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Trending Searches</span>
-                    <div className="flex flex-wrap gap-2">
-                      {TRENDING_SEARCHES.map((item) => (
-                        <button
-                          key={item}
-                          onClick={() => handleSearchSubmit(item)}
-                          className="px-3 py-1.5 bg-gray-50 hover:bg-teal-50 border border-gray-150 hover:border-[#0d9488] text-gray-800 hover:text-[#0d9488] rounded-full font-semibold transition-all cursor-pointer flex items-center gap-1"
-                        >
-                          <Sparkles className="w-3 h-3 text-amber-500 fill-amber-400" />
-                          <span>{item}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            )}
           </div>
 
-          {/* Right Side Actions: Profile, Wishlist, Bag */}
-          <div className="flex items-center gap-5 sm:gap-6 text-gray-800 dark:text-gray-200 shrink-0">
+          {/* Right Side Actions: Profile, Wishlist, Bag, Theme, Mobile Search */}
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-6 text-gray-800 dark:text-gray-200 shrink-0">
             
-            {/* Login Button (only when not authenticated, hidden on mobile) */}
-            {!isAuthenticated && (
-              <motion.button
-                whileHover={{ scale: 1.05, translateY: -1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={openLoginModal}
-                className="hidden md:inline-flex items-center h-8 px-4 border border-[#0F766E] text-[#0F766E] hover:bg-[#0F766E]/5 font-bold text-xs rounded-sm tracking-wider cursor-pointer bg-transparent transition-colors"
-              >
-                LOGIN
-              </motion.button>
-            )}
+            {/* Mobile Search Button */}
+            <button
+              onClick={() => setIsMobileSearchOpen(true)}
+              className="md:hidden flex items-center justify-center p-1 text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors cursor-pointer border-none bg-transparent"
+              aria-label="Search products"
+            >
+              <Search className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-200" />
+            </button>
 
-            {/* User Dropdown */}
+            {/* Profile Dropdown (Hide username on mobile, show avatar only) */}
             <motion.div 
-              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="relative group flex flex-col items-center cursor-pointer"
             >
               {mounted && isAuthenticated && user ? (
                 <Link href="/profile" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
-                  {/* Show real avatar if available, otherwise initials/icon */}
                   {(() => {
                     const avatarUrl = resolveAvatarUrl((user as any).avatar ?? (user as any).avatarUrl);
                     return avatarUrl ? (
@@ -441,95 +327,68 @@ export function Header() {
                       </div>
                     );
                   })()}
-                  <span className="text-[10px] font-bold tracking-tight">{displayName}</span>
+                  {/* Hide username on mobile to prevent overlapping */}
+                  <span className="hidden md:block text-[10px] font-bold tracking-tight truncate max-w-[80px]">{displayName}</span>
                 </Link>
               ) : (
                 <Link href="/login" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none">
-                  <User className="h-5 w-5" />
-                  <span className="text-[10px] font-bold tracking-tight">Profile</span>
+                  <User className="w-5.5 h-5.5 sm:w-6 sm:h-6" />
+                  <span className="hidden md:block text-[10px] font-bold tracking-tight">Profile</span>
                 </Link>
               )}
-              
-              {/* Dropdown items popup */}
-              <div className="absolute top-full right-0 mt-1 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 shadow-xl rounded-sm py-1.5 text-xs text-gray-700 dark:text-gray-300 hidden group-hover:block z-30">
-                <Link href="/orders" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">My Orders</Link>
-                <Link href="/wishlist" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">My Wishlist</Link>
-                <Link href="/faq" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#0d9488]">Help Center</Link>
-              </div>
             </motion.div>
 
             {/* Wishlist */}
             <motion.div
-              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Link href="/wishlist" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
                 <div className="relative">
-                  <Heart className="h-5 w-5" />
+                  <Heart className="w-5.5 h-5.5 sm:w-6 sm:h-6" />
                   {mounted && wishlistItemsCount > 0 && (
                     <Badge className="absolute -top-1.5 -right-2 h-4 min-w-4 flex items-center justify-center p-0.5 bg-rose-500 text-white text-[8px] font-black rounded-full border border-white shadow-sm">
                       {wishlistItemsCount}
                     </Badge>
                   )}
                 </div>
-                <span className="text-[10px] font-bold tracking-tight">Wishlist</span>
+                <span className="hidden md:block text-[10px] font-bold tracking-tight">Wishlist</span>
               </Link>
             </motion.div>
 
             {/* Bag/Cart */}
             <motion.div
-              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Link href="/cart" className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors relative gap-0.5 select-none">
                 <div className="relative">
-                  <ShoppingBag className="h-5 w-5" />
+                  <ShoppingBag className="w-5.5 h-5.5 sm:w-6 sm:h-6" />
                   {mounted && cartItemsCount > 0 && (
                     <Badge className="absolute -top-1.5 -right-2 h-4 min-w-4 flex items-center justify-center p-0.5 bg-[#0d9488] text-white text-[8px] font-black rounded-full border border-white shadow-sm">
                       {cartItemsCount}
                     </Badge>
                   )}
                 </div>
-                <span className="text-[10px] font-bold tracking-tight">Bag</span>
+                <span className="hidden md:block text-[10px] font-bold tracking-tight">Bag</span>
               </Link>
             </motion.div>
 
             {/* Theme Toggle */}
             <motion.button
-              whileHover={{ scale: 1.05, translateY: -1 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={toggleTheme}
-              className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none cursor-pointer bg-transparent border-none"
+              className="flex flex-col items-center text-gray-700 dark:text-gray-300 hover:text-[#0d9488] transition-colors gap-0.5 select-none cursor-pointer bg-transparent border-none p-0"
               aria-label="Toggle theme"
             >
               {mounted && theme === 'dark' ? (
-                <Sun className="h-5 w-5 text-amber-500 fill-amber-400" />
+                <Sun className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-amber-500 fill-amber-400" />
               ) : (
-                <Moon className="h-5 w-5 text-gray-700" />
+                <Moon className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-gray-700 dark:text-gray-200" />
               )}
-              <span className="text-[10px] font-bold tracking-tight">Theme</span>
+              <span className="hidden md:block text-[10px] font-bold tracking-tight">Theme</span>
             </motion.button>
-
-            {/* Mobile Actions: Search + Camera icons on mobile */}
-            <div className="md:hidden flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-gray-800 rounded-full hover:bg-gray-100"
-                onClick={() => setIsVisualSearchOpen(true)}
-                aria-label="Search by image"
-              >
-                <Camera className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-gray-800 rounded-full hover:bg-gray-100"
-                onClick={() => setIsMobileSearchOpen(true)}
-              >
-                <Search className="h-5 w-5" />
-              </Button>
-            </div>
 
           </div>
 

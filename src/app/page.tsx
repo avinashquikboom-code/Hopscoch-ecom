@@ -184,31 +184,30 @@ export default function Home() {
       <div className="absolute top-[35%] right-[-15%] w-[60vw] h-[60vw] bg-[radial-gradient(circle,_rgba(124,58,237,0.08)_0%,_transparent_65%)] blur-[100px] pointer-events-none rounded-full" />
       <div className="absolute bottom-[10%] left-[-10%] w-[50vw] h-[50vw] bg-[radial-gradient(circle,_rgba(244,63,94,0.06)_0%,_transparent_65%)] blur-[80px] pointer-events-none rounded-full" />
 
-      {/* 1. Category Bar (Modern Floating Glass Track) */}
-      <section className="mx-4 sm:mx-6 md:mx-12 my-6 rounded-2xl backdrop-blur-md bg-white/45 dark:bg-gray-950/40 border border-white/40 dark:border-white/5 py-4 px-6 shadow-md transition-all duration-300 relative z-10">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto scrollbar-hide py-1">
+      {/* 1. Category Bar (Responsive Snap Scroll Slider with Circular 64-72px Images) */}
+      <section className="w-full my-4 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 md:px-12">
+          <div className="flex items-start gap-3.5 sm:gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory py-2 px-0.5 scroll-smooth">
             {mockCategories.map((category) => (
               <Link
                 key={category.id}
                 href={`/products?category=${encodeURIComponent(category.name)}`}
-                className="flex flex-col items-center text-center shrink-0 group select-none cursor-pointer"
+                className="flex flex-col items-center text-center shrink-0 snap-start group select-none cursor-pointer w-[68px] sm:w-[80px]"
               >
                 <motion.div 
-                  whileHover={{ scale: 1.08, y: -4 }}
+                  whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-neutral-250/20 dark:border-neutral-800/20 shadow-md relative bg-neutral-100/30 dark:bg-neutral-900/30 flex items-center justify-center transition-all duration-300 group-hover:border-[#0d9488]/40 dark:group-hover:border-[#0d9488]/50"
+                  className="w-[64px] h-[64px] sm:w-[72px] sm:h-[72px] rounded-full overflow-hidden border-2 border-teal-600/20 dark:border-teal-500/30 shadow-sm relative bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center transition-all duration-300 group-hover:border-[#0d9488]"
                 >
                   <Image
                     src={category.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200'}
                     alt={category.name}
                     fill
-                    sizes="80px"
-                    className="object-cover object-top filter group-hover:scale-110 transition-all duration-500"
+                    sizes="72px"
+                    className="object-cover object-top group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors duration-300" />
                 </motion.div>
-                <span className="text-[10px] sm:text-[11px] font-black text-neutral-600 dark:text-neutral-400 mt-2.5 group-hover:text-[#0d9488] transition-colors leading-none tracking-widest uppercase font-mono">
+                <span className="text-[10px] sm:text-[11px] font-bold text-gray-800 dark:text-gray-200 mt-1.5 group-hover:text-[#0d9488] transition-colors leading-tight line-clamp-2 max-w-[68px] sm:max-w-[80px] text-center">
                   {category.name}
                 </span>
               </Link>
