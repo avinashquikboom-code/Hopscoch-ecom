@@ -191,7 +191,7 @@ export default function StudioPage() {
                   </div>
                 )}
               </div>
-              <p className="text-[10px] font-bold text-[#0F766E] uppercase tracking-widest">{product.brand || 'AURA'}</p>
+              <p className="text-[10px] font-bold text-[#0F766E] uppercase tracking-widest">{product.brand || 'FCISeller'}</p>
               <p className="text-xs font-semibold text-[#0F172A] line-clamp-1 mt-0.5">{product.name}</p>
               <p className="text-xs text-[#64748B] mt-0.5">₹{product.price}</p>
             </div>

@@ -26,7 +26,7 @@ const initialGateways = [
     iconBg: 'bg-blue-500/10 text-blue-500',
     apiKey: 'rzp_live_8g7Hsd82knds9a',
     secret: '••••••••••••••••••••••••••••',
-    webhook: 'https://api.aurastore.com/v1/webhooks/razorpay',
+    webhook: 'https://api.fciseller.com/v1/webhooks/razorpay',
     sandbox: false,
     active: true,
     features: ['UPI', 'Cards', 'Net Banking', 'Wallets', 'EMI'],
@@ -42,7 +42,7 @@ const initialGateways = [
     iconBg: 'bg-indigo-500/10 text-indigo-500',
     apiKey: 'pk_live_51Ny8hs92nsd9s1',
     secret: '••••••••••••••••••••••••••••',
-    webhook: 'https://api.aurastore.com/v1/webhooks/stripe',
+    webhook: 'https://api.fciseller.com/v1/webhooks/stripe',
     sandbox: true,
     active: false,
     features: ['Cards', 'Apple Pay', 'Google Pay', 'SEPA Debit'],
@@ -58,7 +58,7 @@ const initialGateways = [
     iconBg: 'bg-sky-500/10 text-sky-500',
     apiKey: 'client_live_Ad2jns982ndskJn',
     secret: '••••••••••••••••••••••••••••',
-    webhook: 'https://api.aurastore.com/v1/webhooks/paypal',
+    webhook: 'https://api.fciseller.com/v1/webhooks/paypal',
     sandbox: true,
     active: false,
     features: ['PayPal Balance', 'Pay Later', 'Credit Cards', 'International'],
@@ -149,7 +149,7 @@ export default function PaymentGatewayPage() {
       iconBg: 'bg-emerald-500/10 text-emerald-500',
       apiKey: form.apiKey,
       secret: '••••••••••••••••••••••••••••',
-      webhook: form.webhook || `https://api.aurastore.com/v1/webhooks/${id}`,
+      webhook: form.webhook || `https://api.fciseller.com/v1/webhooks/${id}`,
       sandbox: form.sandbox,
       active: false,
       features: ['Cards', 'Alternative Methods'],
@@ -623,7 +623,7 @@ export default function PaymentGatewayPage() {
                 <ShieldCheck className="h-4 w-4 text-primary" /> Gateway Routing Logic
               </CardTitle>
               <CardDescription className="text-xs mt-1 leading-relaxed">
-                AURA Smart Route automatically distributes user transactions based on geo-IP, active gateway health checks, and fee optimization structures.
+                FCISeller Smart Route automatically distributes user transactions based on geo-IP, active gateway health checks, and fee optimization structures.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 pt-0 space-y-4 text-xs">
