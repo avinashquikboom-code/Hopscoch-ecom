@@ -187,7 +187,7 @@ export default function Home() {
       {/* 1. Category Bar (Responsive Snap Scroll Slider with Circular 64-72px Images) */}
       <section className="w-full my-4 relative z-10">
         <div className="container mx-auto px-4 sm:px-6 md:px-12">
-          <div className="flex items-start gap-3.5 sm:gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory py-2 px-0.5 scroll-smooth">
+          <div className="flex items-start justify-start sm:justify-center gap-3.5 sm:gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory py-2 px-0.5 scroll-smooth">
             {mockCategories.map((category) => (
               <Link
                 key={category.id}
