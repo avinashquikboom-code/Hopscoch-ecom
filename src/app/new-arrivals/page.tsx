@@ -11,7 +11,7 @@ export default function NewArrivalsPage() {
   const mockProducts = productsData?.data || [];
 
   const rawList = (dedicatedNewArrivals && dedicatedNewArrivals.length > 0) ? dedicatedNewArrivals : mockProducts;
-  const newArrivals = rawList.filter(p => p.isNew || (p as any).isNewArrival || true).slice(0, 40);
+  const newArrivals = rawList.filter(p => p.isNew || (p as any).isNewArrival).slice(0, 40);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (

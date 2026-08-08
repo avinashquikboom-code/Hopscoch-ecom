@@ -6,10 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
 
 export default function SummerCollectionPage() {
-  const { data: productsData } = useProducts();
-  const mockProducts = productsData?.data || [];
-
-  const products = mockProducts.slice(0, 8);
+  const { data: productsData } = useProducts({ search: 'Summer' });
+  const products = productsData?.data || [];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">

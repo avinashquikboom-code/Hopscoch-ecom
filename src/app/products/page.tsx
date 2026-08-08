@@ -1,5 +1,6 @@
 'use client';
 import { useProducts, useCategories } from '@/hooks/use-products';
+import { ProductFilters } from '@/types';
 
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
@@ -206,10 +207,6 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
 function ProductsContent() {
   const { data: categoriesData } = useCategories();
   const mockCategories = categoriesData || [];
-  // Fetch full catalog (limit=500, within backend max) so local category/price/brand
-  // filters work across ALL products. Catalog is ~250 products; 500 provides headroom.
-  const { data: productsData } = useProducts(undefined, 1, 500);
-  const mockProducts = productsData?.data || [];
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -236,6 +233,14 @@ function ProductsContent() {
   const [sortBy, setSortBy] = useState('newest');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Fetch catalog with active category & sort filters
+  const activeFilters: ProductFilters = {
+    category: selectedCategory !== 'all' ? selectedCategory : undefined,
+    sortBy: sortBy as ProductFilters['sortBy'],
+  };
+  const { data: productsData } = useProducts(activeFilters, 1, 500);
+  const mockProducts = productsData?.data || [];
 
   // Visual search state
   const [visualSearchResults, setVisualSearchResults] = useState<{
@@ -298,10 +303,10 @@ function ProductsContent() {
 
       // Gender alias matching (strictly for Men & Women categories)
       if (isMenTarget) {
-        return pGenderUpper === 'MALE' || (pCatLower.length > 0 && (pCatLower.includes('boy') || pCatLower.includes('men'))) || (pSubCatLower.length > 0 && (pSubCatLower.includes('boy') || pSubCatLower.includes('men')));
+        return pGenderUpper === 'MALE' || pGenderUpper === 'UNISEX' || (pCatLower.length > 0 && (pCatLower.includes('boy') || pCatLower.includes('men'))) || (pSubCatLower.length > 0 && (pSubCatLower.includes('boy') || pSubCatLower.includes('men')));
       }
       if (isWomenTarget) {
-        return pGenderUpper === 'FEMALE' || (pCatLower.length > 0 && (pCatLower.includes('girl') || pCatLower.includes('women'))) || (pSubCatLower.length > 0 && (pSubCatLower.includes('girl') || pSubCatLower.includes('women')));
+        return pGenderUpper === 'FEMALE' || pGenderUpper === 'UNISEX' || (pCatLower.length > 0 && (pCatLower.includes('girl') || pCatLower.includes('women'))) || (pSubCatLower.length > 0 && (pSubCatLower.includes('girl') || pSubCatLower.includes('women')));
       }
 
       // 1. Direct or partial match on category name, subcategory name, parent category name, or IDs

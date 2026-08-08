@@ -8,10 +8,8 @@ import { ProductCard } from '@/components/product/ProductCard';
 import { Grid, List } from 'lucide-react';
 
 export default function BoysPage() {
-  const { data: productsData } = useProducts();
-  const mockProducts = productsData?.data || [];
-
-  const boysProducts = mockProducts.filter(p => p.category === 'Boys Wear' || p.category === 'Fashion');
+  const { data: productsData } = useProducts({ category: 'Boys' });
+  const boysProducts = productsData?.data || [];
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (

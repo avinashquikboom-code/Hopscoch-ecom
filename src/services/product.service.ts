@@ -259,13 +259,8 @@ export const productService = {
       const raw = extractRawProducts(json);
       const mapped = raw.map(mapBackendProductToFrontend);
 
-      // Apply other filters locally (search, rating, inStock, brands, colors, sizes, etc.)
-      const filtered = applyFilters(mapped, {
-        ...filters,
-        category: undefined,
-        priceRange: undefined,
-        sortBy: undefined
-      });
+      // Apply filters locally (search, category, priceRange, rating, inStock, brands, colors, sizes, etc.)
+      const filtered = applyFilters(mapped, filters);
 
       const total = json.data?.pagination?.total ?? json.pagination?.total ?? filtered.length;
       const totalPages = json.data?.pagination?.totalPages ?? json.pagination?.totalPages ?? Math.ceil(filtered.length / limit);
