@@ -43,6 +43,8 @@ export interface Product {
   categoryId?: string;
   subcategory?: string;
   subcategoryId?: string;
+  parentCategory?: string;
+  parentCategoryId?: string;
   brand?: string;
   stock: number;
   rating: number;

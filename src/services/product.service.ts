@@ -80,6 +80,8 @@ function mapBackendProductToFrontend(raw: any): Product {
   const catId = String(raw.categoryId || catObj?.id || '');
   const subCategoryName = catObj?.parent ? catObj.name : (raw.subCategoryName || raw.subcategory || undefined);
   const subCategoryId = catObj?.parent ? String(catObj.id) : (raw.subCategoryId ? String(raw.subCategoryId) : undefined);
+  const parentCategoryName = catObj?.parent?.name || raw.parentCategory || raw.parentCategoryName || undefined;
+  const parentCategoryId = catObj?.parent?.id ? String(catObj.parent.id) : (raw.parentCategoryId ? String(raw.parentCategoryId) : undefined);
 
   return {
     id: String(raw.id),
@@ -93,6 +95,8 @@ function mapBackendProductToFrontend(raw: any): Product {
     categoryId: catId,
     subcategory: subCategoryName,
     subcategoryId: subCategoryId,
+    parentCategory: parentCategoryName,
+    parentCategoryId: parentCategoryId,
     brand: raw.brand?.name || 'FCISeller',
     stock: totalStock,
     rating: Number(raw.avgRating || 4.5),
@@ -125,14 +129,19 @@ function applyFilters(products: Product[], filters?: ProductFilters): Product[] 
     result = result.filter((p) => {
       const pCat = ((p as any).category || '').toLowerCase().trim();
       const pSubCat = ((p as any).subcategory || '').toLowerCase().trim();
+      const pParentCat = ((p as any).parentCategory || '').toLowerCase().trim();
       const pCatId = String((p as any).categoryId || '').toLowerCase().trim();
+      const pParentCatId = String((p as any).parentCategoryId || '').toLowerCase().trim();
       return (
         pCat === targetLower ||
         pSubCat === targetLower ||
+        pParentCat === targetLower ||
         pCatId === targetLower ||
+        pParentCatId === targetLower ||
         pCat.includes(targetLower) ||
         targetLower.includes(pCat) ||
-        (pSubCat && (pSubCat.includes(targetLower) || targetLower.includes(pSubCat)))
+        (pSubCat && (pSubCat.includes(targetLower) || targetLower.includes(pSubCat))) ||
+        (pParentCat && (pParentCat.includes(targetLower) || targetLower.includes(pParentCat)))
       );
     });
   }

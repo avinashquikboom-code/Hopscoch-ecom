@@ -287,14 +287,23 @@ function ProductsContent() {
       const getCatStr = (cat: any) => typeof cat === 'string' ? cat : (cat?.name || cat?.title || cat?.slug || '');
       const pCatLower = getCatStr(p.category).toLowerCase().trim();
       const pSubCatLower = getCatStr((p as any).subcategory).toLowerCase().trim();
+      const pParentCatLower = getCatStr((p as any).parentCategory).toLowerCase().trim();
       const pCatIdStr = String((p as any).categoryId || (typeof p.category === 'object' ? (p.category as any)?.id : '')).toLowerCase().trim();
+      const pParentCatIdStr = String((p as any).parentCategoryId || '').toLowerCase().trim();
 
-      // 1. Direct or partial match on category name, subcategory name, or ID
+      // 1. Direct or partial match on category name, subcategory name, parent category name, or IDs
       if (
         pCatLower === targetLower ||
         pSubCatLower === targetLower ||
+        pParentCatLower === targetLower ||
         pCatIdStr === targetLower ||
-        (cleanTarget.length > 1 && (pCatLower.includes(cleanTarget) || cleanTarget.includes(pCatLower))) ||
+        pParentCatIdStr === targetLower ||
+        (cleanTarget.length > 1 && (
+          pCatLower.includes(cleanTarget) ||
+          cleanTarget.includes(pCatLower) ||
+          pParentCatLower.includes(cleanTarget) ||
+          cleanTarget.includes(pParentCatLower)
+        )) ||
         (pSubCatLower && cleanTarget.length > 1 && (pSubCatLower.includes(cleanTarget) || cleanTarget.includes(pSubCatLower)))
       ) {
         return true;
@@ -305,18 +314,35 @@ function ProductsContent() {
         c.name.toLowerCase().trim() === targetLower ||
         c.slug?.toLowerCase().trim() === targetLower ||
         String(c.id) === targetLower ||
-        (cleanTarget.length > 2 && c.name.toLowerCase().trim().includes(cleanTarget))
+        (cleanTarget.length > 1 && c.name.toLowerCase().trim().includes(cleanTarget))
       );
 
       if (parentCat) {
         const parentName = parentCat.name.toLowerCase().trim();
-        if (pCatLower === parentName || pSubCatLower === parentName || pCatIdStr === String(parentCat.id)) {
+        const parentIdStr = String(parentCat.id).toLowerCase().trim();
+        if (
+          pCatLower === parentName ||
+          pSubCatLower === parentName ||
+          pParentCatLower === parentName ||
+          pCatIdStr === parentIdStr ||
+          pParentCatIdStr === parentIdStr
+        ) {
           return true;
         }
-        if (Array.isArray((parentCat as any).children)) {
-          const isChildMatch = (parentCat as any).children.some((child: any) => {
+
+        // Gather all subcategories from flat list (by parentId), subcategories array, and children array
+        const childCatsFromFlat = mockCategories.filter((c: any) =>
+          String(c.parentId) === parentIdStr || String(c.parent?.id) === parentIdStr
+        );
+        const childCatsFromSub = Array.isArray((parentCat as any).subcategories) ? (parentCat as any).subcategories : [];
+        const childCatsFromChild = Array.isArray((parentCat as any).children) ? (parentCat as any).children : [];
+        const allChildCategories = [...childCatsFromFlat, ...childCatsFromSub, ...childCatsFromChild];
+
+        if (allChildCategories.length > 0) {
+          const isChildMatch = allChildCategories.some((child: any) => {
             const childName = (child.name || '').toLowerCase().trim();
-            return pCatLower === childName || pSubCatLower === childName || pCatIdStr === String(child.id);
+            const childIdStr = String(child.id || '').toLowerCase().trim();
+            return pCatLower === childName || pSubCatLower === childName || pCatIdStr === childIdStr;
           });
           if (isChildMatch) return true;
         }
