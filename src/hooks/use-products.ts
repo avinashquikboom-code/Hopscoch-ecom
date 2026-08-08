@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { productService } from '@/services';
 import { Product, ProductFilters, PaginatedResponse } from '@/types';
 
-export function useProducts(filters?: ProductFilters, page = 1, limit = 12) {
+export function useProducts(filters?: ProductFilters, page = 1, limit = 500) {
   return useQuery({
     queryKey: ['products', filters, page, limit],
     queryFn: () => productService.getProducts(filters, { page, limit }),

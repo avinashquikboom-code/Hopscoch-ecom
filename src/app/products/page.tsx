@@ -284,17 +284,18 @@ function ProductsContent() {
       .trim();
 
     filtered = filtered.filter(p => {
-      const pCatLower = (p.category || '').toLowerCase().trim();
-      const pSubCatLower = ((p as any).subcategory || '').toLowerCase().trim();
-      const pCatIdStr = String((p as any).categoryId || '').toLowerCase().trim();
+      const getCatStr = (cat: any) => typeof cat === 'string' ? cat : (cat?.name || cat?.title || cat?.slug || '');
+      const pCatLower = getCatStr(p.category).toLowerCase().trim();
+      const pSubCatLower = getCatStr((p as any).subcategory).toLowerCase().trim();
+      const pCatIdStr = String((p as any).categoryId || (typeof p.category === 'object' ? (p.category as any)?.id : '')).toLowerCase().trim();
 
       // 1. Direct or partial match on category name, subcategory name, or ID
       if (
         pCatLower === targetLower ||
         pSubCatLower === targetLower ||
         pCatIdStr === targetLower ||
-        (cleanTarget.length > 2 && (pCatLower.includes(cleanTarget) || cleanTarget.includes(pCatLower))) ||
-        (pSubCatLower && cleanTarget.length > 2 && (pSubCatLower.includes(cleanTarget) || cleanTarget.includes(pSubCatLower)))
+        (cleanTarget.length > 1 && (pCatLower.includes(cleanTarget) || cleanTarget.includes(pCatLower))) ||
+        (pSubCatLower && cleanTarget.length > 1 && (pSubCatLower.includes(cleanTarget) || cleanTarget.includes(pSubCatLower)))
       ) {
         return true;
       }
