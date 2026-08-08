@@ -283,6 +283,10 @@ function ProductsContent() {
       .replace(/special|edition|zone|spotlight|collection|crafted/g, '')
       .trim();
 
+    // Map Men/Women category queries to Boys/Girls & Gender DB schema representation
+    const isMenTarget = cleanTarget === 'men' || cleanTarget === 'boy' || cleanTarget === 'boys' || cleanTarget === 'male';
+    const isWomenTarget = cleanTarget === 'women' || cleanTarget === 'girl' || cleanTarget === 'girls' || cleanTarget === 'female';
+
     filtered = filtered.filter(p => {
       const getCatStr = (cat: any) => typeof cat === 'string' ? cat : (cat?.name || cat?.title || cat?.slug || '');
       const pCatLower = getCatStr(p.category).toLowerCase().trim();
@@ -290,6 +294,15 @@ function ProductsContent() {
       const pParentCatLower = getCatStr((p as any).parentCategory).toLowerCase().trim();
       const pCatIdStr = String((p as any).categoryId || (typeof p.category === 'object' ? (p.category as any)?.id : '')).toLowerCase().trim();
       const pParentCatIdStr = String((p as any).parentCategoryId || '').toLowerCase().trim();
+      const pGenderUpper = String((p as any).gender || '').toUpperCase().trim();
+
+      // Gender alias matching
+      if (isMenTarget && (pGenderUpper === 'MALE' || pGenderUpper === 'UNISEX' || pCatLower.includes('boy') || pSubCatLower.includes('boy') || pParentCatLower.includes('boy'))) {
+        return true;
+      }
+      if (isWomenTarget && (pGenderUpper === 'FEMALE' || pGenderUpper === 'UNISEX' || pCatLower.includes('girl') || pSubCatLower.includes('girl') || pParentCatLower.includes('girl'))) {
+        return true;
+      }
 
       // 1. Direct or partial match on category name, subcategory name, parent category name, or IDs
       if (
@@ -379,12 +392,16 @@ function ProductsContent() {
   // Filter by size, color, material, fabric, fit, occasion, and discount
   if (selectedSizes.length > 0) {
     filtered = filtered.filter(p => 
+      selectedSizes.some(s => p.sizes?.some(sz => sz.toLowerCase() === s.toLowerCase())) ||
+      selectedSizes.some(s => p.variants?.some(v => v.size?.toLowerCase() === s.toLowerCase())) ||
       selectedSizes.some(s => p.tags.some(t => t.toLowerCase() === s.toLowerCase())) || 
       selectedSizes.some(s => p.name.toLowerCase().includes(s.toLowerCase()))
     );
   }
   if (selectedColors.length > 0) {
     filtered = filtered.filter(p => 
+      selectedColors.some(c => p.colors?.some(col => col.toLowerCase() === c.toLowerCase())) ||
+      selectedColors.some(c => p.variants?.some(v => v.color?.toLowerCase() === c.toLowerCase())) ||
       selectedColors.some(c => p.tags.some(t => t.toLowerCase() === c.toLowerCase())) ||
       selectedColors.some(c => p.name.toLowerCase().includes(c.toLowerCase()))
     );

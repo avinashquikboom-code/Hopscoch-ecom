@@ -97,6 +97,7 @@ function mapBackendProductToFrontend(raw: any): Product {
     subcategoryId: subCategoryId,
     parentCategory: parentCategoryName,
     parentCategoryId: parentCategoryId,
+    gender: raw.gender || undefined,
     brand: raw.brand?.name || 'FCISeller',
     stock: totalStock,
     rating: Number(raw.avgRating || 4.5),

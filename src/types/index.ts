@@ -45,6 +45,7 @@ export interface Product {
   subcategoryId?: string;
   parentCategory?: string;
   parentCategoryId?: string;
+  gender?: string;
   brand?: string;
   stock: number;
   rating: number;
