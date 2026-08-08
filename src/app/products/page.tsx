@@ -641,11 +641,11 @@ function ProductsContent() {
         <div className="container mx-auto px-4 sm:px-6 md:px-12 mb-5">
           <div className={`rounded-2xl bg-gradient-to-r ${CATEGORY_BANNERS[selectedCategory].bg} p-6 sm:p-8 text-white shadow-lg relative overflow-hidden border border-white/10`}>
             <div className="relative z-10 max-w-2xl space-y-2">
-              <span className="text-[9px] font-black bg-white/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest border border-white/20">
+              <span className="text-[9px] font-black bg-white/20 backdrop-blur-md px-3 py-1 rounded-full uppercase tracking-widest border border-white/20 text-white">
                 {CATEGORY_BANNERS[selectedCategory].badge}
               </span>
-              <h2 className="text-xl sm:text-3xl font-black tracking-tight">{CATEGORY_BANNERS[selectedCategory].title}</h2>
-              <p className="text-xs sm:text-sm text-gray-200 font-light">{CATEGORY_BANNERS[selectedCategory].subtitle}</p>
+              <h2 className="text-xl sm:text-3xl font-black tracking-tight text-white">{CATEGORY_BANNERS[selectedCategory].title}</h2>
+              <p className="text-xs sm:text-sm text-white/90 font-light">{CATEGORY_BANNERS[selectedCategory].subtitle}</p>
             </div>
             <div className="absolute right-[-20px] bottom-[-20px] w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none" />
           </div>
