@@ -296,49 +296,48 @@ function ProductsContent() {
       const pParentCatIdStr = String((p as any).parentCategoryId || '').toLowerCase().trim();
       const pGenderUpper = String((p as any).gender || '').toUpperCase().trim();
 
-      // Gender alias matching
-      if (isMenTarget && (pGenderUpper === 'MALE' || pGenderUpper === 'UNISEX' || pCatLower.includes('boy') || pSubCatLower.includes('boy') || pParentCatLower.includes('boy'))) {
-        return true;
+      // Gender alias matching (strictly for Men & Women categories)
+      if (isMenTarget) {
+        return pGenderUpper === 'MALE' || (pCatLower.length > 0 && (pCatLower.includes('boy') || pCatLower.includes('men'))) || (pSubCatLower.length > 0 && (pSubCatLower.includes('boy') || pSubCatLower.includes('men')));
       }
-      if (isWomenTarget && (pGenderUpper === 'FEMALE' || pGenderUpper === 'UNISEX' || pCatLower.includes('girl') || pSubCatLower.includes('girl') || pParentCatLower.includes('girl'))) {
-        return true;
+      if (isWomenTarget) {
+        return pGenderUpper === 'FEMALE' || (pCatLower.length > 0 && (pCatLower.includes('girl') || pCatLower.includes('women'))) || (pSubCatLower.length > 0 && (pSubCatLower.includes('girl') || pSubCatLower.includes('women')));
       }
 
       // 1. Direct or partial match on category name, subcategory name, parent category name, or IDs
       if (
-        pCatLower === targetLower ||
-        pSubCatLower === targetLower ||
-        pParentCatLower === targetLower ||
-        pCatIdStr === targetLower ||
-        pParentCatIdStr === targetLower ||
-        (cleanTarget.length > 1 && (
-          pCatLower.includes(cleanTarget) ||
-          cleanTarget.includes(pCatLower) ||
-          pParentCatLower.includes(cleanTarget) ||
-          cleanTarget.includes(pParentCatLower)
-        )) ||
-        (pSubCatLower && cleanTarget.length > 1 && (pSubCatLower.includes(cleanTarget) || cleanTarget.includes(pSubCatLower)))
+        (pCatLower.length > 0 && pCatLower === targetLower) ||
+        (pSubCatLower.length > 0 && pSubCatLower === targetLower) ||
+        (pParentCatLower.length > 0 && pParentCatLower === targetLower) ||
+        (pCatIdStr.length > 0 && pCatIdStr === targetLower) ||
+        (pParentCatIdStr.length > 0 && pParentCatIdStr === targetLower)
       ) {
         return true;
       }
 
+      if (cleanTarget.length > 2) {
+        if (pCatLower.length > 2 && (pCatLower.includes(cleanTarget) || cleanTarget.includes(pCatLower))) return true;
+        if (pSubCatLower.length > 2 && (pSubCatLower.includes(cleanTarget) || cleanTarget.includes(pSubCatLower))) return true;
+        if (pParentCatLower.length > 2 && (pParentCatLower.includes(cleanTarget) || cleanTarget.includes(pParentCatLower))) return true;
+      }
+
       // 2. Check if selectedCategory matches a category in mockCategories
-      const parentCat = mockCategories.find((c: any) =>
-        c.name.toLowerCase().trim() === targetLower ||
-        c.slug?.toLowerCase().trim() === targetLower ||
-        String(c.id) === targetLower ||
-        (cleanTarget.length > 1 && c.name.toLowerCase().trim().includes(cleanTarget))
-      );
+      const parentCat = mockCategories.find((c: any) => {
+        const cName = (c.name || '').toLowerCase().trim();
+        const cSlug = (c.slug || '').toLowerCase().trim();
+        const cId = String(c.id || '').toLowerCase().trim();
+        return cName === targetLower || cSlug === targetLower || cId === targetLower || (cleanTarget.length > 2 && cName.includes(cleanTarget));
+      });
 
       if (parentCat) {
         const parentName = parentCat.name.toLowerCase().trim();
         const parentIdStr = String(parentCat.id).toLowerCase().trim();
         if (
-          pCatLower === parentName ||
-          pSubCatLower === parentName ||
-          pParentCatLower === parentName ||
-          pCatIdStr === parentIdStr ||
-          pParentCatIdStr === parentIdStr
+          (pCatLower.length > 0 && pCatLower === parentName) ||
+          (pSubCatLower.length > 0 && pSubCatLower === parentName) ||
+          (pParentCatLower.length > 0 && pParentCatLower === parentName) ||
+          (pCatIdStr.length > 0 && pCatIdStr === parentIdStr) ||
+          (pParentCatIdStr.length > 0 && pParentCatIdStr === parentIdStr)
         ) {
           return true;
         }
@@ -355,7 +354,8 @@ function ProductsContent() {
           const isChildMatch = allChildCategories.some((child: any) => {
             const childName = (child.name || '').toLowerCase().trim();
             const childIdStr = String(child.id || '').toLowerCase().trim();
-            return pCatLower === childName || pSubCatLower === childName || pCatIdStr === childIdStr;
+            return (childName.length > 0 && (pCatLower === childName || pSubCatLower === childName)) ||
+                   (childIdStr.length > 0 && pCatIdStr === childIdStr);
           });
           if (isChildMatch) return true;
         }

@@ -133,16 +133,21 @@ function applyFilters(products: Product[], filters?: ProductFilters): Product[] 
       const pParentCat = ((p as any).parentCategory || '').toLowerCase().trim();
       const pCatId = String((p as any).categoryId || '').toLowerCase().trim();
       const pParentCatId = String((p as any).parentCategoryId || '').toLowerCase().trim();
+      const pGender = String((p as any).gender || '').toUpperCase().trim();
+
+      if (targetLower === 'men' || targetLower === 'boys') {
+        return pGender === 'MALE' || (pCat.length > 0 && (pCat.includes('boy') || pCat.includes('men')));
+      }
+      if (targetLower === 'women' || targetLower === 'girls') {
+        return pGender === 'FEMALE' || (pCat.length > 0 && (pCat.includes('girl') || pCat.includes('women')));
+      }
+
       return (
-        pCat === targetLower ||
-        pSubCat === targetLower ||
-        pParentCat === targetLower ||
-        pCatId === targetLower ||
-        pParentCatId === targetLower ||
-        pCat.includes(targetLower) ||
-        targetLower.includes(pCat) ||
-        (pSubCat && (pSubCat.includes(targetLower) || targetLower.includes(pSubCat))) ||
-        (pParentCat && (pParentCat.includes(targetLower) || targetLower.includes(pParentCat)))
+        (pCat.length > 0 && (pCat === targetLower || pCat.includes(targetLower) || (targetLower.length > 2 && targetLower.includes(pCat)))) ||
+        (pSubCat.length > 0 && (pSubCat === targetLower || pSubCat.includes(targetLower) || (targetLower.length > 2 && targetLower.includes(pSubCat)))) ||
+        (pParentCat.length > 0 && (pParentCat === targetLower || pParentCat.includes(targetLower) || (targetLower.length > 2 && targetLower.includes(pParentCat)))) ||
+        (pCatId.length > 0 && pCatId === targetLower) ||
+        (pParentCatId.length > 0 && pParentCatId === targetLower)
       );
     });
   }
