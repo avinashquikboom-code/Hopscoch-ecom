@@ -181,11 +181,27 @@ export const productService = {
       if (filters) {
         if (filters.category && filters.category !== 'all') {
           const categories = await this.getCategories();
-          const found = categories.find(
-            (c) => c.name.toLowerCase() === filters.category!.toLowerCase()
-          );
-          if (found) {
-            params.append('categoryId', found.id);
+          const filterCatName = filters.category!.toLowerCase().trim();
+          let foundId: string | undefined;
+
+          for (const c of categories) {
+            if (c.name.toLowerCase().trim() === filterCatName) {
+              foundId = String(c.id);
+              break;
+            }
+            if ((c as any).children && Array.isArray((c as any).children)) {
+              const child = (c as any).children.find((sub: any) => sub.name.toLowerCase().trim() === filterCatName);
+              if (child) {
+                foundId = String(child.id);
+                break;
+              }
+            }
+          }
+
+          if (foundId) {
+            params.append('categoryId', foundId);
+          } else {
+            params.append('category', filters.category);
           }
         }
 
