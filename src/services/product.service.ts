@@ -72,10 +72,14 @@ function mapBackendProductToFrontend(raw: any): Product {
     ? raw.variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
     : (raw.stock !== undefined ? Number(raw.stock) : 10);
 
-  const catObj = raw.category;
-  // If the product belongs to a subcategory, use the parent category name for
-  // filter consistency (e.g. "Kurtis" under "Women" → category = "Women")
-  const effectiveCategory = catObj?.parent?.name || catObj?.name || 'Collections';
+  const catObj = typeof raw.category === 'object' ? raw.category : null;
+  const effectiveCategory = typeof raw.category === 'string'
+    ? raw.category
+    : (catObj?.parent?.name || catObj?.name || raw.categoryName || 'Collections');
+
+  const catId = String(raw.categoryId || catObj?.id || '');
+  const subCategoryName = catObj?.parent ? catObj.name : (raw.subCategoryName || raw.subcategory || undefined);
+  const subCategoryId = catObj?.parent ? String(catObj.id) : (raw.subCategoryId ? String(raw.subCategoryId) : undefined);
 
   return {
     id: String(raw.id),
@@ -86,7 +90,9 @@ function mapBackendProductToFrontend(raw: any): Product {
     discount: raw.discountValue ? Number(raw.discountValue) : 0,
     images: images,
     category: effectiveCategory,
-    subcategory: catObj?.parent ? catObj.name : undefined,
+    categoryId: catId,
+    subcategory: subCategoryName,
+    subcategoryId: subCategoryId,
     brand: raw.brand?.name || 'FCISeller',
     stock: totalStock,
     rating: Number(raw.avgRating || 4.5),
@@ -114,11 +120,21 @@ function applyFilters(products: Product[], filters?: ProductFilters): Product[] 
   let result = [...products];
   if (!filters) return result;
 
-  if (filters.category) {
-    result = result.filter((p) =>
-      (p as any).category?.toLowerCase() === filters.category!.toLowerCase() ||
-      (p as any).subcategory?.toLowerCase() === filters.category!.toLowerCase()
-    );
+  if (filters.category && filters.category !== 'all') {
+    const targetLower = filters.category.toLowerCase().trim();
+    result = result.filter((p) => {
+      const pCat = ((p as any).category || '').toLowerCase().trim();
+      const pSubCat = ((p as any).subcategory || '').toLowerCase().trim();
+      const pCatId = String((p as any).categoryId || '').toLowerCase().trim();
+      return (
+        pCat === targetLower ||
+        pSubCat === targetLower ||
+        pCatId === targetLower ||
+        pCat.includes(targetLower) ||
+        targetLower.includes(pCat) ||
+        (pSubCat && (pSubCat.includes(targetLower) || targetLower.includes(pSubCat)))
+      );
+    });
   }
   if (filters.search) {
     const q = filters.search.toLowerCase();

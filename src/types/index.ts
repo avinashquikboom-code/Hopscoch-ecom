@@ -40,7 +40,9 @@ export interface Product {
   discount?: number;
   images: string[];
   category: string;
+  categoryId?: string;
   subcategory?: string;
+  subcategoryId?: string;
   brand?: string;
   stock: number;
   rating: number;

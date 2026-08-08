@@ -276,10 +276,53 @@ function ProductsContent() {
   let filtered = [...mockProducts];
 
   if (selectedCategory !== 'all') {
-    filtered = filtered.filter(p =>
-      p.category === selectedCategory ||
-      (p as any).subcategory === selectedCategory
-    );
+    const targetLower = selectedCategory.toLowerCase().trim();
+    // Normalize target category name (e.g. "MEN'S EDITION" -> "men", "WOMEN'S SPECIAL" -> "women", etc.)
+    const cleanTarget = targetLower
+      .replace(/['’]s\b/g, '')
+      .replace(/special|edition|zone|spotlight|collection|crafted/g, '')
+      .trim();
+
+    filtered = filtered.filter(p => {
+      const pCatLower = (p.category || '').toLowerCase().trim();
+      const pSubCatLower = ((p as any).subcategory || '').toLowerCase().trim();
+      const pCatIdStr = String((p as any).categoryId || '').toLowerCase().trim();
+
+      // 1. Direct or partial match on category name, subcategory name, or ID
+      if (
+        pCatLower === targetLower ||
+        pSubCatLower === targetLower ||
+        pCatIdStr === targetLower ||
+        (cleanTarget.length > 2 && (pCatLower.includes(cleanTarget) || cleanTarget.includes(pCatLower))) ||
+        (pSubCatLower && cleanTarget.length > 2 && (pSubCatLower.includes(cleanTarget) || cleanTarget.includes(pSubCatLower)))
+      ) {
+        return true;
+      }
+
+      // 2. Check if selectedCategory matches a category in mockCategories
+      const parentCat = mockCategories.find((c: any) =>
+        c.name.toLowerCase().trim() === targetLower ||
+        c.slug?.toLowerCase().trim() === targetLower ||
+        String(c.id) === targetLower ||
+        (cleanTarget.length > 2 && c.name.toLowerCase().trim().includes(cleanTarget))
+      );
+
+      if (parentCat) {
+        const parentName = parentCat.name.toLowerCase().trim();
+        if (pCatLower === parentName || pSubCatLower === parentName || pCatIdStr === String(parentCat.id)) {
+          return true;
+        }
+        if (Array.isArray((parentCat as any).children)) {
+          const isChildMatch = (parentCat as any).children.some((child: any) => {
+            const childName = (child.name || '').toLowerCase().trim();
+            return pCatLower === childName || pSubCatLower === childName || pCatIdStr === String(child.id);
+          });
+          if (isChildMatch) return true;
+        }
+      }
+
+      return false;
+    });
   }
   if (searchQuery) {
     filtered = filtered.filter(p =>
