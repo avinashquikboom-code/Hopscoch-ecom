@@ -533,53 +533,70 @@ export function Header() {
 
       {/* 3. REDESIGNED LUXURY MOBILE SIDEBAR */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="left" className="w-[310px] sm:w-[340px] p-0 overflow-y-auto bg-white dark:bg-slate-950 text-slate-900 dark:text-white border-r border-slate-200 dark:border-white/10 shadow-2xl">
+        <SheetContent side="left" showCloseButton={false} className="w-[315px] sm:w-[340px] p-0 overflow-y-auto bg-white dark:bg-slate-950 text-slate-900 dark:text-white border-r border-slate-200 dark:border-white/10 shadow-2xl">
           
-          {/* Header Card: Aura Teal Gradient User / Brand Banner */}
-          <div className="bg-gradient-to-br from-[#0F766E] via-[#0d9488] to-[#042f2e] p-5 text-white relative overflow-hidden">
-            {/* Background ambient lighting */}
-            <div className="absolute top-[-20%] right-[-20%] w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
-            
-            <div className="flex items-center justify-between relative z-10">
-              <div 
-                className="flex items-center gap-3 cursor-pointer"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  if (!isAuthenticated) openLoginModal();
-                  else router.push('/profile');
-                }}
-              >
-                {/* User avatar or initials */}
-                {(() => {
-                  const avatarUrl = resolveAvatarUrl((user as any)?.avatar ?? (user as any)?.avatarUrl);
-                  return avatarUrl ? (
-                    <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-white/50 shadow-md">
-                      <img src={avatarUrl} alt={user?.firstName || 'User'} className="w-full h-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="w-11 h-11 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white text-base font-extrabold shadow-md">
-                      {isAuthenticated && user ? user.firstName?.[0] : <User className="w-5 h-5" />}
-                    </div>
-                  );
-                })()}
-                
-                <div className="flex flex-col min-w-0">
-                  <span className="font-black text-sm tracking-tight truncate max-w-[170px]">
-                    {isAuthenticated && user ? `${user.firstName} ${user.lastName || ''}` : 'Welcome to FCI Seller'}
-                  </span>
-                  <span className="text-[11px] text-teal-100/80 font-medium truncate">
-                    {isAuthenticated ? user?.email || 'Logged in user' : 'Tap to sign in or register →'}
-                  </span>
-                </div>
-              </div>
+          {/* Header Card: Luxury Teal Gradient User / Brand Banner */}
+          <div className="bg-gradient-to-br from-[#0F766E] via-[#0d9488] to-[#0a5c55] p-5 pt-6 pb-6 text-white relative overflow-hidden shadow-md">
+            {/* Ambient Background Lights */}
+            <div className="absolute top-[-30%] right-[-20%] w-36 h-36 bg-teal-300/20 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute bottom-[-40%] left-[-20%] w-32 h-32 bg-emerald-400/15 rounded-full blur-xl pointer-events-none" />
 
+            {/* Top Bar: Brand Identifier + Close Button */}
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+                <span className="text-[11px] font-black uppercase tracking-widest text-teal-100/90">
+                  FCI SELLER
+                </span>
+              </div>
               <button
+                type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-1.5 rounded-full hover:bg-white/10 text-white/80 transition-colors border-none bg-transparent cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/20 text-white flex items-center justify-center transition-all cursor-pointer shadow-xs"
                 aria-label="Close menu"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 text-white" />
               </button>
+            </div>
+
+            {/* User Profile Card */}
+            <div
+              className="flex items-center gap-3.5 cursor-pointer relative z-10 group"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                if (!isAuthenticated) openLoginModal();
+                else router.push('/profile');
+              }}
+            >
+              {/* User avatar or initials */}
+              {(() => {
+                const avatarUrl = resolveAvatarUrl((user as any)?.avatar ?? (user as any)?.avatarUrl);
+                return avatarUrl ? (
+                  <div className="w-13 h-13 rounded-full overflow-hidden ring-2 ring-white/60 shadow-lg border border-white/30 shrink-0 group-hover:scale-105 transition-transform">
+                    <img src={avatarUrl} alt={user?.firstName || 'User'} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-13 h-13 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center text-white text-lg font-black shadow-lg shrink-0 group-hover:scale-105 transition-transform">
+                    {isAuthenticated && user ? user.firstName?.[0] : <User className="w-6 h-6" />}
+                  </div>
+                );
+              })()}
+
+              <div className="flex flex-col min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-base tracking-tight text-white truncate max-w-[160px]">
+                    {isAuthenticated && user ? `${user.firstName} ${user.lastName || ''}` : 'Welcome to FCI Seller'}
+                  </span>
+                </div>
+                <span className="text-[11px] text-teal-100/90 font-medium truncate mt-0.5">
+                  {isAuthenticated ? user?.email || 'Logged in user' : 'Tap to sign in or register →'}
+                </span>
+                {isAuthenticated && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-200 mt-1 group-hover:text-white transition-colors">
+                    View Profile →
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
