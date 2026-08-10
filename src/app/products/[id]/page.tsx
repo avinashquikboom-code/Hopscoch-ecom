@@ -176,7 +176,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
       const deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + 4);
       const dateStr = deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      setPincodeMsg({ text: `Delivery by ${dateStr} · FREE Delivery`, ok: true });
+      setPincodeMsg({ text: `Expected to deliver on ${dateStr} · FREE Delivery`, ok: true });
     } else {
       setPincodeMsg({ text: 'Enter a valid 6-digit pincode', ok: false });
     }
@@ -604,9 +604,13 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                   />
                   <button type="submit" className="text-[#0d9488] font-bold text-[12px] cursor-pointer border-none bg-transparent hover:underline">Check</button>
                 </form>
-                {pincodeMsg && (
+                {pincodeMsg ? (
                   <p className={`text-[12px] mt-1.5 flex items-center gap-1.5 font-semibold ${pincodeMsg.ok ? 'text-[#26a541]' : 'text-red-500'}`}>
                     <Truck className="w-3.5 h-3.5 shrink-0" /> {pincodeMsg.text}
+                  </p>
+                ) : (
+                  <p className="text-[12px] mt-1.5 flex items-center gap-1.5 font-semibold text-[#26a541]">
+                    <Truck className="w-3.5 h-3.5 shrink-0" /> Expected to deliver in 3 - 4 Days · FREE Delivery
                   </p>
                 )}
               </div>
