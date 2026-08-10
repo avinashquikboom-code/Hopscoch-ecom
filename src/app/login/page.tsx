@@ -5,13 +5,25 @@ import Link from 'next/link';
 import { Phone, Loader2, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { auth } from '@/lib/firebase/config';
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { useLogin } from '@/hooks';
 
 export default function LoginPage() {
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
+  const [loginMode, setLoginMode] = useState<'email' | 'phone'>('email');
+  const [email, setEmail]         = useState('');
+  const [password, setPassword]   = useState('');
+  const [phone, setPhone]         = useState('');
+  const [otp, setOtp]             = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
+
+  const loginMutation = useLogin();
+
+  const handleEmailLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    loginMutation.mutate({ email, password });
+  };
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +66,6 @@ export default function LoginPage() {
     try {
       await confirmationResult.confirm(otp);
       alert('OTP verified successfully!');
-      // Redirect to home page or dashboard
       window.location.href = '/';
     } catch (error: any) {
       alert(error.message || 'Invalid OTP');
@@ -66,7 +77,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] px-4 py-12 font-sans">
       <div 
-        className="w-full max-w-3xl h-auto md:h-[500px] rounded-[18px] overflow-hidden flex flex-col md:flex-row"
+        className="w-full max-w-3xl h-auto md:min-h-[500px] rounded-[18px] overflow-hidden flex flex-col md:flex-row"
         style={{ background: '#ffffff', boxShadow: '0 24px 64px -8px rgba(0,0,0,0.12), 0 8px 24px -4px rgba(0,0,0,0.06)', border: '1px solid #E2E8F0' }}
       >
         
@@ -103,159 +114,309 @@ export default function LoginPage() {
           style={{ background: '#ffffff' }}
         >
           <div id="recaptcha-container"></div>
-          {!isOtpSent ? (
-            <form onSubmit={handleSendOTP} className="space-y-6">
-              {/* Phone Number Field */}
-              <div style={{ marginBottom: '20px' }}>
-                <label 
-                  htmlFor="phone" 
-                  style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
-                >
-                  Phone Number
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <Phone style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
-                  <input
-                    id="phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                    required
-                    maxLength={10}
-                    style={{
-                      width: '100%',
-                      paddingLeft: '24px',
-                      paddingBottom: '8px',
-                      paddingTop: '6px',
-                      background: 'transparent',
-                      border: 'none',
-                      borderBottom: '1.5px solid #E2E8F0',
-                      outline: 'none',
-                      fontSize: '14px',
-                      color: '#0F172A',
-                      fontFamily: 'inherit',
-                      transition: 'border-color 0.2s',
-                    }}
-                    onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
-                    onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
-                  />
-                </div>
-              </div>
 
-              {/* Send OTP Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  background: isLoading ? '#94A3B8' : '#0F766E',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  transition: 'background 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                }}
-              >
-                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send OTP'}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOTP} className="space-y-6">
-              {/* OTP Field */}
-              <div style={{ marginBottom: '20px' }}>
-                <label 
-                  htmlFor="otp" 
-                  style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
-                >
-                  Enter 4-Digit OTP
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    id="otp"
-                    type="text"
-                    placeholder="0000"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                    required
-                    maxLength={4}
-                    style={{
-                      width: '100%',
-                      paddingLeft: '0',
-                      paddingBottom: '8px',
-                      paddingTop: '6px',
-                      background: 'transparent',
-                      border: 'none',
-                      borderBottom: '1.5px solid #E2E8F0',
-                      outline: 'none',
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      color: '#0F172A',
-                      fontFamily: 'inherit',
-                      letterSpacing: '8px',
-                      textAlign: 'center',
-                      transition: 'border-color 0.2s',
-                    }}
-                    onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
-                    onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
-                  />
-                </div>
-              </div>
-
-              {/* Verify OTP Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  background: isLoading ? '#94A3B8' : '#0F766E',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  transition: 'background 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                }}
-              >
-                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify OTP'}
-              </button>
-
-              {/* Resend OTP */}
+          <div>
+            {/* Mode Switcher Tabs */}
+            <div style={{ display: 'flex', borderBottom: '1px solid #E2E8F0', marginBottom: '24px' }}>
               <button
                 type="button"
-                onClick={() => {
-                  setIsOtpSent(false);
-                  setOtp('');
-                }}
+                onClick={() => setLoginMode('email')}
                 style={{
-                  width: '100%',
-                  padding: '8px',
-                  background: 'transparent',
-                  color: '#0F766E',
-                  border: 'none',
+                  flex: 1,
+                  paddingBottom: '10px',
                   fontSize: '12px',
-                  fontWeight: 600,
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: loginMode === 'email' ? '2px solid #0F766E' : '2px solid transparent',
+                  color: loginMode === 'email' ? '#0F766E' : '#64748B',
                   cursor: 'pointer',
-                  textDecoration: 'underline',
+                  transition: 'all 0.2s',
                 }}
               >
-                Back to enter phone number
+                Email &amp; Password
               </button>
-            </form>
-          )}
+              <button
+                type="button"
+                onClick={() => setLoginMode('phone')}
+                style={{
+                  flex: 1,
+                  paddingBottom: '10px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: loginMode === 'phone' ? '2px solid #0F766E' : '2px solid transparent',
+                  color: loginMode === 'phone' ? '#0F766E' : '#64748B',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                Phone &amp; OTP
+              </button>
+            </div>
+
+            {loginMode === 'email' ? (
+              <form onSubmit={handleEmailLogin} className="space-y-5">
+                {/* Email Field */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label 
+                    htmlFor="email" 
+                    style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
+                  >
+                    Email Address
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <Mail style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        paddingLeft: '24px',
+                        paddingBottom: '8px',
+                        paddingTop: '6px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: '1.5px solid #E2E8F0',
+                        outline: 'none',
+                        fontSize: '14px',
+                        color: '#0F172A',
+                        fontFamily: 'inherit',
+                        transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
+                      onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
+                    />
+                  </div>
+                </div>
+
+                {/* Password Field */}
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label 
+                      htmlFor="password" 
+                      style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase' }}
+                    >
+                      Password
+                    </label>
+                    <Link href="/forgot-password" style={{ fontSize: '11px', color: '#0F766E', fontWeight: 600, textDecoration: 'none' }}>
+                      Forgot?
+                    </Link>
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <Lock style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
+                    <input
+                      id="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        paddingLeft: '24px',
+                        paddingBottom: '8px',
+                        paddingTop: '6px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: '1.5px solid #E2E8F0',
+                        outline: 'none',
+                        fontSize: '14px',
+                        color: '#0F172A',
+                        fontFamily: 'inherit',
+                        transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
+                      onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
+                    />
+                  </div>
+                </div>
+
+                {/* Email Login Button */}
+                <button
+                  type="submit"
+                  disabled={loginMutation.isPending}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: loginMutation.isPending ? '#94A3B8' : '#0F766E',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    cursor: loginMutation.isPending ? 'not-allowed' : 'pointer',
+                    transition: 'background 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  {loginMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Log In'}
+                </button>
+              </form>
+            ) : !isOtpSent ? (
+              <form onSubmit={handleSendOTP} className="space-y-6">
+                {/* Phone Number Field */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label 
+                    htmlFor="phone" 
+                    style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
+                  >
+                    Phone Number
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <Phone style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: '#94A3B8' }} />
+                    <input
+                      id="phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                      required
+                      maxLength={10}
+                      style={{
+                        width: '100%',
+                        paddingLeft: '24px',
+                        paddingBottom: '8px',
+                        paddingTop: '6px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: '1.5px solid #E2E8F0',
+                        outline: 'none',
+                        fontSize: '14px',
+                        color: '#0F172A',
+                        fontFamily: 'inherit',
+                        transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
+                      onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
+                    />
+                  </div>
+                </div>
+
+                {/* Send OTP Button */}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: isLoading ? '#94A3B8' : '#0F766E',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    transition: 'background 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send OTP'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOTP} className="space-y-6">
+                {/* OTP Field */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label 
+                    htmlFor="otp" 
+                    style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}
+                  >
+                    Enter 4-Digit OTP
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      id="otp"
+                      type="text"
+                      placeholder="0000"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                      required
+                      maxLength={4}
+                      style={{
+                        width: '100%',
+                        paddingLeft: '0',
+                        paddingBottom: '8px',
+                        paddingTop: '6px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderBottom: '1.5px solid #E2E8F0',
+                        outline: 'none',
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        color: '#0F172A',
+                        fontFamily: 'inherit',
+                        letterSpacing: '8px',
+                        textAlign: 'center',
+                        transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => (e.target.style.borderBottomColor = '#0F766E')}
+                      onBlur={e => (e.target.style.borderBottomColor = '#E2E8F0')}
+                    />
+                  </div>
+                </div>
+
+                {/* Verify OTP Button */}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    background: isLoading ? '#94A3B8' : '#0F766E',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    transition: 'background 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify OTP'}
+                </button>
+
+                {/* Resend OTP */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOtpSent(false);
+                    setOtp('');
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    background: 'transparent',
+                    color: '#0F766E',
+                    border: 'none',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Back to enter phone number
+                </button>
+              </form>
+            )}
+          </div>
 
           {/* Terms and Privacy */}
           <p style={{ fontSize: '11px', color: '#94A3B8', lineHeight: 1.6, marginBottom: '20px', marginTop: '20px' }}>
