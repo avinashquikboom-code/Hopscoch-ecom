@@ -533,7 +533,7 @@ export function Header() {
 
       {/* 3. REDESIGNED LUXURY MOBILE SIDEBAR */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="left" className="w-[310px] sm:w-[340px] p-0 overflow-y-auto bg-slate-950 text-white border-r border-white/10 shadow-2xl">
+        <SheetContent side="left" className="w-[310px] sm:w-[340px] p-0 overflow-y-auto bg-white dark:bg-slate-950 text-slate-900 dark:text-white border-r border-slate-200 dark:border-white/10 shadow-2xl">
           
           {/* Header Card: Aura Teal Gradient User / Brand Banner */}
           <div className="bg-gradient-to-br from-[#0F766E] via-[#0d9488] to-[#042f2e] p-5 text-white relative overflow-hidden">
@@ -586,7 +586,7 @@ export function Header() {
           <div className="p-4 space-y-5">
             {/* Quick Category Pills */}
             <div>
-              <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest block mb-2.5">
+              <span className="text-[10px] font-black text-teal-700 dark:text-teal-400 uppercase tracking-widest block mb-2.5">
                 Popular Departments
               </span>
               <div className="grid grid-cols-2 gap-2">
@@ -602,7 +602,7 @@ export function Header() {
                     key={item.label}
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-2 bg-white/5 hover:bg-teal-500/15 border border-white/10 hover:border-teal-500/40 rounded-xl p-2.5 transition-all text-xs font-bold text-gray-200"
+                    className="flex items-center gap-2 bg-slate-100/90 dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-500/15 border border-slate-200/80 dark:border-white/10 hover:border-teal-500/40 rounded-xl p-2.5 transition-all text-xs font-bold text-slate-800 dark:text-gray-200"
                   >
                     <span className="text-base select-none">{item.icon}</span>
                     <span className="truncate">{item.label}</span>
@@ -612,8 +612,8 @@ export function Header() {
             </div>
 
             {/* Main Navigation Menu */}
-            <div className="border-t border-white/10 pt-4">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2.5">
+            <div className="border-t border-slate-200 dark:border-white/10 pt-4">
+              <span className="text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest block mb-2.5">
                 Explore &amp; Shop
               </span>
               <nav className="space-y-1">
@@ -630,10 +630,10 @@ export function Header() {
                       key={link.label}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                      className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 font-semibold text-xs transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className="w-4 h-4 text-teal-500" />
+                        <Icon className="w-4 h-4 text-teal-600 dark:text-teal-500" />
                         <span>{link.label}</span>
                       </div>
                       {link.badge ? (
@@ -641,7 +641,7 @@ export function Header() {
                           {link.badge}
                         </span>
                       ) : (
-                        <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-gray-600" />
                       )}
                     </Link>
                   );
@@ -650,15 +650,15 @@ export function Header() {
             </div>
 
             {/* User Account Access */}
-            <div className="border-t border-white/10 pt-4">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2.5">
+            <div className="border-t border-slate-200 dark:border-white/10 pt-4">
+              <span className="text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest block mb-2.5">
                 My Account
               </span>
               <nav className="space-y-1">
                 <Link
                   href="/wishlist"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 font-semibold text-xs transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <Heart className="w-4 h-4 text-rose-500" />
@@ -669,104 +669,147 @@ export function Header() {
                       {wishlistItemsCount}
                     </span>
                   ) : (
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-gray-600" />
                   )}
                 </Link>
 
                 <Link
                   href="/cart"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 font-semibold text-xs transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <ShoppingBag className="w-4 h-4 text-teal-500" />
+                    <ShoppingBag className="w-4 h-4 text-teal-600 dark:text-teal-500" />
                     <span>Shopping Bag</span>
                   </div>
                   {cartItemsCount > 0 ? (
-                    <span className="px-2 py-0.5 rounded-full bg-teal-500 text-white text-[10px] font-bold">
+                    <span className="px-2 py-0.5 rounded-full bg-teal-600 dark:bg-teal-500 text-white text-[10px] font-bold">
                       {cartItemsCount}
                     </span>
                   ) : (
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-gray-600" />
                   )}
                 </Link>
 
                 <Link
                   href="/orders"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 font-semibold text-xs transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <Package className="w-4 h-4 text-amber-500" />
                     <span>Track Orders</span>
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-gray-600" />
                 </Link>
 
                 <Link
                   href="/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-white/5 text-gray-200 hover:text-teal-400 font-semibold text-xs transition-colors"
+                  className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 font-semibold text-xs transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <User className="w-4 h-4 text-blue-400" />
+                    <User className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                     <span>Profile &amp; Addresses</span>
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-gray-600" />
                 </Link>
               </nav>
             </div>
 
-            {/* Regional Preferences */}
-            <div className="border-t border-white/10 pt-4">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2.5">
-                Regional &amp; Currency
+            {/* Regional Preferences & Theme */}
+            <div className="border-t border-slate-200 dark:border-white/10 pt-4">
+              <span className="text-[10px] font-black text-slate-500 dark:text-gray-400 uppercase tracking-widest block mb-2.5">
+                Preferences
               </span>
               <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 flex flex-col gap-1">
-                  <span className="text-[10px] text-gray-400">Language</span>
+                <div className="bg-slate-100/90 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 rounded-xl p-2.5 flex flex-col gap-1">
+                  <span className="text-[10px] text-slate-500 dark:text-gray-400">Language</span>
                   <select 
                     value={language} 
                     onChange={(e) => setLanguage(e.target.value as any)}
-                    className="bg-transparent border-none outline-none font-bold text-white cursor-pointer p-0 text-xs"
+                    className="bg-transparent border-none outline-none font-bold text-slate-800 dark:text-white cursor-pointer p-0 text-xs"
                   >
-                    <option value="EN" className="bg-gray-900 text-white">English</option>
-                    <option value="HI" className="bg-gray-900 text-white">हिन्दी</option>
-                    <option value="AR" className="bg-gray-900 text-white">العربية</option>
-                    <option value="MS" className="bg-gray-900 text-white">Bahasa Melayu</option>
-                    <option value="NL" className="bg-gray-900 text-white">Nederlands</option>
-                    <option value="FR" className="bg-gray-900 text-white">Français</option>
+                    <option value="EN" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">English</option>
+                    <option value="HI" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">हिन्दी</option>
+                    <option value="AR" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">العربية</option>
+                    <option value="MS" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">Bahasa Melayu</option>
+                    <option value="NL" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">Nederlands</option>
+                    <option value="FR" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">Français</option>
                   </select>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2.5 flex flex-col gap-1">
-                  <span className="text-[10px] text-gray-400">Currency</span>
+                <div className="bg-slate-100/90 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 rounded-xl p-2.5 flex flex-col gap-1">
+                  <span className="text-[10px] text-slate-500 dark:text-gray-400">Currency</span>
                   <select 
                     value={currency} 
                     onChange={(e) => setCurrency(e.target.value as any)}
-                    className="bg-transparent border-none outline-none font-bold text-white cursor-pointer p-0 text-xs"
+                    className="bg-transparent border-none outline-none font-bold text-slate-800 dark:text-white cursor-pointer p-0 text-xs"
                   >
-                    <option value="INR" className="bg-gray-900 text-white">INR (₹)</option>
-                    <option value="USD" className="bg-gray-900 text-white">USD ($)</option>
-                    <option value="AED" className="bg-gray-900 text-white">AED (Dubai)</option>
-                    <option value="BHD" className="bg-gray-900 text-white">BHD (Bahrain)</option>
-                    <option value="MYR" className="bg-gray-900 text-white">MYR (Malaysia)</option>
-                    <option value="GBP" className="bg-gray-900 text-white">GBP (£)</option>
-                    <option value="EUR" className="bg-gray-900 text-white">EUR (€)</option>
+                    <option value="INR" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">INR (₹)</option>
+                    <option value="USD" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">USD ($)</option>
+                    <option value="AED" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">AED (Dubai)</option>
+                    <option value="BHD" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">BHD (Bahrain)</option>
+                    <option value="MYR" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">MYR (Malaysia)</option>
+                    <option value="GBP" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">GBP (£)</option>
+                    <option value="EUR" className="bg-white dark:bg-gray-900 text-slate-900 dark:text-white">EUR (€)</option>
                   </select>
+                </div>
+              </div>
+
+              {/* Mobile Theme Mode Switcher */}
+              <div className="mt-2 bg-slate-100/90 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 rounded-xl p-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-white">
+                  {theme === 'dark' ? <Moon className="w-4 h-4 text-teal-500" /> : <Sun className="w-4 h-4 text-amber-500" />}
+                  <span>Theme</span>
+                </div>
+                <div className="flex items-center bg-white dark:bg-gray-800 rounded-lg p-0.5 border border-slate-200 dark:border-gray-700 shadow-xs">
+                  <button
+                    type="button"
+                    onClick={() => setTheme('light')}
+                    className={`px-2.5 py-1 text-[10px] font-extrabold rounded-md transition-colors cursor-pointer ${
+                      theme === 'light'
+                        ? 'bg-[#0d9488] text-white shadow-xs'
+                        : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Light
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTheme('dark')}
+                    className={`px-2.5 py-1 text-[10px] font-extrabold rounded-md transition-colors cursor-pointer ${
+                      theme === 'dark'
+                        ? 'bg-[#0d9488] text-white shadow-xs'
+                        : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    Dark
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTheme('system')}
+                    className={`px-2.5 py-1 text-[10px] font-extrabold rounded-md transition-colors cursor-pointer ${
+                      theme === 'system'
+                        ? 'bg-[#0d9488] text-white shadow-xs'
+                        : 'text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    System
+                  </button>
                 </div>
               </div>
             </div>
 
             {/* Logout button */}
             {isAuthenticated && (
-              <div className="border-t border-white/10 pt-4 pb-2">
+              <div className="border-t border-slate-200 dark:border-white/10 pt-4 pb-2">
                 <button
                   onClick={() => {
                     logout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 rounded-xl font-bold text-xs text-rose-400 uppercase tracking-wider cursor-pointer transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 rounded-xl font-bold text-xs text-rose-500 dark:text-rose-400 uppercase tracking-wider cursor-pointer transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Logout Account</span>
