@@ -284,127 +284,130 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
             <div className="lg:sticky lg:top-[68px] space-y-2">
 
               {/* IMAGE CARD */}
-              <div className="bg-white border border-[#efefef] flex flex-col sm:flex-row">
+              <div className="bg-white border border-[#efefef]">
 
-                {/* Desktop & Tablet Vertical Thumbnails */}
-                {product.images && product.images.length > 0 && (
-                  <div className="hidden sm:flex flex-col gap-2 p-2 max-h-[520px] overflow-y-auto shrink-0 border-r border-[#f0f0f0]">
-                    {product.images.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setSelectedImage(i)}
-                        onMouseEnter={() => setSelectedImage(i)}
-                        className={`w-14 h-[64px] border-2 overflow-hidden cursor-pointer shrink-0 transition-all ${
-                          selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0] hover:border-[#0d9488]/60'
-                        }`}
-                      >
-                        <img src={img} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover object-top" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Main image */}
-                <div className="relative flex-1 min-w-0">
-                  {/* Wishlist + Share — top right overlay */}
-                  <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
-                    <button
-                      onClick={doWishlist}
-                      className={`w-9 h-9 bg-white shadow border flex items-center justify-center cursor-pointer transition-all hover:scale-105 ${
-                        isInWishlist ? 'text-red-500 border-red-200' : 'text-[#878787] border-[#e0e0e0] hover:text-red-400'
-                      }`}
-                    >
-                      <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
-                    </button>
-                    <button
-                      onClick={() => setShareOpen(!shareOpen)}
-                      className="w-9 h-9 bg-white shadow border border-[#e0e0e0] text-[#878787] flex items-center justify-center cursor-pointer hover:text-[#0d9488] transition-all hover:scale-105"
-                    >
-                      <Share2 className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Share dropdown */}
-                  {shareOpen && (
-                    <div className="absolute top-3 right-14 z-30 bg-white border border-[#e0e0e0] shadow-lg p-3 w-52 animate-in fade-in slide-in-from-top-1 duration-150">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-[11px] font-bold text-[#212121] uppercase">Share</span>
-                        <button onClick={() => setShareOpen(false)} className="text-[#878787] cursor-pointer border-none bg-transparent"><X className="w-3.5 h-3.5" /></button>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(product.name + ' ' + window.location.href)}`)} className="flex items-center gap-1 px-2 py-1 bg-[#25d366] text-white text-[11px] font-bold cursor-pointer border-none">WhatsApp</button>
-                        <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied!'); setShareOpen(false); }} className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-[#212121] text-[11px] font-bold cursor-pointer border-none">Copy Link</button>
-                        <button onClick={doDownload} className="flex items-center gap-1 px-2 py-1 bg-teal-50 text-[#0d9488] text-[11px] font-bold cursor-pointer border border-teal-200"><Download className="w-3 h-3" /> Save</button>
-                      </div>
+                {/* Top: Gallery (Vertical Thumbnails + Main Image) */}
+                <div className="flex flex-col sm:flex-row">
+                  {/* Desktop & Tablet Vertical Thumbnails */}
+                  {product.images && product.images.length > 0 && (
+                    <div className="hidden sm:flex flex-col gap-2 p-2 max-h-[520px] overflow-y-auto shrink-0 border-r border-[#f0f0f0]">
+                      {product.images.map((img, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setSelectedImage(i)}
+                          onMouseEnter={() => setSelectedImage(i)}
+                          className={`w-14 h-[64px] border-2 overflow-hidden cursor-pointer shrink-0 transition-all ${
+                            selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0] hover:border-[#0d9488]/60'
+                          }`}
+                        >
+                          <img src={img} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover object-top" />
+                        </button>
+                      ))}
                     </div>
                   )}
 
-                  {/* Main image with zoom & swipe */}
-                  <div
-                    className="relative overflow-hidden cursor-zoom-in touch-pan-y"
-                    style={{ aspectRatio: '5/6' }}
-                    onMouseMove={doMouseMove}
-                    onMouseLeave={() => setZoom(false)}
-                    onTouchStart={onTouchStart}
-                    onTouchMove={onTouchMove}
-                    onTouchEnd={onTouchEnd}
-                  >
-                    <img
-                      src={product.images[selectedImage]}
-                      alt={product.name}
-                      className="w-full h-full object-cover object-top select-none transition-all duration-300"
-                      style={zoom ? { transform: 'scale(2)', transformOrigin: `${zoomXY.x}% ${zoomXY.y}%`, transition: 'transform 0.1s' } : { transition: 'transform 0.3s' }}
-                    />
-
-                    {/* Navigation Arrows for direct sliding */}
-                    {product.images && product.images.length > 1 && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={handlePrevImage}
-                          aria-label="Previous Image"
-                          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#212121] shadow border border-[#e0e0e0] flex items-center justify-center cursor-pointer transition-transform hover:scale-110 active:scale-95"
-                        >
-                          <ChevronLeft className="w-5 h-5 text-[#212121]" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleNextImage}
-                          aria-label="Next Image"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#212121] shadow border border-[#e0e0e0] flex items-center justify-center cursor-pointer transition-transform hover:scale-110 active:scale-95"
-                        >
-                          <ChevronRight className="w-5 h-5 text-[#212121]" />
-                        </button>
-                      </>
-                    )}
-
-                    {/* Image Counter Badge */}
-                    {product.images && product.images.length > 1 && (
-                      <div className="absolute bottom-2 right-2 z-10 bg-black/60 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-sm">
-                        {selectedImage + 1} / {product.images.length}
-                      </div>
-                    )}
-
-                    {discount > 0 && (
-                      <div className="absolute top-0 left-0 bg-[#26a541] text-white text-[11px] font-bold px-2 py-0.5">
-                        {discount}% OFF
-                      </div>
-                    )}
-                    {!zoom && (
-                      <div className="absolute bottom-2 left-2 bg-black/40 text-white text-[10px] px-2 py-0.5 flex items-center gap-1 rounded-sm backdrop-blur-sm">
-                        <ZoomIn className="w-2.5 h-2.5" /> Hover to zoom
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Mobile thumbnails */}
-                  <div className="sm:hidden flex gap-2 p-2 overflow-x-auto border-t border-[#f0f0f0]">
-                    {product.images.map((img, i) => (
-                      <button key={i} onClick={() => setSelectedImage(i)}
-                        className={`flex-shrink-0 w-11 h-[52px] border overflow-hidden cursor-pointer ${selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0]'}`}>
-                        <img src={img} alt="" className="w-full h-full object-cover object-top" />
+                  {/* Main image */}
+                  <div className="relative flex-1 min-w-0">
+                    {/* Wishlist + Share — top right overlay */}
+                    <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
+                      <button
+                        onClick={doWishlist}
+                        className={`w-9 h-9 bg-white shadow border flex items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+                          isInWishlist ? 'text-red-500 border-red-200' : 'text-[#878787] border-[#e0e0e0] hover:text-red-400'
+                        }`}
+                      >
+                        <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
                       </button>
-                    ))}
+                      <button
+                        onClick={() => setShareOpen(!shareOpen)}
+                        className="w-9 h-9 bg-white shadow border border-[#e0e0e0] text-[#878787] flex items-center justify-center cursor-pointer hover:text-[#0d9488] transition-all hover:scale-105"
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Share dropdown */}
+                    {shareOpen && (
+                      <div className="absolute top-3 right-14 z-30 bg-white border border-[#e0e0e0] shadow-lg p-3 w-52 animate-in fade-in slide-in-from-top-1 duration-150">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-[11px] font-bold text-[#212121] uppercase">Share</span>
+                          <button onClick={() => setShareOpen(false)} className="text-[#878787] cursor-pointer border-none bg-transparent"><X className="w-3.5 h-3.5" /></button>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(product.name + ' ' + window.location.href)}`)} className="flex items-center gap-1 px-2 py-1 bg-[#25d366] text-white text-[11px] font-bold cursor-pointer border-none">WhatsApp</button>
+                          <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Copied!'); setShareOpen(false); }} className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-[#212121] text-[11px] font-bold cursor-pointer border-none">Copy Link</button>
+                          <button onClick={doDownload} className="flex items-center gap-1 px-2 py-1 bg-teal-50 text-[#0d9488] text-[11px] font-bold cursor-pointer border border-teal-200"><Download className="w-3 h-3" /> Save</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Main image with zoom & swipe */}
+                    <div
+                      className="relative overflow-hidden cursor-zoom-in touch-pan-y"
+                      style={{ aspectRatio: '5/6' }}
+                      onMouseMove={doMouseMove}
+                      onMouseLeave={() => setZoom(false)}
+                      onTouchStart={onTouchStart}
+                      onTouchMove={onTouchMove}
+                      onTouchEnd={onTouchEnd}
+                    >
+                      <img
+                        src={product.images[selectedImage]}
+                        alt={product.name}
+                        className="w-full h-full object-cover object-top select-none transition-all duration-300"
+                        style={zoom ? { transform: 'scale(2)', transformOrigin: `${zoomXY.x}% ${zoomXY.y}%`, transition: 'transform 0.1s' } : { transition: 'transform 0.3s' }}
+                      />
+
+                      {/* Navigation Arrows for direct sliding */}
+                      {product.images && product.images.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={handlePrevImage}
+                            aria-label="Previous Image"
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#212121] shadow border border-[#e0e0e0] flex items-center justify-center cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                          >
+                            <ChevronLeft className="w-5 h-5 text-[#212121]" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleNextImage}
+                            aria-label="Next Image"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#212121] shadow border border-[#e0e0e0] flex items-center justify-center cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                          >
+                            <ChevronRight className="w-5 h-5 text-[#212121]" />
+                          </button>
+                        </>
+                      )}
+
+                      {/* Image Counter Badge */}
+                      {product.images && product.images.length > 1 && (
+                        <div className="absolute bottom-2 right-2 z-10 bg-black/60 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                          {selectedImage + 1} / {product.images.length}
+                        </div>
+                      )}
+
+                      {discount > 0 && (
+                        <div className="absolute top-0 left-0 bg-[#26a541] text-white text-[11px] font-bold px-2 py-0.5">
+                          {discount}% OFF
+                        </div>
+                      )}
+                      {!zoom && (
+                        <div className="absolute bottom-2 left-2 bg-black/40 text-white text-[10px] px-2 py-0.5 flex items-center gap-1 rounded-sm backdrop-blur-sm">
+                          <ZoomIn className="w-2.5 h-2.5" /> Hover to zoom
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Mobile thumbnails */}
+                    <div className="sm:hidden flex gap-2 p-2 overflow-x-auto border-t border-[#f0f0f0]">
+                      {product.images.map((img, i) => (
+                        <button key={i} onClick={() => setSelectedImage(i)}
+                          className={`flex-shrink-0 w-11 h-[52px] border overflow-hidden cursor-pointer ${selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0]'}`}>
+                          <img src={img} alt="" className="w-full h-full object-cover object-top" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
