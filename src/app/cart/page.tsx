@@ -92,7 +92,7 @@ export default function CartPage() {
         <div className="bg-white dark:bg-zinc-900 border border-neutral-100 dark:border-neutral-800/80 p-5 mb-5 rounded-2xl shadow-xs flex justify-between items-center">
           <div>
             <h1 className="text-xl font-black uppercase text-neutral-850 dark:text-neutral-100 tracking-wider">Shopping Cart</h1>
-            <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">Manage details and apply discount coupons before checking out.</p>
+            <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">Manage item details before checking out.</p>
           </div>
         </div>
 
@@ -236,56 +236,8 @@ export default function CartPage() {
 
             </div>
 
-            {/* Order Price Details & Coupon Options */}
+            {/* Order Price Details */}
             <div className="space-y-4">
-              
-              {/* Premium Coupons Panel list */}
-              <Card className="border-neutral-100 dark:border-neutral-850 shadow-xs rounded-2xl bg-white dark:bg-zinc-900 overflow-hidden p-4.5 transition-colors duration-300">
-                <h3 className="text-xs font-black uppercase text-neutral-800 dark:text-neutral-200 tracking-wider mb-3.5 flex items-center gap-1.5">
-                  <Percent className="w-4 h-4 text-[#0d9488]" />
-                  <span>Available Discount Coupons</span>
-                </h3>
-                
-                <div className="space-y-2.5">
-                  {AVAILABLE_COUPONS.map((coupon) => (
-                    <div 
-                      key={coupon.code}
-                      className="border border-dashed border-neutral-200 dark:border-neutral-800 p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-950/40 flex flex-col justify-between items-start gap-2.5 transition-all"
-                    >
-                      <div className="flex justify-between items-center w-full">
-                        <span className="bg-teal-50 dark:bg-teal-950/20 text-[#0d9488] dark:text-teal-400 px-2.5 py-0.5 rounded-lg border border-teal-200/50 dark:border-teal-900/50 text-[10px] font-black uppercase tracking-wider">
-                          {coupon.code}
-                        </span>
-                        <button
-                          onClick={() => handleApplyCoupon(coupon.code)}
-                          disabled={cart?.coupon?.code === coupon.code}
-                          className="text-[10px] font-black text-[#0d9488] hover:underline cursor-pointer border-none bg-transparent disabled:opacity-40"
-                        >
-                          APPLY
-                        </button>
-                      </div>
-                      <p className="text-[10px] text-neutral-450 dark:text-neutral-500 font-semibold leading-relaxed">{coupon.description}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Custom Input apply coupon */}
-                <div className="flex gap-2 mt-4.5 pt-4 border-t border-neutral-150 dark:border-neutral-800">
-                  <Input
-                    placeholder="Enter Custom Code"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    className="h-9 text-xs bg-white dark:bg-zinc-900 border-neutral-200 dark:border-neutral-800 uppercase placeholder:normal-case font-bold rounded-lg"
-                  />
-                  <Button
-                    onClick={() => handleApplyCoupon(couponCode)}
-                    disabled={!couponCode.trim()}
-                    className="h-9 bg-[#0d9488] hover:bg-[#0d9488]/95 text-white font-bold text-xs uppercase px-4 rounded-lg cursor-pointer border-none"
-                  >
-                    Apply
-                  </Button>
-                </div>
-              </Card>
 
               {/* Pricing Details */}
               <Card className="border-neutral-100 dark:border-neutral-850 shadow-xs rounded-2xl bg-white dark:bg-zinc-900 overflow-hidden p-4.5 transition-colors duration-300">

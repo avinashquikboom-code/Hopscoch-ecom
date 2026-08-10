@@ -107,7 +107,6 @@ export default function CheckoutPage() {
     setFirstName(nameParts[0] || '');
     setLastName(nameParts.slice(1).join(' ') || '');
     setPhone(addr.phone || '');
-    if (addr.email) setEmailAddress(addr.email);
     setStreetAddress(addr.line2 ? `${addr.line1}, ${addr.line2}` : addr.line1 || '');
     setCity(addr.city || '');
     setStateProvince(addr.state || '');
@@ -564,28 +563,15 @@ export default function CheckoutPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="phone" className="text-xs font-bold text-gray-700">Phone Number</Label>
-                          <Input 
-                            id="phone"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                            placeholder="10-digit mobile number"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="email" className="text-xs font-bold text-gray-700">Email Address</Label>
-                          <Input 
-                            id="email"
-                            type="email"
-                            value={emailAddress}
-                            onChange={(e) => setEmailAddress(e.target.value)}
-                            className="h-10 text-xs bg-white focus:border-[#0d9488]"
-                            placeholder="name@example.com"
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-xs font-bold text-gray-700">Phone Number</Label>
+                        <Input 
+                          id="phone"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="h-10 text-xs bg-white focus:border-[#0d9488]"
+                          placeholder="10-digit mobile number"
+                        />
                       </div>
 
                       <div className="space-y-2">
@@ -661,7 +647,7 @@ export default function CheckoutPage() {
 
                   <div className="pt-4 border-t border-gray-150 flex justify-end">
                     <button 
-                      disabled={!firstName || !phone || !emailAddress || !streetAddress || !city || !zipPostal}
+                      disabled={!firstName || !phone || !streetAddress || !city || !zipPostal}
                       onClick={() => setCheckoutStep('payment')}
                       className="bg-[#fb641b] hover:bg-[#fb641b]/95 text-white font-bold h-11 px-8 rounded-sm text-xs tracking-wider uppercase border-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     >

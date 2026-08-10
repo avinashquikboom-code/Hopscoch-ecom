@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product/ProductCard';
 import {
-  Heart, Share2, Star, ChevronRight, Tag, MapPin, Truck,
+  Heart, Share2, Star, ChevronRight, ChevronLeft, Tag, MapPin, Truck,
   HelpCircle, X, Check, ShieldCheck, RotateCcw,
   ChevronDown, ChevronUp, Package, Clock, CreditCard,
   BadgeCheck, MessageSquare, ThumbsUp, Download, ZoomIn, Loader2, AlertCircle
@@ -44,6 +44,45 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
   const [descOpen, setDescOpen]           = useState(false);
   const [zoom, setZoom]                   = useState(false);
   const [zoomXY, setZoomXY]              = useState({ x: 50, y: 50 });
+  const [touchStart, setTouchStart]       = useState<number | null>(null);
+  const [touchEnd, setTouchEnd]           = useState<number | null>(null);
+
+  const minSwipeDistance = 40;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd || !product?.images?.length) return;
+    const distance = touchStart - touchEnd;
+    if (Math.abs(distance) > minSwipeDistance) {
+      if (distance > 0) {
+        setSelectedImage((prev) => (prev + 1) % product.images.length);
+      } else {
+        setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+      }
+    }
+  };
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (product?.images?.length && product.images.length > 1) {
+      setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (product?.images?.length && product.images.length > 1) {
+      setSelectedImage((prev) => (prev + 1) % product.images.length);
+    }
+  };
 
   // ── Review submission modal state ──
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -133,8 +172,14 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
 
   const doCheckPin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (/^\d{6}$/.test(pincode)) setPincodeMsg({ text: 'Delivery by Aug 8 · FREE Delivery', ok: true });
-    else setPincodeMsg({ text: 'Enter a valid 6-digit pincode', ok: false });
+    if (/^\d{6}$/.test(pincode)) {
+      const deliveryDate = new Date();
+      deliveryDate.setDate(deliveryDate.getDate() + 4);
+      const dateStr = deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      setPincodeMsg({ text: `Delivery by ${dateStr} · FREE Delivery`, ok: true });
+    } else {
+      setPincodeMsg({ text: 'Enter a valid 6-digit pincode', ok: false });
+    }
   };
 
   const doMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -191,17 +236,23 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
     );
   };
 
-  const specEntries = Object.entries({
-    'Brand':             product.brand || 'FCISeller',
-    'Material':          'Premium Cotton Blend',
-    'Fit':               'Regular Comfort Fit',
-    'Style Code':        `AC-${product.id.toUpperCase()}-01`,
-    'Occasion':          'Everyday Wear',
-    'Fabric Care':       'Gentle Machine Wash',
-    'Country of Origin': 'India',
-    'Pattern':           'Solid',
-    'Sleeve Length':     'Full Sleeve',
-  });
+  const specMap: Record<string, string> = {
+    'Brand': product.brand || 'FCISeller',
+  };
+  if (product.category) specMap['Category'] = product.category;
+  if (product.subcategory) specMap['Subcategory'] = product.subcategory;
+  if (product.gender) specMap['Ideal For'] = product.gender;
+  if (product.hsnCode) specMap['HSN Code'] = product.hsnCode;
+
+  if (product.specifications && Object.keys(product.specifications).length > 0) {
+    Object.entries(product.specifications).forEach(([k, v]) => {
+      if (v) specMap[k] = String(v);
+    });
+  } else {
+    specMap['Country of Origin'] = 'India';
+  }
+
+  const specEntries = Object.entries(specMap);
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
@@ -233,10 +284,28 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
             <div className="lg:sticky lg:top-[68px] space-y-2">
 
               {/* IMAGE CARD */}
-              <div className="bg-white border border-[#efefef]">
+              <div className="bg-white border border-[#efefef] flex flex-col sm:flex-row">
+
+                {/* Desktop & Tablet Vertical Thumbnails */}
+                {product.images && product.images.length > 0 && (
+                  <div className="hidden sm:flex flex-col gap-2 p-2 max-h-[520px] overflow-y-auto shrink-0 border-r border-[#f0f0f0]">
+                    {product.images.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedImage(i)}
+                        onMouseEnter={() => setSelectedImage(i)}
+                        className={`w-14 h-[64px] border-2 overflow-hidden cursor-pointer shrink-0 transition-all ${
+                          selectedImage === i ? 'border-[#0d9488]' : 'border-[#e0e0e0] hover:border-[#0d9488]/60'
+                        }`}
+                      >
+                        <img src={img} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover object-top" />
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Main image */}
-                <div className="relative">
+                <div className="relative flex-1 min-w-0">
                   {/* Wishlist + Share — top right overlay */}
                   <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
                     <button
@@ -270,19 +339,52 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                     </div>
                   )}
 
-                  {/* Main image with zoom */}
+                  {/* Main image with zoom & swipe */}
                   <div
-                    className="relative overflow-hidden cursor-zoom-in"
+                    className="relative overflow-hidden cursor-zoom-in touch-pan-y"
                     style={{ aspectRatio: '5/6' }}
                     onMouseMove={doMouseMove}
                     onMouseLeave={() => setZoom(false)}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
                   >
                     <img
                       src={product.images[selectedImage]}
                       alt={product.name}
-                      className="w-full h-full object-cover object-top"
+                      className="w-full h-full object-cover object-top select-none transition-all duration-300"
                       style={zoom ? { transform: 'scale(2)', transformOrigin: `${zoomXY.x}% ${zoomXY.y}%`, transition: 'transform 0.1s' } : { transition: 'transform 0.3s' }}
                     />
+
+                    {/* Navigation Arrows for direct sliding */}
+                    {product.images && product.images.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={handlePrevImage}
+                          aria-label="Previous Image"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#212121] shadow border border-[#e0e0e0] flex items-center justify-center cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                        >
+                          <ChevronLeft className="w-5 h-5 text-[#212121]" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleNextImage}
+                          aria-label="Next Image"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#212121] shadow border border-[#e0e0e0] flex items-center justify-center cursor-pointer transition-transform hover:scale-110 active:scale-95"
+                        >
+                          <ChevronRight className="w-5 h-5 text-[#212121]" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Image Counter Badge */}
+                    {product.images && product.images.length > 1 && (
+                      <div className="absolute bottom-2 right-2 z-10 bg-black/60 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                        {selectedImage + 1} / {product.images.length}
+                      </div>
+                    )}
+
                     {discount > 0 && (
                       <div className="absolute top-0 left-0 bg-[#26a541] text-white text-[11px] font-bold px-2 py-0.5">
                         {discount}% OFF
@@ -368,9 +470,8 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
                     {(product.rating || 0).toFixed(1)} <Star className="w-2.5 h-2.5 fill-current ml-0.5" />
                   </span>
                 </div>
-                <div className="grid grid-cols-3 mt-3 pt-3 border-t border-[#f0f0f0] gap-2">
+                <div className="grid grid-cols-2 mt-3 pt-3 border-t border-[#f0f0f0] gap-2">
                   {[
-                    { Icon: ShieldCheck, label: '7 Day\nReturn' },
                     { Icon: RotateCcw,   label: 'Easy\nExchange' },
                     { Icon: Truck,       label: 'Free\nDelivery' },
                   ].map(({ Icon, label }) => (
@@ -646,8 +747,7 @@ export default function ProductDetailsPage({ params }: { params: Promise<{ id: s
               <div className="space-y-4">
                 {[
                   { q: 'Is the colour same as shown in pictures?',    a: 'Yes, colours are accurate. Minor variation may occur due to screen settings.' },
-                  { q: 'Does this product have a warranty?',           a: '30-day manufacturing defect warranty from purchase date.' },
-                  { q: 'What is the return policy?',                   a: '7-day easy return/exchange. Item must be unused in original packaging.' },
+                  { q: 'What is the return policy?',                   a: 'Return only if defective product deliever please send percel opening video 360 degree on whatsApp 9601511596 for return' },
                 ].map(({ q, a }, i) => (
                   <div key={i} className="border-t border-[#f0f0f0] pt-4 first:border-0 first:pt-0">
                     <p className="text-[13px] font-semibold text-[#212121] flex gap-2 mb-1">

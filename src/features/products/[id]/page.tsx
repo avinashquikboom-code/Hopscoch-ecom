@@ -233,7 +233,7 @@ export default function ProductDetailsPage() {
             <div className="text-center">
               <RotateCcw className="w-6 h-6 mx-auto mb-2 text-blue-600" />
               <p className="text-sm font-medium">Easy Returns</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">7 days return</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Defective product return</p>
             </div>
           </div>
         </div>
