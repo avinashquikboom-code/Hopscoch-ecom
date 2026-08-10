@@ -277,8 +277,8 @@ export function Header() {
             <Link href="/products?category=Men" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Men</Link>
             <Link href="/products?category=Women" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Women</Link>
             <Link href="/products?category=Kids" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Kids</Link>
-            <Link href="/products?category=Accessories" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Accessories</Link>
-            <Link href="/products?category=Collections" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Collections</Link>
+            <Link href="/accessories" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Accessories</Link>
+            <Link href="/watches" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5">Watches</Link>
             <Link href="/studio" className="hover:text-[#0d9488] transition-colors border-b-4 border-transparent hover:border-[#0d9488] py-5 -my-5 flex items-center gap-0.5">
               <span>Studio</span>
               <sup className="text-[9px] font-black text-rose-500 tracking-normal ml-0.5 animate-pulse">NEW</sup>
@@ -594,8 +594,8 @@ export function Header() {
                   { label: 'Women', href: '/products?category=Women', icon: '👗' },
                   { label: 'Men', href: '/products?category=Men', icon: '👔' },
                   { label: 'Kids', href: '/products?category=Kids', icon: '🧸' },
-                  { label: 'Accessories', href: '/products?category=Accessories', icon: '🕶️' },
-                  { label: 'Collections', href: '/products?category=Collections', icon: '✨' },
+                  { label: 'Accessories', href: '/accessories', icon: '🕶️' },
+                  { label: 'Watches', href: '/watches', icon: '⌚' },
                   { label: 'Footwear', href: '/products?category=Footwear', icon: '👟' },
                 ].map((item) => (
                   <Link

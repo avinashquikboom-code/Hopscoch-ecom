@@ -181,9 +181,9 @@ export function Footer() {
               <li><Link href="/products?category=Women" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Women's Fashion</Link></li>
               <li><Link href="/products?category=Men" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Men's Apparel</Link></li>
               <li><Link href="/products?category=Kids" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Kids Wear</Link></li>
-              <li><Link href="/products?category=Accessories" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Luxury Accessories</Link></li>
+              <li><Link href="/accessories" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Luxury Accessories</Link></li>
               <li><Link href="/products?category=Footwear" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Footwear Collection</Link></li>
-              <li><Link href="/products?category=Collections" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Curated Collections</Link></li>
+              <li><Link href="/watches" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Watches Collection</Link></li>
               <li><Link href="/studio" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Runway Studio Drops</Link></li>
             </ul>
           </div>
