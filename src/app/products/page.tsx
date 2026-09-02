@@ -280,7 +280,7 @@ function ProductsContent() {
   // ── Filter & Sort ────────────────────────────────────────────────────────
   let filtered = [...mockProducts];
 
-  if (selectedCategory !== 'all') {
+  if (selectedCategory !== 'all' && selectedCategory.toLowerCase() !== 'collections' && selectedCategory.toLowerCase() !== 'all-products' && selectedCategory.toLowerCase() !== 'all products') {
     const targetLower = selectedCategory.toLowerCase().trim();
     // Normalize target category name (e.g. "MEN'S EDITION" -> "men", "WOMEN'S SPECIAL" -> "women", etc.)
     const cleanTarget = targetLower
@@ -288,9 +288,10 @@ function ProductsContent() {
       .replace(/special|edition|zone|spotlight|collection|crafted/g, '')
       .trim();
 
-    // Map Men/Women category queries to Boys/Girls & Gender DB schema representation
+    // Map Men/Women/Kids category queries
     const isMenTarget = cleanTarget === 'men' || cleanTarget === 'boy' || cleanTarget === 'boys' || cleanTarget === 'male';
     const isWomenTarget = cleanTarget === 'women' || cleanTarget === 'girl' || cleanTarget === 'girls' || cleanTarget === 'female';
+    const isKidsTarget = cleanTarget === 'kids' || cleanTarget === 'kid' || cleanTarget === 'children' || cleanTarget === 'baby';
 
     filtered = filtered.filter(p => {
       const getCatStr = (cat: any) => typeof cat === 'string' ? cat : (cat?.name || cat?.title || cat?.slug || '');
@@ -300,6 +301,7 @@ function ProductsContent() {
       const pCatIdStr = String((p as any).categoryId || (typeof p.category === 'object' ? (p.category as any)?.id : '')).toLowerCase().trim();
       const pParentCatIdStr = String((p as any).parentCategoryId || '').toLowerCase().trim();
       const pGenderUpper = String((p as any).gender || '').toUpperCase().trim();
+      const pAgeGroupUpper = String((p as any).ageGroup || '').toUpperCase().trim();
 
       // Gender alias matching (strictly for Men & Women categories)
       if (isMenTarget) {
@@ -307,6 +309,9 @@ function ProductsContent() {
       }
       if (isWomenTarget) {
         return pGenderUpper === 'FEMALE' || pGenderUpper === 'UNISEX' || (pCatLower.length > 0 && (pCatLower.includes('girl') || pCatLower.includes('women'))) || (pSubCatLower.length > 0 && (pSubCatLower.includes('girl') || pSubCatLower.includes('women')));
+      }
+      if (isKidsTarget) {
+        return pAgeGroupUpper === 'KID' || pAgeGroupUpper === 'INFANT' || (pCatLower.length > 0 && pCatLower.includes('kid')) || (pSubCatLower.length > 0 && pSubCatLower.includes('kid'));
       }
 
       // 1. Direct or partial match on category name, subcategory name, parent category name, or IDs

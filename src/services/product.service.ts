@@ -125,7 +125,7 @@ function applyFilters(products: Product[], filters?: ProductFilters): Product[] 
   let result = [...products];
   if (!filters) return result;
 
-  if (filters.category && filters.category !== 'all') {
+  if (filters.category && filters.category !== 'all' && filters.category.toLowerCase() !== 'collections' && filters.category.toLowerCase() !== 'all-products' && filters.category.toLowerCase() !== 'all products') {
     const targetLower = filters.category.toLowerCase().trim();
     result = result.filter((p) => {
       const pCat = ((p as any).category || '').toLowerCase().trim();
@@ -134,12 +134,16 @@ function applyFilters(products: Product[], filters?: ProductFilters): Product[] 
       const pCatId = String((p as any).categoryId || '').toLowerCase().trim();
       const pParentCatId = String((p as any).parentCategoryId || '').toLowerCase().trim();
       const pGender = String((p as any).gender || '').toUpperCase().trim();
+      const pAgeGroup = String((p as any).ageGroup || '').toUpperCase().trim();
 
-      if (targetLower === 'men' || targetLower === 'boys') {
-        return pGender === 'MALE' || (pCat.length > 0 && (pCat.includes('boy') || pCat.includes('men')));
+      if (targetLower === 'men' || targetLower === 'boys' || targetLower === 'male') {
+        return pGender === 'MALE' || pGender === 'UNISEX' || (pCat.length > 0 && (pCat.includes('boy') || pCat.includes('men'))) || (pSubCat.length > 0 && (pSubCat.includes('boy') || pSubCat.includes('men')));
       }
-      if (targetLower === 'women' || targetLower === 'girls') {
-        return pGender === 'FEMALE' || (pCat.length > 0 && (pCat.includes('girl') || pCat.includes('women')));
+      if (targetLower === 'women' || targetLower === 'girls' || targetLower === 'female') {
+        return pGender === 'FEMALE' || pGender === 'UNISEX' || (pCat.length > 0 && (pCat.includes('girl') || pCat.includes('women'))) || (pSubCat.length > 0 && (pSubCat.includes('girl') || pSubCat.includes('women')));
+      }
+      if (targetLower === 'kids' || targetLower === 'kid' || targetLower === 'children' || targetLower === 'baby') {
+        return pAgeGroup === 'KID' || pAgeGroup === 'INFANT' || (pCat.length > 0 && pCat.includes('kid')) || (pSubCat.length > 0 && pSubCat.includes('kid'));
       }
 
       return (
