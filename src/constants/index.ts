@@ -145,9 +145,9 @@ export const SOCIAL_LINKS = {
 
 // Contact Info
 export const CONTACT_INFO = {
-  EMAIL: 'support@fciseller.com',
+  EMAIL: 'fashioncityinidia18@gmail.com',
   PHONE: '+91 1800-123-4567',
-  ADDRESS: '123 E-commerce Street, Tech City, India - 560001',
+  ADDRESS: 'F/7 Jethabhai Park, Narayan Nagar Road, Paldi, Ahmedabad, Gujarat - 380007, India',
 } as const;
 
 // Currency

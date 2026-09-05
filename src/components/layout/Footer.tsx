@@ -239,11 +239,11 @@ export function Footer() {
                 </div>
                 <div className="flex items-center gap-2 text-gray-800 dark:text-gray-300 font-semibold">
                   <Mail className="w-3.5 h-3.5 text-[#0d9488] dark:text-teal-400 shrink-0" />
-                  <a href="mailto:support@fciseller.com" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">support@fciseller.com</a>
+                  <a href="mailto:fashioncityinidia18@gmail.com" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">fashioncityinidia18@gmail.com</a>
                 </div>
                 <div className="flex items-start gap-2 text-gray-500 dark:text-gray-400">
                   <MapPin className="w-3.5 h-3.5 text-[#0d9488] dark:text-teal-400 shrink-0 mt-0.5" />
-                  <span>FCI Towers, Tech Park, Bangalore - 560103, KA, India</span>
+                  <span>F/7 Jethabhai Park, Narayan Nagar Road, Paldi, Ahmedabad, Gujarat - 380007, India</span>
                 </div>
               </div>
             </div>
