@@ -200,6 +200,13 @@ export default function CheckoutPage() {
   const taxAmount = Number(cart?.taxAmount || 0);
   const total = Number(cart?.total !== undefined ? cart.total : (subtotal - discount + shippingCost + totalExclusiveTax));
 
+  const isCodAllowed = useMemo(() => {
+    return !cartItems.some((item: any) => {
+      const p = item.product;
+      return p && (p.isCodAllowed === false || p.codAllowed === false);
+    });
+  }, [cartItems]);
+
   const handleVerifyUpi = () => {
     if (upiId.includes('@')) {
       setIsUpiVerified(true);
@@ -672,14 +679,23 @@ export default function CheckoutPage() {
                       <CreditCard className="w-4 h-4" /> Online Payment (Razorpay)
                     </button>
                     <button
-                      onClick={() => setPaymentTab('cod')}
+                      onClick={() => isCodAllowed && setPaymentTab('cod')}
+                      disabled={!isCodAllowed}
                       className={`py-2.5 px-4 text-xs font-bold border-b-2 flex items-center gap-1.5 transition-all cursor-pointer ${
                         paymentTab === 'cod' ? 'border-[#0d9488] text-[#0d9488]' : 'border-transparent text-gray-500'
-                      }`}
+                      } ${!isCodAllowed ? 'opacity-40 cursor-not-allowed' : ''}`}
+                      title={!isCodAllowed ? 'COD unavailable for an item in your cart' : ''}
                     >
                       <ShoppingBag className="w-4 h-4" /> Cash on Delivery (COD)
+                      {!isCodAllowed && <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-bold ml-1">Disabled</span>}
                     </button>
                   </div>
+
+                  {!isCodAllowed && (
+                    <div className="text-xs bg-amber-50 border border-amber-200 text-amber-800 p-2.5 rounded-sm">
+                      ⚠️ Cash on Delivery (COD) is not available for one or more items in your cart. Please complete your purchase using Online Payment.
+                    </div>
+                  )}
 
                   <div className="p-4 bg-gray-50 border border-gray-150 rounded-sm">
                     {paymentTab === 'razorpay' && (
