@@ -7,12 +7,25 @@ import {
   ArrowLeft, Package, Truck, CheckCircle, Clock, XCircle,
   MapPin, CreditCard, Star, RefreshCw, PhoneCall,
   ChevronRight, Download, MessageSquare, RotateCcw, ShieldCheck, Loader2,
-  Copy, Check, FileText, AlertTriangle, Upload, X
+  Copy, Check, FileText, AlertTriangle, Upload, X, ExternalLink
 } from 'lucide-react';
 import { useOrder, useCancelOrder, useReturnOrder } from '@/hooks/use-orders';
 import { orderService } from '@/services';
 import { toast } from '@/components/ui/toast';
 import { resolveImageUrl } from '@/lib/utils';
+
+function getTrackingLink(courier?: string, awb?: string, directUrl?: string): string {
+  if (directUrl && directUrl.startsWith('http')) return directUrl;
+  const c = (courier || '').toLowerCase();
+  const a = awb || '';
+  if (c.includes('delhivery')) return `https://www.delhivery.com/track/package/${a}`;
+  if (c.includes('bluedart')) return `https://www.bluedart.com/tracking?handler=tnt&action=custtrack&trackid=${a}`;
+  if (c.includes('dtdc')) return `https://www.dtdc.in/tracking/shipment-tracking.asp?trkType=awb&strCnno=${a}`;
+  if (c.includes('xpressbees')) return `https://www.xpressbees.com/track?isAwb=true&trackid=${a}`;
+  if (c.includes('india post') || c.includes('speed post')) return `https://www.indiapost.gov.in/_layouts/15/dpt.cpt.trackconsignment/tracking.aspx`;
+  if (c.includes('shiprocket')) return `https://shiprocket.co/tracking/${a}`;
+  return `https://www.google.com/search?q=${encodeURIComponent(`${courier || ''} ${a} tracking`.trim())}`;
+}
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; Icon: any }> = {
   pending:           { label: 'Pending',           color: 'text-amber-700 dark:text-amber-400',   bg: 'bg-amber-50 dark:bg-amber-950/40',   border: 'border-amber-200 dark:border-amber-800',   Icon: Clock },
@@ -123,7 +136,9 @@ export default function OrderDetailPage() {
   const shipping = Number((order as any).shippingFee || (order as any).shipping || 0);
   const discount = Number((order as any).discountAmount || (order as any).discount || 0);
   const paymentMethod = ((order as any).paymentMethod || 'COD').toUpperCase();
-  const trackingNumber = (order as any).trackingNumber;
+  const trackingNumber = (order as any).awbNumber || (order as any).trackingNumber || (order as any).shipment?.awbNumber || (order as any).shipment?.trackingNumber;
+  const courierName = (order as any).courierName || (order as any).shipment?.courierName || (order as any).courier;
+  const trackingUrl = (order as any).trackingUrl || (order as any).shipment?.trackingUrl;
 
   const canCancel = ['pending', 'payment_pending', 'confirmed', 'processing'].includes(statusKey);
   const canReturn = statusKey === 'delivered';
@@ -201,15 +216,37 @@ export default function OrderDetailPage() {
               <h2 className="text-base font-bold text-slate-900 dark:text-white">Delivery Tracker</h2>
               <p className="text-xs text-slate-500">Live order status and fulfillment progress</p>
             </div>
-            {trackingNumber && (
+            {trackingNumber ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <Truck className="w-4 h-4 text-teal-600" />
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    {courierName ? `${courierName} • ` : ''}AWB: <span className="font-mono font-bold">{trackingNumber}</span>
+                  </span>
+                  <button
+                    onClick={copyTracking}
+                    title="Copy AWB"
+                    className="p-1 text-slate-400 hover:text-teal-600 transition-colors"
+                  >
+                    {copiedTracking ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+                <a
+                  href={getTrackingLink(courierName, trackingNumber, trackingUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-xs"
+                >
+                  Track Order
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            ) : courierName ? (
               <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
                 <Truck className="w-4 h-4 text-teal-600" />
-                <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-300">AWB: {trackingNumber}</span>
-                <button onClick={copyTracking} className="p-1 text-slate-400 hover:text-teal-600">
-                  {copiedTracking ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                </button>
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Courier: {courierName}</span>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* Stepper Progress Bar */}

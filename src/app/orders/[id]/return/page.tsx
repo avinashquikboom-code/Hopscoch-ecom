@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight, Package, CheckCircle, Loader2 } from 'lucide-react';
 
-import { useReturnOrder } from '@/hooks';
+import { useReturnOrder, useOrder } from '@/hooks';
 
 const RETURN_REASONS = [
   { id: 'size', label: 'Wrong size / fit issue', emoji: '📏' },
@@ -39,6 +39,12 @@ export default function ReturnPage() {
   const [selectedPickup, setSelectedPickup] = useState('tomorrow_am');
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const { data: order } = useOrder(cleanId);
+  const addr = (order as any)?.shippingAddress;
+  const pickupAddress = typeof addr === 'string'
+    ? addr
+    : [addr?.fullName, addr?.streetAddress || addr?.address, addr?.city, addr?.state, addr?.zipCode || addr?.pincode].filter(Boolean).join(', ') || 'Original Delivery Address';
 
   const returnOrderMutation = useReturnOrder();
 
@@ -242,7 +248,7 @@ export default function ReturnPage() {
                 { label: 'Return Reason', value: RETURN_REASONS.find(r => r.id === selectedReason)?.label || '' },
                 { label: 'Refund Method', value: REFUND_METHODS.find(r => r.id === selectedRefund)?.label || '' },
                 { label: 'Pickup Slot', value: `${PICKUP_SLOTS.find(s => s.id === selectedPickup)?.label} · ${PICKUP_SLOTS.find(s => s.id === selectedPickup)?.time}` },
-                { label: 'Pickup Address', value: '42 Sunshine Lane, Koregaon Park, Pune – 411001' },
+                { label: 'Pickup Address', value: pickupAddress },
               ].map(({ label, value }) => (
                 <div key={label} className="flex items-start justify-between gap-4 px-5 py-4">
                   <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider flex-shrink-0">{label}</span>
