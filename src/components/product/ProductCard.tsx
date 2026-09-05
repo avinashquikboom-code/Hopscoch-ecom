@@ -37,6 +37,12 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : undefined;
 
+  const availableSizes = (product.sizes && product.sizes.length > 0)
+    ? product.sizes
+    : (product.variants && product.variants.length > 0)
+      ? Array.from(new Set(product.variants.map((v: any) => v.size).filter(Boolean))) as string[]
+      : DEFAULT_SIZES;
+
   // === Offer badge priority stack ==========================================
   // Rules: max 2 badges shown, priority: OUT_OF_STOCK > NEW > TRENDING > FEATURED > high_discount > sale
   const topBadges: { label: string; className: string }[] = [];
@@ -191,15 +197,15 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
               <span className="text-[#0d9488] flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> View Details</span>
             </div>
             
-            <div className="flex justify-between gap-1.5">
-              {DEFAULT_SIZES.map((size) => (
+            <div className="flex justify-between gap-1.5 flex-wrap">
+              {availableSizes.slice(0, 5).map((size) => (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   key={size}
                   onClick={(e) => handleQuickAddSize(e, size)}
                   disabled={product.stock === 0}
-                  className="flex-1 min-h-[32px] bg-white dark:bg-neutral-900 hover:bg-[#0d9488]/5 dark:hover:bg-[#0d9488]/10 border border-gray-200/80 dark:border-neutral-800 hover:border-[#0d9488] text-gray-700 dark:text-gray-300 hover:text-[#0d9488] text-xs font-bold rounded-xl transition-colors disabled:opacity-40"
+                  className="flex-1 min-h-[32px] bg-white dark:bg-neutral-900 hover:bg-[#0d9488]/5 dark:hover:bg-[#0d9488]/10 border border-gray-200/80 dark:border-neutral-800 hover:border-[#0d9488] text-gray-700 dark:text-gray-300 hover:text-[#0d9488] text-xs font-bold rounded-xl transition-colors disabled:opacity-40 px-1"
                 >
                   {size}
                 </motion.button>

@@ -32,7 +32,12 @@ const RATING_OPTIONS = [
   { value: 3, label: '3★ & above'  },
 ];
 
-const SIZES = ['S', 'M', 'L', 'XL'];
+const SIZES = [
+  'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '4XL', '5XL',
+  'Free Size', 'One Size',
+  '28', '30', '32', '34', '36', '38', '40',
+  '5', '6', '7', '8', '9', '10', '11', '12',
+];
 const COLORS = ['Teal', 'Slate', 'Blue', 'Red', 'Green', 'White'];
 const MATERIALS = ['Cotton', 'Linen', 'Silk', 'Wool', 'Leather'];
 const FABRICS = ['Pashmina', 'Velvet', 'Crepe', 'Georgette', 'Denim'];
