@@ -207,7 +207,7 @@ export function Footer() {
               <li><Link href="/orders" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Track Order Package</Link></li>
               <li><Link href="/orders" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Returns &amp; Exchange</Link></li>
               <li><Link href="/return-policy" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Refund Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Shipping Terms</Link></li>
+              <li><Link href="/help" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Help Center</Link></li>
               <li><Link href="/faq" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">Help &amp; FAQs</Link></li>
             </ul>
           </div>
@@ -235,7 +235,7 @@ export function Footer() {
               <div className="pt-2 border-t border-gray-200 dark:border-gray-800/80 space-y-2 text-[11px]">
                 <div className="flex items-center gap-2 text-gray-800 dark:text-gray-300 font-semibold">
                   <Phone className="w-3.5 h-3.5 text-[#0d9488] dark:text-teal-400 shrink-0" />
-                  <a href="tel:+9118001234567" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">+91 1800-123-4567</a>
+                  <a href="tel:+919601511596" className="hover:text-[#0d9488] dark:hover:text-teal-400 transition-colors">+91 96015 11596</a>
                 </div>
                 <div className="flex items-center gap-2 text-gray-800 dark:text-gray-300 font-semibold">
                   <Mail className="w-3.5 h-3.5 text-[#0d9488] dark:text-teal-400 shrink-0" />

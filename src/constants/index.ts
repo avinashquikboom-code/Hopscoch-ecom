@@ -146,7 +146,7 @@ export const SOCIAL_LINKS = {
 // Contact Info
 export const CONTACT_INFO = {
   EMAIL: 'fashioncityinidia18@gmail.com',
-  PHONE: '+91 1800-123-4567',
+  PHONE: '+91 96015 11596',
   ADDRESS: 'F/7 Jethabhai Park, Narayan Nagar Road, Paldi, Ahmedabad, Gujarat - 380007, India',
 } as const;
 

@@ -114,7 +114,7 @@ export default function ContactPage() {
                 <Mail className="w-5 h-5 mt-1 text-blue-600" />
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">Email</p>
-                  <p className="text-gray-600 dark:text-gray-400">{CONTACT_INFO.EMAIL}</p>
+                  <a href={`mailto:${CONTACT_INFO.EMAIL}`} className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">{CONTACT_INFO.EMAIL}</a>
                 </div>
               </div>
 
@@ -122,7 +122,7 @@ export default function ContactPage() {
                 <Phone className="w-5 h-5 mt-1 text-blue-600" />
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">Phone</p>
-                  <p className="text-gray-600 dark:text-gray-400">{CONTACT_INFO.PHONE}</p>
+                  <a href={`tel:${CONTACT_INFO.PHONE.replace(/\s+/g, '')}`} className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-semibold">{CONTACT_INFO.PHONE}</a>
                 </div>
               </div>
 
