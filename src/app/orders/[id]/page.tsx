@@ -7,7 +7,7 @@ import {
   ArrowLeft, Package, Truck, CheckCircle, Clock, XCircle,
   MapPin, CreditCard, Star, RefreshCw, PhoneCall,
   ChevronRight, Download, MessageSquare, RotateCcw, ShieldCheck, Loader2,
-  Copy, Check, FileText, AlertTriangle, Upload, X, ExternalLink
+  Copy, Check, FileText, AlertTriangle, Upload, X, ExternalLink, Info
 } from 'lucide-react';
 import { useOrder, useCancelOrder, useReturnOrder } from '@/hooks/use-orders';
 import { orderService } from '@/services';
@@ -226,7 +226,7 @@ export default function OrderDetailPage() {
                   <button
                     onClick={copyTracking}
                     title="Copy AWB"
-                    className="p-1 text-slate-400 hover:text-teal-600 transition-colors"
+                    className="p-1 text-slate-400 hover:text-teal-600 transition-colors cursor-pointer"
                   >
                     {copiedTracking ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
@@ -237,16 +237,16 @@ export default function OrderDetailPage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-semibold transition-colors shadow-xs"
                 >
-                  Track Order
+                  Track Shipment
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
-            ) : courierName ? (
-              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                <Truck className="w-4 h-4 text-teal-600" />
-                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Courier: {courierName}</span>
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>Tracking information will be available after shipment.</span>
               </div>
-            ) : null}
+            )}
           </div>
 
           {/* Stepper Progress Bar */}
