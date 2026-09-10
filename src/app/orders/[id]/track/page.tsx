@@ -7,6 +7,7 @@ import { ArrowLeft, CheckCircle, Clock, Truck, Package, MapPin, Copy, Check, Ext
 
 import { API_BASE } from '@/constants';
 import { fetchWithAuth } from '@/lib/api-client';
+import { toast } from '@/components/ui/toast';
 
 export default function TrackOrderPage() {
   const params = useParams();
@@ -72,6 +73,7 @@ export default function TrackOrderPage() {
     if (!trackingInfo.trackingNumber || trackingInfo.trackingNumber === 'Pending') return;
     navigator.clipboard.writeText(trackingInfo.trackingNumber);
     setCopied(true);
+    toast.success('AWB copied');
     setTimeout(() => setCopied(false), 2000);
   };
 

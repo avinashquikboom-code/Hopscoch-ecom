@@ -147,7 +147,7 @@ export default function OrderDetailPage() {
     if (trackingNumber) {
       navigator.clipboard.writeText(trackingNumber);
       setCopiedTracking(true);
-      toast.success('Tracking number copied to clipboard!');
+      toast.success('AWB copied');
       setTimeout(() => setCopiedTracking(false), 2000);
     }
   };
