@@ -49,6 +49,11 @@ export const API_ENDPOINTS = {
   // Coupons
   COUPONS: '/coupons',
   VALIDATE_COUPON: '/coupons/validate',
+
+  // Policies
+  POLICY_CATEGORIES: '/policy-categories',
+  POLICIES: '/policies',
+  POLICY_BY_SLUG: (slug: string) => `/policies/${slug}`,
 } as const;
 
 // Pagination

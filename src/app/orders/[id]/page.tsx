@@ -220,7 +220,7 @@ export default function OrderDetailPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
                   <Truck className="w-4 h-4 text-teal-600" />
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 break-all">
                     {courierName ? `${courierName} • ` : ''}AWB: <span className="font-mono font-bold">{trackingNumber}</span>
                   </span>
                   <button
