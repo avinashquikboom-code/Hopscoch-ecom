@@ -309,7 +309,7 @@ export default function CheckoutPage() {
               key: keyId,
               amount: paiseAmount,
               currency: currency,
-              name: 'FCI SELLER',
+              name: 'Fashion City India Ltd',
               description: `Order ${createdOrder.orderNumber}`,
               order_id: razorpayOrderId,
               handler: async function (response: any) {
